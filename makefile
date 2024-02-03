@@ -76,16 +76,6 @@ else
 	engine_control_build_target = $(engine_control_release_build_target)
 endif
 
-# Targets
-
-control_room_targets = $(addprefix $(control_room_build_path)/, $(addsuffix .o, $(control_room_filenames)))
-# control_room_cpp_files = $(addprefix $(control_room_src)/, $(addsuffix .cpp, $(control_room_filenames)))
-# control_room_hpp_files = $(addprefix $(control_room_src)/, $(addsuffix .hpp, $(control_room_filenames)))
-
-engine_control_targets = $(addprefix $(engine_control_build_path)/, $(addsuffix .o, $(engine_control_filenames)))
-# engine_control_cpp_files = $(addprefix $(engine_control_src)/, $(addsuffix .cpp, $(engine_control_filenames)))
-# engine_control_hpp_files = $(addprefix $(engine_control_src)/, $(addsuffix .hpp, $(engine_control_filenames)))
-
 # Rules
 
 all: control_room engine_control
@@ -95,22 +85,22 @@ clean:
 	mkdir -p build
 	cd build; mkdir -p control_room/release; mkdir -p control_room/debug; mkdir -p engine_control/release; mkdir -p engine_control/debug
 
-control_room:  $(control_room_build_path)/main.o $(control_room_targets)
+control_room:  $(control_room_build_path)/main.o $(patsubst %, $(control_room_build_path)/%.o, $(control_room_filenames))
 	$(control_room_compiler) $(control_room_config_flags) $(control_room_linker_flags) -o $(control_room_build_path)/$(control_room_build_target) $^
 
 $(control_room_build_path)/main.o: $(control_room_src)/main.cpp
 	$(control_room_compiler) $(control_room_config_flags) -c -o $@ $<
 
-$(control_room_targets): $(control_room_build_path)/%.o: $(control_room_src)/%.cpp $(control_room_src)/%.hpp
+$(control_room_build_path)/%.o: $(control_room_src)/%.cpp $(control_room_src)/%.hpp
 	$(control_room_compiler) $(control_room_config_flags) -c -o $@ $<
 
-engine_control: $(engine_control_build_path)/main.o $(engine_control_targets)
+engine_control: $(engine_control_build_path)/main.o $(patsubst %, $(engine_control_build_path)/%.o, $(engine_control_filenames))
 	$(engine_control_compiler) $(engine_control_config_flags) $(engine_control_linker_flags) -o $(engine_control_build_path)/$(engine_control_build_target) $^
 
 $(engine_control_build_path)/main.o: $(engine_control_src)/main.cpp 
 	$(engine_control_compiler) $(engine_control_config_flags) -c -o $@ $<
 
-$(engine_control_targets): $(engine_control_build_path)/%.o: $(engine_control_src)/%.cpp $(engine_control_src)/%.hpp
+$(engine_control_build_path)/%.o: $(engine_control_src)/%.cpp $(engine_control_src)/%.hpp
 	$(engine_control_compiler) $(engine_control_config_flags) -c -o $@ $<
 
 
