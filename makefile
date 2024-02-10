@@ -5,7 +5,7 @@ debug = 1
 # Control Room
 control_room_src = src/control_room
 # Names of files to be compiled for the control room, without the .cpp extension
-control_room_filenames := 
+control_room_filenames := SerialCommunicator
 
 control_room_release_compiler = g++
 control_room_release_config_flags= -O3 -s -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused 
