@@ -24,7 +24,7 @@ public:
     ~SerialCommunicator();
 
     void write_data(const char *data) override;
-    ssize_t read_data(char *&buffer, size_t size) override;
+    int read_data(char *&buffer, size_t size) override;
 
     bool isOpen() { return this->is_open; }
 };

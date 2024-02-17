@@ -89,7 +89,7 @@ void SerialCommunicator::write_data(const char *data)
     write(fd, data, strlen(data));
 }
 
-ssize_t SerialCommunicator::read_data(char *&buffer, size_t size)
+int SerialCommunicator::read_data(char *&buffer, size_t size)
 {
     return read(fd, buffer, size);
 }
