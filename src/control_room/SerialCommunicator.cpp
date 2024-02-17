@@ -19,16 +19,24 @@ SerialCommunicator::SerialCommunicator(const char *port, speed_t baudrate)
 
     if (this->fd < 0)
     {
-        std::cerr << "Error " << errno << " opening " << port << ": " << strerror(errno) << std::endl;
-        return;
+        throw std::runtime_error("Error " + std::to_string(errno) + " opening " + port + ": " + strerror(errno));
     }
 
+    try{
+        this->setup_port();
+    } catch (std::exception &e) {
+        close(this->fd);
+        throw e;
+    }    
+}
+
+void SerialCommunicator::setup_port() {
     // Get current serial port settings
     memset(&this->tty, 0, sizeof(this->tty));
 
     if (tcgetattr(this->fd, &this->tty) != 0)
     {
-        std::cerr << "Error " << errno << " from tcgetattr: " << strerror(errno) << std::endl;
+        std::cerr << "Error " << errno << " unable to get old tty config from tcgetattr: " << strerror(errno) << std::endl;
     }
 
     // Save old serial port settings
@@ -39,7 +47,7 @@ SerialCommunicator::SerialCommunicator(const char *port, speed_t baudrate)
     this->tty.c_cflag &= (tcflag_t)~CSTOPB;        // Clear stop field, only one stop bit used in communication (most common)
     this->tty.c_cflag &= (tcflag_t)~CSIZE;         // Clear all the size bits
     this->tty.c_cflag |= (tcflag_t)CS8;            // 8 bits per byte (most common)
-    this->tty.c_cflag &= (tcflag_t)CRTSCTS;        // Enable RTS/CTS hardware flow control to ensure no data is lost
+    this->tty.c_cflag &= (tcflag_t)~CRTSCTS;       // Disable RTS/CTS hardware flow control to ensure no data is lost
     this->tty.c_cflag |= (tcflag_t)CREAD | CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
 
     // Setting Local Modes
@@ -67,34 +75,21 @@ SerialCommunicator::SerialCommunicator(const char *port, speed_t baudrate)
     // Save tty settings, also checking for error
     if (tcsetattr(this->fd, TCSANOW, &this->tty) != 0)
     {
-        std::cerr << "Error " << errno << " from tcsetattr: " << strerror(errno) << std::endl;
+        throw std::runtime_error("Error " + std::to_string(errno) + " from tcsetattr: " + strerror(errno));
     }
-
-    this->is_open = true;
 }
 
 SerialCommunicator::~SerialCommunicator()
 {
-    if (this->is_open)
-    {
-        close(this->fd);
-    }
+    close(this->fd);
 }
 
 void SerialCommunicator::write_data(const char *data)
 {
-    if (this->is_open)
-    {
-        write(fd, data, strlen(data));
-    }
+    write(fd, data, strlen(data));
 }
 
-int SerialCommunicator::read_data(char *&buffer, size_t size)
+ssize_t SerialCommunicator::read_data(char *&buffer, size_t size)
 {
-    if (this->is_open)
-    {
-        int n = read(fd, buffer, size);
-        return n;
-    }
-    return -1;
+    return read(fd, buffer, size);
 }

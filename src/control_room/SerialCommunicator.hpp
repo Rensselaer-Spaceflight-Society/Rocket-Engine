@@ -17,12 +17,14 @@ private:
     struct termios tty_old;
     bool is_open;
 
+    void setup_port();
+
 public:
     SerialCommunicator(const char *port, speed_t baudrate);
     ~SerialCommunicator();
 
     void write_data(const char *data) override;
-    int read_data(char *&buffer, size_t size) override;
+    ssize_t read_data(char *&buffer, size_t size) override;
 
     bool isOpen() { return this->is_open; }
 };
