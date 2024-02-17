@@ -2,10 +2,12 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/screen/screen.hpp>
 
-
-
 int main()
 {
-	std::cout << "Engine Control" << std::endl;
+	using namespace ftxui;
+	Screen screen = Screen::Create(Dimension::Full());
+	Element elements = text(L"Hello World");
+	Render(screen, elements);
+	screen.Print();
 	return 0;
 }
