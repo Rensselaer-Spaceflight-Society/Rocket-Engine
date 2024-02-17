@@ -4,10 +4,11 @@
 
 int main()
 {
-	using namespace ftxui;
-	Screen screen = Screen::Create(Dimension::Full());
-	Element elements = text(L"Hello World");
-	Render(screen, elements);
-	screen.Print();
-	return 0;
+	std::cout << "Hello World" << std::endl;
+	// using namespace ftxui;
+	// Screen screen = Screen::Create(Dimension::Full());
+	// Element elements = text(L"Hello World");
+	// Render(screen, elements);
+	// screen.Print();
+	// return 0;
 }

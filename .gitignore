@@ -1,1 +1,42 @@
-build
+# CMake build directory
+build/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+*.cmake
+
+# Generated binaries/executables
+*.exe
+*.out
+*.dll
+*.so
+*.dylib
+
+# Generated libraries
+*.lib
+*.a
+
+# Generated object files
+*.o
+*.obj
+
+# Visual Studio specific files
+.vscode/
+*.sln
+*.vcxproj
+*.vcproj
+*.pdb
+
+# Xcode specific files
+*.xcodeproj/
+*.xcworkspace/
+
+# Sublime Text specific files
+*.sublime-workspace
+
+# macOS specific files
+.DS_Store
