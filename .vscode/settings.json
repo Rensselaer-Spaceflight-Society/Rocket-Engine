@@ -4,5 +4,7 @@
         "ostream": "cpp",
         "stdexcept": "cpp",
         "iosfwd": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false,
+    "C_Cpp.errorSquiggles": "disabled"
 }

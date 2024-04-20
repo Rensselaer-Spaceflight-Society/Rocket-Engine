@@ -62,6 +62,6 @@ Element CreateGraphLayout()
 Element CreateControlsLayout()
 {
     return hbox({
-        text("Controls") | bold | center | flex,
+        text("10:00") | center | flex,
     });
 }
