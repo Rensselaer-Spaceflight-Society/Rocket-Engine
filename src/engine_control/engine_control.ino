@@ -26,10 +26,6 @@ sensors sensorData = {0};
 char dataIn[16];
 char dataOut[sizeof(sensors)];
 
-void readSenors(sensors& sensorData);
-void abortProcedure();
-void sendSensorData(sensors * sensorPtr);
-
 void setup() {
   Serial1.begin(BAUD_RATE);
 
@@ -84,8 +80,8 @@ void setup() {
         abortProcedure();
       }
     }
-    // readSensors(sensorData);
-    // sendSensorData(&sensorData);
+    readSensors(sensorData);
+    sendSensorData(&sensorData);
   }
 
   if (strcmp(dataIn, HOLD_CONTINUE) != 0) {
