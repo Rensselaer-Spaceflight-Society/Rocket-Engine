@@ -15,11 +15,11 @@
 #define AUTO_HOLD "AutoHold"
 #define ABORT_SIG "RCAbort!"
 
-typedef struct Sensors_Struct
+typedef struct
 {
-  double loadCell;
-  double pressure[6];
-  double thermocouple;
+  float loadCell;
+  float thermocouple;
+  float pressure[6];
 } sensors;
 
 sensors sensorData = {0};
@@ -119,7 +119,7 @@ void setup()
   }
 
   // TODO: Replace with actual ignition sequence
-  Serial.println("Ignition"); 
+  Serial.println("Ignition");
 }
 
 void loop()
@@ -127,13 +127,13 @@ void loop()
   if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) // Check if the control room has sent a signal
   {
     Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE); // Read the signal
-    if (strcmp(dataIn, ABORT_SIG) == 0) // Check if the control room has sent an abort signal
+    if (strcmp(dataIn, ABORT_SIG) == 0)                   // Check if the control room has sent an abort signal
     {
       abortProcedure(); // Abort the procedure
     }
   }
 
-  readSensors(sensorData);    // Read the sensors
+  readSensors(sensorData);     // Read the sensors
   sendSensorData(&sensorData); // Send the sensor data
 }
 
@@ -152,7 +152,7 @@ void readSensors(sensors &sensorData)
 
 void abortProcedure()
 {
-  // Replace with proper abort procedure
+  // TODO: Replace with proper abort procedure
   Serial.println("RCAborted");
   while (true)
   {
