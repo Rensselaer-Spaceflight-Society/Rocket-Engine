@@ -1,13 +1,14 @@
 # RPU Systems Design and Communications Protocol V1.0.0
 
 > [!IMPORTANT]
-> Last Updated: 5/8/2024
+> Last Updated: 7/22/2024
 
 Below is a brief overview of the design and communications protocol between our laptop acting as our remote interface (i.e. the control room) and the Rocket Engine Test Stand itself.
 
 ## Table of Contents
  - [Control Room](#control-room)
  - [Test Stand Controller](#test-stand-controller)
+ - [Powering the Test Stand](#powering-the-test-stand)
  - [Sensors](#sensors)
  - [Valves](#valves)
  - [Communications](#communications)
@@ -54,6 +55,20 @@ The rocket engine controller is an Arduino based platform that controls the phys
 - Ignition and Shutoff Sequence
 - Processing Control Signals
 
+## Powering the Test Stand
+
+We have a variety of electronics that need power:
+
+- Solenoid Valves, 48W (12vdc @4A)
+- Arduino, 1W (12vdc @0.08333)
+- Sensors, 5W (5v @1A)
+
+The sensors need 5v, but everything else needs 12v, fortunately, the Arduino's power regulation will step the power down to 5v for the sensors.
+
+Its really hard to send 60w @ 12vdc over 300ft, so we decided that battery power is our best bet for powering the test stand. Lithium Iron Phosphate (LiFePO4) batteries show the best potential for delivering both the voltage and current that the test stand will need.
+
+The use of battery power allows us to set our downrange distance anywhere from 300ft (100m) - 3400ft (1000m).
+
 ### Technologies
 
 This is built on the Arduino platform for easy and plentiful I/O. Arduino provides plenty of digital and analog pins for reading sensors and controlling valves. It also provides simple serial communications over UART.
@@ -86,11 +101,10 @@ The thermocouple and load cell both have amplifiers that act as analog-digital c
 
 ## Valves
 
-From what I understand, the valves are 12V solenoids, we will have to review with the fluids / propulsion teams to determine the quantity of valves.
+We are using three 12v solenoid valves that operate at 1.33 amps. This is simply too much power to send over a wire with our budget. See the power section for more information.
 
-Since these are 12V valves, and the Arduino is a 5V board, we are going to need to figure out how to change the voltage.
-
-In my opinion the best way to handle this will be by sending a 12V source to the rocket engine, and using some relays to open or close the valves. This still needs to be decided.
+Power will be delivered to the solenoids via solid-state relays, this allows the 
+5v logic level of the Arduino power the relays reliably.
 
 
 ## Communications
