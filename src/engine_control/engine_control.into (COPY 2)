@@ -1,33 +1,31 @@
-#include <iostream>
-#include <string>
 #include <array>
-#include <chrono>
-#include <cstdlib>
-
-using namespace std;
-
 
 constexpr int CONTROL_ROOM_RESPONSE_SIZE{8};
 constexpr int BAUD_RATE{9600};
 
-constexpr char CTRL_ACTI[] = "CtrlActi"; //Control Activities
-constexpr char TEST_ACTI[] = "TestActi"; //Test Activities
+constexpr char CTRL_ACTI[] = "CtrlActi";  // Control Activities
+constexpr char TEST_ACTI[] = "TestActi";  // Test Activities
 
-
-array<char, 16> dataIn;
-string incoming_Signal;
+std::array<char, 16> dataIn;
+String incoming_Signal;
 
 void setup() {
-    Serial1.begin(BAUD_RATE); //Start Serial1 for communication with Control Room
+    Serial1.begin(BAUD_RATE);  // Start Serial1 for communication with Control Room
     
     // Send TestActi until we receive CtrlActi
     while (incoming_Signal != CTRL_ACTI) {
         if (Serial1.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
-            Serial1.readBytes(dataIn.data(), CONTROL_ROOM_RESPONSE_SIZE); //Read incoming signal into dataIn array
-            incoming_Signal = string(dataIn.data(), CONTROL_ROOM_RESPONSE_SIZE); //Convert the array to a string
+            Serial1.readBytes(dataIn.data(), CONTROL_ROOM_RESPONSE_SIZE);  // Read incoming signal into dataIn array
+            incoming_Signal = String(dataIn.data());  // Convert the array to an Arduino String
             continue;
         }
-        Serial1.print(TEST_ACTI);
+        Serial1.print(TEST_ACTI);  // Send TestActi
         delay(1000);
     }
+    
+    Serial.println("Comms Established!");
+}
+
+void loop() {
+    // Main loop code can go here
 }
