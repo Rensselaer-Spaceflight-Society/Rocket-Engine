@@ -9,6 +9,7 @@ constexpr char CTRL_ACTI[] = "CtrlActi";
 constexpr char TEST_ACTI[] = "TestActi";
 constexpr char LOG_STR[] = "LogStart";
 constexpr char INERT_FLW[] = "InertFlw"; //Inert Gas Flowing
+constexpr char SH_DWN[] = "Shutdown";
 constexpr char ABORT_SIG[] = "AbortStp" //Terminate
 
 char dataIn[16];  //Using a regular C-style array
@@ -137,9 +138,9 @@ const int oxidizer_valves1{10};
 const int oxidizer_valves2{11};
 const int oxidizer_valves3{12};
 
-const int fuel_valves1 = 13;
-const int fuel_valves2 = A0;
-const int fuel_valves3 = A1;
+const int fuel_valves1{13};
+const int fuel_valves2{14};
+const int fuel_valves3{15};
 
 void Ignition() {
   if (incoming_Signal == IGN) {
@@ -175,5 +176,31 @@ void Ignition() {
     }
   } else {
     Serial.println("Invalid Signal. Waiting for Ignition...");
+  }
+}
+
+void Shutdown() {
+  if (incoming_String == SH_DWN) {
+    Serial.println("Shutdown");
+    // Close oxidizer valves
+    digitalWrite(oxidizer_valves1, LOW);
+    digitalWrite(oxidizer_valves2, LOW);
+    digitalWrite(oxidizer_valves3, LOW);
+    // Close fuel valves
+    digitalWrite(fuel_valves1, LOW);
+    digitalWrite(fuel_valves2, LOW);
+    digitalWrite(fuel_valves3, LOW);
+    //Perform another inert gas flush (for safety)
+    Serial.println("Inert gas flush starts");
+    digitalWrite(valve1, HIGH);
+    digitalWrite(valve2, HIGH);
+    digitalWrite(valve3, HIGH);
+    delay(5000); //Keep the inert gas flush for 5 seconds
+    //Close the inert gas flush after
+    digitalWrite(valve1, LOW);
+    digitalWrite(valve2, LOW);
+    digitalWrite(valve3, LOW);
+    
+    Serial.println("Inert gas flush stops. Shutdown complete.");
   }
 }
