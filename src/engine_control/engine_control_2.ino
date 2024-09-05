@@ -2,8 +2,8 @@
 #include <time.h>
 #include <stdlib.h>
 
-constexpr int CONTROL_ROOM_RESPONSE_SIZE{7};
-constexpr int BAUD_RATE{9600};
+constexpr int CONTROL_ROOM_RESPONSE_SIZE = 7;
+constexpr int BAUD_RATE = 9600;
 
 constexpr char CTRL_ACTI[] = "CtrlActi";
 constexpr char TEST_ACTI[] = "TestActi";
@@ -12,33 +12,28 @@ constexpr char INERT_FLW[] = "InertFlw"; //Inert Gas Flowing
 constexpr char SH_DWN[] = "Shutdown";
 constexpr char ABORT_SIG[] = "AbortStp" //Terminate
 
+constexpr int NITROGEN = 25;
+constexpr int OXIDIZER = 26;
+constexpr int FUEL = 27;
+
 char dataIn[16];  //Using a regular C-style array
 String incoming_Signal;
 
-struct sensors {
+typedef struct {
   float loadCell;
   float thermocouple;
   float pressure[6];
-};
-sensors sensorData{0};
+} Sensors;
+Sensors sensorData = {0};
+
 
 void setup() {
   Serial.begin(BAUD_RATE);  //Start Serial1 for communication with Control Room
   
   //Add a temporarily valve pin (for later use)
-  pinMode(valve1, OUTPUT);
-  pinMode(valve2, OUTPUT);
-  pinMode(valve3, OUTPUT);
-
-  //Set the oxidizer valve pins as outputs (for later use)
-  pinMode(oxidizer_valves1, OUTPUT);
-  pinMode(oxidizer_valves2, OUTPUT);
-  pinMode(oxidizer_valves3, OUTPUT)
-
-  //Set the fuel valve pins as outputs (for later use)
-  pinMode(fuel_valves1, OUTPUT);
-  pinMode(fuel_valves2, OUTPUT);
-  pinMode(fuel_valves3, OUTPUT);
+  pinMode(NITROGEN, OUTPUT);
+  pinMode(OXIDIZER, OUTPUT);
+  pinMode(FUEL, OUTPUT);
 
   //Send TestActi until we receive CtrlActi
   while (incoming_Signal != CTRL_ACTI) {
@@ -50,7 +45,7 @@ void setup() {
       Serial.print(TEST_ACTI);  //Send TestActi (if not CtrlActi)
       delay(1000);
     }
-  Serial.println("Comms Established!"); //"Communications Established"
+  Serial.println("CommsEst"); //"Communications Established"
 }
 
 //Start collecting data
@@ -65,18 +60,11 @@ void readSensors(sensors &sensorData) { // Temporarily data (engine_control.ino)
   sensorData.pressure[6] += 0.01;
 }
 void sendSensorData(const sensors &sensorData) {
-  Serial.print("LoadCell: ");
-  Serial.println(sensorData.loadCell);
+  
+  // TODO: Better handling if write buffer is full
+  readSensors(sensorData);
+  Serial.write(sensorData, 32);
 
-  Serial.print("Thermocouple: ");
-  Serial.println(sensorData.thermocouple);
-
-  for (int i{1}; i <= 6; i++) {
-    Serial.print("Pressure[");
-    Serial.print(i);
-    Serial.print("]: ");
-    Serial.println(sensorData.pressure[i]);
-  }
 }
 void LogStart() {
   if (incoming_Signal == LOG_STR) {
@@ -99,18 +87,12 @@ void LogStart() {
   }
 }
 
-//Assign Pin Numbers (Temporarily)
-const int value1{7};
-const int value2{8};
-const int value3{9};
-
 void InertGas() {
   if (incoming_Signal == INERT_FLW) {
     Serial.println("Inert gas flush starts");
     //Open valves for inert gas flush
-    digitalWrite(valve1, HIGH);
-    digitalWrite(valve2, HIGH);
-    digitalWrite(valve3, HIGH);
+    digitalWrite(NITROGEN, HIGH);
+
     while (true) {
       readSensors(sensorData);
       sendSensorData(sensorData);
@@ -120,9 +102,7 @@ void InertGas() {
         if (incoming_Signal == ABORT_SIG) {
           Serial.println("Inert gas flush stops");
           //Close the valves
-          digitalWrite(valve1, LOW);
-          digitalWrite(valve2, LOW);
-          digitalWrite(valve3, LOW);
+          digitalWrite(NITROGEN, LOW);
           break;
         }
       }
@@ -133,14 +113,7 @@ void InertGas() {
   }
 }
 
-//Assign Pin Numbers for Fuel and Oxidizer Valves (Temporarily)
-const int oxidizer_valves1{10};
-const int oxidizer_valves2{11};
-const int oxidizer_valves3{12};
 
-const int fuel_valves1{13};
-const int fuel_valves2{14};
-const int fuel_valves3{15};
 
 void Ignition() {
   if (incoming_Signal == IGN) {
