@@ -2,9 +2,10 @@
 #include <time.h>
 #include <stdlib.h>
 
-constexpr int CONTROL_ROOM_RESPONSE_SIZE = 7;
+constexpr int CONTROL_ROOM_RESPONSE_SIZE = 6;
 constexpr int BAUD_RATE = 9600;
 
+constexpr char ON_READY[] = "Turn_On_Ready";
 constexpr char CTRL_ACTI[] = "CtrlActi";
 constexpr char INERT_GAS[] = "InertGas";
 constexpr char LOG_STR[] = "LogStart";
@@ -17,6 +18,7 @@ constexpr char IGN[] = "Ignition";
 constexpr char TEST_ACTI[] = "TestActi";
 constexpr char INERT_FLW[] = "InertFlw"; //Inert Gas Flowing
 constexpr char SH_DWN[] = "Shutdown";
+constexpr char ST_LOG[] = "StopLogs";
 constexpr char ABORT_SIG[] = "AbortStp"; //Terminate
 constexpr char FUEL_FLOW[] = "FuelFlow"; //Fuel Flowing
 
@@ -35,7 +37,25 @@ typedef struct {
 } Sensors;
 Sensors sensorData = {0};
 
+void control() {
+  Serial.println("Type ON_READY to begin the setup");
+  String receiveInput = "";
+  while (true) {
+    if (Serial.available > 0) {
+      char incomingChar = Serial.read(); //Read one byte(letter) at a time
+      receiveInput += incoming_Char; //Append to the input String
+      if (receiveInput == ON_READY) { //Check if the input matches "Turn_On_Ready"
+        Serial.println("Computer is now starting...");
+        break;
+      }
+    }
+  }
+}
 
+void sendSensorData(const Sensors &sensorData) { // Sending sensor data in a structured format (32 bytes)
+  Serial.write((const uint8_t*)(&sensorData), sizeof(Sensors));
+}
+        
 void setup() {
   Serial.begin(BAUD_RATE);  //Start Serial1 for communication with Control Room
   
@@ -125,6 +145,22 @@ void sendSensorData(const sensors &sensorData) {
   readSensors(sensorData);
   Serial.write(sensorData, 32);
 
+void StopLogs() {
+  if (incoming_Signal == ST_LOG) {
+    Serial.println("Terminating Data Logging..."); //Stop reading sensors and sending data
+    while (true) {
+      if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
+        Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
+        incoming_Signal = String(dataIn);
+        if (incoming_Signal == SH_DWN) {
+          Serial.println("Shutdown initiated after StopLogs...");
+          break;
+        }
+      }
+    }
+  }
+}
+  
 }
 void LogStart() {
   
@@ -155,8 +191,6 @@ void InertGas() {
     Serial.println("Invalid Signal. Waiting for InertFlw...")
   }
 }
-
-
 
 void Ignition() {
   if (incoming_Signal == IGN) {
