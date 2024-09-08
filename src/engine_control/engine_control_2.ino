@@ -5,6 +5,7 @@
 constexpr int CONTROL_ROOM_RESPONSE_SIZE = 7;
 constexpr int BAUD_RATE = 9600;
 
+constexpr char ON_READY[] = "Turn_On_Ready";
 constexpr char CTRL_ACTI[] = "CtrlActi";
 constexpr char TEST_ACTI[] = "TestActi";
 constexpr char LOG_STR[] = "LogStart";
@@ -26,7 +27,21 @@ typedef struct {
 } Sensors;
 Sensors sensorData = {0};
 
-
+void control() {
+  Serial.println("Type ON_READY to begin the setup");
+  String receiveInput = "";
+  while (true) {
+    if (Serial.available > 0) {
+      char incomingChar = Serial.read(); //Read one byte(letter) at a time
+      receiveInput += incoming_Char; //Append to the input String
+      if (receiveInput == ON_READY) { //Check if the input matches "Turn_On_Ready"
+        Serial.println("Computer is now starting...");
+        break;
+      }
+    }
+  }
+}
+        
 void setup() {
   Serial.begin(BAUD_RATE);  //Start Serial1 for communication with Control Room
   
