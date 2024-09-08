@@ -2,11 +2,13 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/screen/screen.hpp>
+#include <iostream>
 
 #include "ui.hpp"
 
 int main()
 {
+	std::cout << "Hello, Control Room!" << std::endl;
 	// Create the interactive screen.
 	ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
