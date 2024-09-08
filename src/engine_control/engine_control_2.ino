@@ -37,20 +37,20 @@ typedef struct {
 } Sensors;
 Sensors sensorData = {0};
 
-void control() {
-  Serial.println("Type ON_READY to begin the setup");
-  String receiveInput = "";
-  while (true) {
-    if (Serial.available > 0) {
-      char incomingChar = Serial.read(); //Read one byte(letter) at a time
-      receiveInput += incoming_Char; //Append to the input String
-      if (receiveInput == ON_READY) { //Check if the input matches "Turn_On_Ready"
-        Serial.println("Computer is now starting...");
-        break;
-      }
-    }
-  }
-}
+// void control() {
+//   Serial.println("Type ON_READY to begin the setup");
+//   String receiveInput = "";
+//   while (true) {
+//     if (Serial.available > 0) {
+//       char incomingChar = Serial.read(); //Read one byte(letter) at a time
+//       receiveInput += incoming_Char; //Append to the input String
+//       if (receiveInput == ON_READY) { //Check if the input matches "Turn_On_Ready"
+//         Serial.println("Computer is now starting...");
+//         break;
+//       }
+//     }
+//   }
+// }
 
 void sendSensorData(const Sensors &sensorData) { // Sending sensor data in a structured format (32 bytes)
   Serial.write((const uint8_t*)(&sensorData), sizeof(Sensors));
