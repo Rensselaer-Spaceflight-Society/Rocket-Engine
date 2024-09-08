@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-constexpr int CONTROL_ROOM_RESPONSE_SIZE = 7;
+constexpr int CONTROL_ROOM_RESPONSE_SIZE = 6;
 constexpr int BAUD_RATE = 9600;
 
 constexpr char ON_READY[] = "Turn_On_Ready";
@@ -11,6 +11,7 @@ constexpr char TEST_ACTI[] = "TestActi";
 constexpr char LOG_STR[] = "LogStart";
 constexpr char INERT_FLW[] = "InertFlw"; //Inert Gas Flowing
 constexpr char SH_DWN[] = "Shutdown";
+constexpr char ST_LOG[] = "StopLogs";
 constexpr char ABORT_SIG[] = "AbortStp" //Terminate
 
 constexpr int NITROGEN = 25;
@@ -40,6 +41,10 @@ void control() {
       }
     }
   }
+}
+
+void sendSensorData(const Sensors &sensorData) { // Sending sensor data in a structured format (32 bytes)
+  Serial.write((const uint8_t*)(&sensorData), sizeof(Sensors));
 }
         
 void setup() {
@@ -80,6 +85,22 @@ void sendSensorData(const sensors &sensorData) {
   readSensors(sensorData);
   Serial.write(sensorData, 32);
 
+void StopLogs() {
+  if (incoming_Signal == ST_LOG) {
+    Serial.println("Terminating Data Logging..."); //Stop reading sensors and sending data
+    while (true) {
+      if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
+        Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
+        incoming_Signal = String(dataIn);
+        if (incoming_Signal == SH_DWN) {
+          Serial.println("Shutdown initiated after StopLogs...");
+          break;
+        }
+      }
+    }
+  }
+}
+  
 }
 void LogStart() {
   if (incoming_Signal == LOG_STR) {
@@ -92,6 +113,9 @@ void LogStart() {
         incoming_Signal = String(dataIn);
         if (incoming_Signal == ABORT_SIG) {
           Serial.println("Stopping Data Logging...");
+          break;
+        } else if (incoming_Signal == ST_LOG) {
+          LogStop();
           break;
         }
       }
@@ -127,8 +151,6 @@ void InertGas() {
     Serial.println("Invalid Signal. Waiting for InertFlw...")
   }
 }
-
-
 
 void Ignition() {
   if (incoming_Signal == IGN) {
