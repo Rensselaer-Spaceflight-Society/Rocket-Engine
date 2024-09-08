@@ -5,7 +5,7 @@
 constexpr int CONTROL_ROOM_RESPONSE_SIZE = 6;
 constexpr int BAUD_RATE = 9600;
 
-constexpr char ON_READY[] = "Turn_On_Ready";
+// constexpr char ON_READY[] = "Turn_On_Ready";
 constexpr char CTRL_ACTI[] = "CtrlActi";
 constexpr char INERT_GAS[] = "InertGas";
 constexpr char LOG_STR[] = "LogStart";
@@ -114,7 +114,7 @@ void setup() {
   CloseInertGasValves();
 
   // Now we want to wait for the control room to start the ignition
-  while(incoming_Signal != IGN) {
+  while (incoming_Signal != IGN) {
     if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
       Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
       incoming_Signal = String(dataIn);
