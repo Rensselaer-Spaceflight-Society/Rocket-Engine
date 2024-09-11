@@ -397,6 +397,10 @@
     [
       "4e05caf8-77e4-4a22-9a05-51fcca8e50ff",
       "Root"
+    ],
+    [
+      "b15947ff-9075-4e47-b24b-e604669a88aa",
+      "Control_Room_Side"
     ]
   ],
   "text_variables": {}
