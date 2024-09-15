@@ -5,18 +5,27 @@
 constexpr int CONTROL_ROOM_RESPONSE_SIZE = 6;
 constexpr int BAUD_RATE = 9600;
 
-constexpr char ON_READY[] = "Turn_On_Ready";
+// constexpr char ON_READY[] = "Turn_On_Ready";
 constexpr char CTRL_ACTI[] = "CtrlActi";
-constexpr char TEST_ACTI[] = "TestActi";
+constexpr char INERT_GAS[] = "InertGas";
 constexpr char LOG_STR[] = "LogStart";
+constexpr char INERT_STOP[] = "InertStp";
+constexpr char FUEL_START[] = "FuelStt";
+constexpr char OXIDIZER_START[] = "OxidStt";
+constexpr char IGN[] = "Ignition";
+
+
+constexpr char TEST_ACTI[] = "TestActi";
 constexpr char INERT_FLW[] = "InertFlw"; //Inert Gas Flowing
 constexpr char SH_DWN[] = "Shutdown";
 constexpr char ST_LOG[] = "StopLogs";
-constexpr char ABORT_SIG[] = "AbortStp" //Terminate
+constexpr char ABORT_SIG[] = "AbortStp"; //Terminate
+constexpr char FUEL_FLOW[] = "FuelFlow"; //Fuel Flowing
 
 constexpr int NITROGEN = 25;
 constexpr int OXIDIZER = 26;
 constexpr int FUEL = 27;
+constexpr int IGNITER = 28;
 
 char dataIn[16];  //Using a regular C-style array
 String incoming_Signal;
@@ -28,20 +37,20 @@ typedef struct {
 } Sensors;
 Sensors sensorData = {0};
 
-void control() {
-  Serial.println("Type ON_READY to begin the setup");
-  String receiveInput = "";
-  while (true) {
-    if (Serial.available > 0) {
-      char incomingChar = Serial.read(); //Read one byte(letter) at a time
-      receiveInput += incoming_Char; //Append to the input String
-      if (receiveInput == ON_READY) { //Check if the input matches "Turn_On_Ready"
-        Serial.println("Computer is now starting...");
-        break;
-      }
-    }
-  }
-}
+// void control() {
+//   Serial.println("Type ON_READY to begin the setup");
+//   String receiveInput = "";
+//   while (true) {
+//     if (Serial.available > 0) {
+//       char incomingChar = Serial.read(); //Read one byte(letter) at a time
+//       receiveInput += incoming_Char; //Append to the input String
+//       if (receiveInput == ON_READY) { //Check if the input matches "Turn_On_Ready"
+//         Serial.println("Computer is now starting...");
+//         break;
+//       }
+//     }
+//   }
+// }
 
 void sendSensorData(const Sensors &sensorData) { // Sending sensor data in a structured format (32 bytes)
   Serial.write((const uint8_t*)(&sensorData), sizeof(Sensors));
@@ -54,6 +63,7 @@ void setup() {
   pinMode(NITROGEN, OUTPUT);
   pinMode(OXIDIZER, OUTPUT);
   pinMode(FUEL, OUTPUT);
+  pinMode(IGNITER, OUTPUT);
 
   //Send TestActi until we receive CtrlActi
   while (incoming_Signal != CTRL_ACTI) {
@@ -65,7 +75,57 @@ void setup() {
       Serial.print(TEST_ACTI);  //Send TestActi (if not CtrlActi)
       delay(1000);
     }
+  
   Serial.println("CommsEst"); //"Communications Established"
+
+  // Now we want to wait for the control room to start logging data
+  while(incoming_Signal != LOG_STR) {
+    if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
+      Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
+      incoming_Signal = String(dataIn);
+      continue;
+    }
+  }
+
+  sendSensorData(sensorData);
+
+  // Now we want to wait for the control room to start the inert gas flush
+  while(incoming_Signal != INERT_GAS) {
+    if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
+      Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
+      incoming_Signal = String(dataIn);
+      continue;
+    }
+  }
+
+  Serial.println(INERT_FLW); //Inert Gas Flowing
+  OpenInertGasValves();
+
+  // Now we want to wait for the control room to stop the inert gas flush
+  while(incoming_Signal != INERT_STOP) {
+    if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
+      Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
+      incoming_Signal = String(dataIn);
+      continue;
+    }
+  }
+
+  Serial.println(INERT_STOP); //Inert Gas Stopped
+  CloseInertGasValves();
+
+  // Now we want to wait for the control room to start the ignition
+  while (incoming_Signal != IGN) {
+    if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
+      Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
+      incoming_Signal = String(dataIn);
+      continue;
+    }
+  }
+
+  Serial.println(IGN); //Ignition
+
+  
+
 }
 
 //Start collecting data
@@ -103,27 +163,7 @@ void StopLogs() {
   
 }
 void LogStart() {
-  if (incoming_Signal == LOG_STR) {
-    Serial.println("Start Data Logging...");
-    while (true) {
-      readSensors(sensorData);
-      sendSensorData(sensorData);
-      if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
-        Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
-        incoming_Signal = String(dataIn);
-        if (incoming_Signal == ABORT_SIG) {
-          Serial.println("Stopping Data Logging...");
-          break;
-        } else if (incoming_Signal == ST_LOG) {
-          LogStop();
-          break;
-        }
-      }
-      delay(1000);
-    }
-  } else {
-    Serial.println("Invalid Signal. Waiting for LogStart...");
-  }
+  
 }
 
 void InertGas() {
