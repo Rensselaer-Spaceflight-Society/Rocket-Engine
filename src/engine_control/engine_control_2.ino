@@ -247,9 +247,9 @@ void Shutdown() {
     digitalWrite(valve3, HIGH);
     delay(5000); //Keep the inert gas flush for 5 seconds
     //Close the inert gas flush after
-    digitalWrite(valve1, LOW);
-    digitalWrite(valve2, LOW);
-    digitalWrite(valve3, LOW);
+    // digitalWrite(valve1, LOW);
+    // digitalWrite(valve2, LOW);
+    // digitalWrite(valve3, LOW);
     
     Serial.println("Inert gas flush stops. Shutdown complete.");
   }
