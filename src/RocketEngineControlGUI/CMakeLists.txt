@@ -11,8 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 list(APPEND CMAKE_PREFIX_PATH "~/Qt/6.7.2/gcc_64/lib/cmake")
 
-find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets Charts)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Charts)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -48,6 +48,7 @@ else()
 endif()
 
 target_link_libraries(RocketEngineControlGUI PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(RocketEngineControlGUI PRIVATE Qt${QT_VERSION_MAJOR}::Charts)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
