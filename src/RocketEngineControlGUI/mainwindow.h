@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtSerialPort/QSerialPortInfo>
+#include <QStringList>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,6 +18,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void configureCharts();
+    QStringList getSerialPorts();
 
 private:
     Ui::MainWindow *ui;

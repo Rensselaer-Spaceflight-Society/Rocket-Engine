@@ -62,8 +62,11 @@
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QChartView" name="LoadCellChart" native="true"/>
+        <widget class="DataChart" name="LoadCellChart" native="true"/>
        </item>
        <item>
         <widget class="Line" name="line_47">
@@ -74,8 +77,11 @@
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item row="0" column="2">
-          <widget class="QChartView" name="FuelInlet2Chart" native="true"/>
+          <widget class="DataChart" name="FuelInlet2Chart" native="true"/>
          </item>
          <item row="0" column="1">
           <widget class="Line" name="line_49">
@@ -85,10 +91,10 @@
           </widget>
          </item>
          <item row="2" column="2">
-          <widget class="QChartView" name="OxidizerInlet2Chart" native="true"/>
+          <widget class="DataChart" name="OxidizerInlet2Chart" native="true"/>
          </item>
          <item row="2" column="0">
-          <widget class="QChartView" name="OxidizerInlet1Chart" native="true"/>
+          <widget class="DataChart" name="OxidizerInlet1Chart" native="true"/>
          </item>
          <item row="2" column="1">
           <widget class="Line" name="line_50">
@@ -98,7 +104,7 @@
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QChartView" name="FuelInlet1Chart" native="true"/>
+          <widget class="DataChart" name="FuelInlet1Chart" native="true"/>
          </item>
          <item row="1" column="0">
           <widget class="Line" name="line_51">
@@ -134,14 +140,17 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item row="2" column="0">
-        <widget class="QChartView" name="FuelTankPressureChart" native="true"/>
+        <widget class="DataChart" name="FuelTankPressureChart" native="true"/>
        </item>
        <item row="0" column="2">
-        <widget class="QChartView" name="NitrogenTankPressureChart" native="true"/>
+        <widget class="DataChart" name="NitrogenTankPressureChart" native="true"/>
        </item>
        <item row="4" column="2">
-        <widget class="QChartView" name="FuelLinePressureChart" native="true"/>
+        <widget class="DataChart" name="FuelLinePressureChart" native="true"/>
        </item>
        <item row="4" column="1">
         <widget class="Line" name="line_56">
@@ -165,7 +174,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QChartView" name="OxidizerTankPressureChart" native="true"/>
+        <widget class="DataChart" name="OxidizerTankPressureChart" native="true"/>
        </item>
        <item row="0" column="1">
         <widget class="Line" name="line_60">
@@ -175,7 +184,7 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QChartView" name="OxidizerLinePressureChart" native="true"/>
+        <widget class="DataChart" name="OxidizerLinePressureChart" native="true"/>
        </item>
        <item row="1" column="2">
         <widget class="Line" name="line_59">
@@ -213,7 +222,7 @@
         </widget>
        </item>
        <item row="2" column="2">
-        <widget class="QChartView" name="FuelFeedPresureChart" native="true"/>
+        <widget class="DataChart" name="FuelFeedPressureChart" native="true"/>
        </item>
       </layout>
      </item>
@@ -342,6 +351,11 @@
      </item>
      <item row="6" column="2">
       <widget class="QLabel" name="FuelInlet2TempValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 C</string>
        </property>
@@ -369,6 +383,11 @@
      </item>
      <item row="18" column="2">
       <widget class="QLabel" name="KeroseneFeedPressureValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 kPa</string>
        </property>
@@ -417,6 +436,11 @@ Pressure</string>
      </item>
      <item row="22" column="2">
       <widget class="QLabel" name="FuelLinePressureValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 kPa</string>
        </property>
@@ -465,6 +489,11 @@ Pressure</string>
      </item>
      <item row="2" column="2">
       <widget class="QLabel" name="LoadCellValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 N</string>
        </property>
@@ -506,6 +535,11 @@ Temperature</string>
      </item>
      <item row="4" column="2">
       <widget class="QLabel" name="FuelInlet1TempValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 C</string>
        </property>
@@ -575,6 +609,11 @@ Pressure</string>
      </item>
      <item row="14" column="2">
       <widget class="QLabel" name="NitrogenTankPressureValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 kPa</string>
        </property>
@@ -665,6 +704,11 @@ Pressure</string>
      </item>
      <item row="12" column="2">
       <widget class="QLabel" name="OxidizerTankPressureValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 kPa</string>
        </property>
@@ -678,6 +722,11 @@ Pressure</string>
      </item>
      <item row="20" column="2">
       <widget class="QLabel" name="OxidizerLinePressureValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 kPa</string>
        </property>
@@ -698,6 +747,11 @@ Pressure</string>
      </item>
      <item row="8" column="2">
       <widget class="QLabel" name="OxidizerInlet1TempValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 C</string>
        </property>
@@ -711,6 +765,11 @@ Pressure</string>
      </item>
      <item row="0" column="2">
       <widget class="QLabel" name="SensorValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Value</string>
        </property>
@@ -724,6 +783,11 @@ Pressure</string>
      </item>
      <item row="16" column="2">
       <widget class="QLabel" name="KeroseneTankPressureValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 kPa</string>
        </property>
@@ -821,6 +885,11 @@ Pressure</string>
      </item>
      <item row="10" column="2">
       <widget class="QLabel" name="OxidizerInlet2TempValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>0.00 C</string>
        </property>
@@ -1089,9 +1158,9 @@ Pressure</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QChartView</class>
+   <class>DataChart</class>
    <extends>QWidget</extends>
-   <header location="global">QtCharts/QtCharts</header>
+   <header>components/datachart.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
