@@ -1,7 +1,7 @@
 #ifndef __SERIAL_COMMUNICATOR_H__
 #define __SERIAL_COMMUNICATOR_H__
 
-#include "data_io.hpp"
+#include "dataio.h"
 #include <fcntl.h>   // Contains file controls like O_RDWR
 #include <errno.h>   // Error integer and strerror() function
 #include <termios.h> // Contains POSIX terminal control definitions

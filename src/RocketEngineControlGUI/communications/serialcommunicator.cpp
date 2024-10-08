@@ -1,4 +1,4 @@
-#include "SerialCommunicator.hpp"
+#include "serialcommunicator.h"
 
 #include <errno.h>
 #include <fcntl.h>
