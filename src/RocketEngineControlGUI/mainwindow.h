@@ -21,7 +21,12 @@ public:
     void configureCharts();
     QStringList getSerialPorts();
 
+private slots:
+    void handleShutdown();
+    void handleSerialPortRefresh();
+
 private:
     Ui::MainWindow *ui;
+
 };
 #endif // MAINWINDOW_H

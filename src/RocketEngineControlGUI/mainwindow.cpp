@@ -8,7 +8,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->configureCharts();
-    ui->SerialPortDropdown->addItems(this->getSerialPorts());
+    this->handleSerialPortRefresh();
+    connect(this->ui->RefreshSerialPorts, &QPushButton::clicked, this, &MainWindow::handleSerialPortRefresh);
+    connect(this->ui->AbortButton, &QPushButton::clicked, this, &MainWindow::handleShutdown);
+}
+
+void MainWindow::handleSerialPortRefresh()
+{
+ ui->SerialPortDropdown->addItems(this->getSerialPorts());
 }
 
 // TODO: Needs Testing with Actual Hardware
@@ -49,6 +56,13 @@ void MainWindow::configureCharts()
     ui->NitrogenTankPressureChart->setChartType(ChartType::Pressure);
     ui->FuelFeedPressureChart->setChartTitle("Nitrogen Line Pressure");
     ui->FuelFeedPressureChart->setChartType(ChartType::Pressure);
+}
+
+void MainWindow::handleShutdown()
+{
+    ui->AbortButton->setDisabled(true);
+    ui->AbortButton->setText("Shutdown Started");
+    ui->AbortButton->setStyleSheet("#AbortButton {\n	background-color: rgb(119, 118, 123); \n color: rgb(255, 255, 255);}");
 }
 
 MainWindow::~MainWindow()
