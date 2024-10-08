@@ -13,18 +13,39 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this->ui->AbortButton, &QPushButton::clicked, this, &MainWindow::handleShutdown);
 }
 
-void MainWindow::handleSerialPortRefresh()
+void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
 {
- ui->SerialPortDropdown->addItems(this->getSerialPorts());
+    if(keyEvent->key() == Qt::Key_Backspace)
+    {
+        this->handleShutdown();
+    }
 }
 
-// TODO: Needs Testing with Actual Hardware
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::handleSerialPortRefresh()
+{
+    ui->SerialPortDropdown->clear();
+    ui->SerialPortDropdown->addItems(this->getSerialPorts());
+}
+
+void MainWindow::handleShutdown()
+{
+    ui->AbortButton->setDisabled(true);
+    ui->AbortButton->setText("Shutdown Started");
+    ui->AbortButton->setStyleSheet("#AbortButton {\n	background-color: rgb(119, 118, 123); \n color: rgb(255, 255, 255);}");
+    // Shutdown Logic goes below here:
+}
+
 QStringList MainWindow::getSerialPorts()
 {
     QStringList ports;
     QList<QSerialPortInfo> openPorts = QSerialPortInfo::availablePorts();
     for(auto const & port: openPorts){
-        if(port.hasVendorIdentifier()) ports.append(port.manufacturer());
+        if(port.hasVendorIdentifier()) ports.append(port.portName() + ": " + port.manufacturer());
     }
     return ports;
 }
@@ -58,14 +79,3 @@ void MainWindow::configureCharts()
     ui->FuelFeedPressureChart->setChartType(ChartType::Pressure);
 }
 
-void MainWindow::handleShutdown()
-{
-    ui->AbortButton->setDisabled(true);
-    ui->AbortButton->setText("Shutdown Started");
-    ui->AbortButton->setStyleSheet("#AbortButton {\n	background-color: rgb(119, 118, 123); \n color: rgb(255, 255, 255);}");
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-}

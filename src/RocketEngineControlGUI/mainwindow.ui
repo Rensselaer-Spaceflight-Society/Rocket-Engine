@@ -1105,33 +1105,56 @@ Pressure</string>
       </spacer>
      </item>
      <item>
-      <widget class="QComboBox" name="SerialPortDropdown">
-       <property name="enabled">
-        <bool>true</bool>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>0</number>
        </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+       <property name="topMargin">
+        <number>2</number>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
+       <property name="bottomMargin">
+        <number>2</number>
        </property>
        <item>
-        <property name="text">
-         <string>Select a Serial Port</string>
-        </property>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Serial Port:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+        </widget>
        </item>
-      </widget>
+       <item>
+        <widget class="QComboBox" name="SerialPortDropdown">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <item>
+          <property name="text">
+           <string>Select a Serial Port</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <spacer name="horizontalSpacer_6">
@@ -1148,6 +1171,11 @@ Pressure</string>
      </item>
      <item>
       <widget class="QLabel" name="ConnectionStatus">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>No Connection</string>
        </property>
