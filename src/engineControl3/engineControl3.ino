@@ -12,7 +12,6 @@ constexpr char INRTFLSH[] = "InertFlush";
 constexpr char PRESFUEL[] = "PressFuel";
 constexpr char IGN[] = "Ignite";
 constexpr char SHTDWN[] = "Shutdown";
-constexpr char AWK[] = "Acknowledge";
 constexpr char PNG[] = "Ping";
 
 // Pin Values (Digital)
@@ -87,7 +86,6 @@ void checkComms(const char* expectedSignal, bool sendAck, const char* pingToSend
             Serial.write(pingToSend); // Send custom ping message if needed
         }
     }
-    Serial.write(AWK); // Send acknowledgment after matching signal
 }
 
 // Sensor-related functions
@@ -184,7 +182,6 @@ void setup() {
 
     checkComms(LOG_STRT, true, CTRLACTV);
     digitalWrite(LED2, HIGH);
-    Serial.write(LOG_STRT);
 
     bool fuelPressed = false;
     bool inertFlushComplete = false;
@@ -199,6 +196,9 @@ void setup() {
         if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
             Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
             incomingSignal = String(dataIn);
+        }
+        if(!fuelPressed && !inertFlushComplete){
+          Serial.write(LOG_STRT);
         }
         if (incomingSignal == PRESFUEL && !fuelPressed) {
             pressFuel();
@@ -236,6 +236,7 @@ void loop() {
     } else if (incomingSignal == PNG) {
         timeSinceLastPing = 0;
         lastPingTime = masterTime;
+        Serial.write(PNG);
     }
 
     timeSinceLastPing = masterTime - lastPingTime;
