@@ -6,43 +6,35 @@
 #include <QtCharts/QSplineSeries>
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include <QTimer>
+#include <QList>
+#include "command.h"
 #include "thre.h"
 #include "recv.h"
 
+QSerialPort *COMPORT = new QSerialPort();
+
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+    QTimer timer;
+    QList <command> command_queue;
 
-    // QLineSeries *series = new QLineSeries();
-    // series->append(0, 6);
-    // series->append(2, 0);
-    // series->append(3, 8);
-    // series->append(7, 4);
-    // series->append(10, 5);
+    // Example commands
+    command terminate("Shutdown", 0);
+    command ignition("ignition", 1);
 
-    // QChart *chart = new QChart();
-    // chart->legend()->hide();
-    // chart->addSeries(series);
-    // chart->createDefaultAxes();
-    // chart->setTitle("Simple Line Chart");
 
-    // QChartView *chartView = new QChartView(chart);
-    // chartView->setRenderHint(QPainter::Antialiasing);
-
-    // QMainWindow window;
-    // window.setCentralWidget(chartView);
-    // window.resize(800, 800);
-    // window.show();
-
-    // for (QSerialPortInfo &portInfo: QSerialPortInfo::availablePorts()){
-    //     qDebug() << "Port Name : " << portInfo.portName();
-    //     qDebug() << "Port Description : " << portInfo.description();
-    // }
+    for (QSerialPortInfo &portInfo: QSerialPortInfo::availablePorts()){
+        qDebug() << "Port Name : " << portInfo.portName();
+        qDebug() << "Port Description : " << portInfo.description();
+        qDebug() << "\n";
+    }
 
     // Serial COMM Setup
     bool retransmit_bool = false;
 
     QSerialPort COMPORT;
-    COMPORT.setPortName("cu.URT1");
+    COMPORT.setPortName("tty.URT1");
     COMPORT.setBaudRate(QSerialPort::BaudRate::Baud9600);
     COMPORT.setParity(QSerialPort::Parity::NoParity);
     COMPORT.setFlowControl(QSerialPort::FlowControl::NoFlowControl);
@@ -53,13 +45,20 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    thre thread(&COMPORT, &retransmit_bool);
-    recv receive(&COMPORT, &retransmit_bool);
+    // Insert ping into the command queue
+    QObject::connect(&timer, &QTimer::timeout, [&command_queue](){
+        command ping("ping", 2);
+        command_queue.append(ping);
+        // qDebug() << "ping";
+    });
+    timer.start(200);
+    thre thread(&COMPORT, &retransmit_bool, &command_queue);
+    recv receive(&COMPORT, &retransmit_bool, &command_queue);
 
     QObject::connect(&thread, &thre::sendFinished, &receive, &recv::startReceiving);
     QObject::connect(&receive, &recv::receiveFinished, &thread, &thre::receiveFinished);
 
     thread.start();
-    
+
     return a.exec();
 }
