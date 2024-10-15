@@ -5,6 +5,8 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QStringList>
 
+#include "communications/serialdatawriter.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -24,12 +26,16 @@ public:
 private slots:
     void handleShutdown();
     void handleSerialPortRefresh();
+    void handleSerialPortSelection(int portIndex);
 
 protected:
     void keyPressEvent(QKeyEvent* keyEvent) override;
 
 private:
     Ui::MainWindow *ui;
-    QSerialPort * commsPort;
+    QSerialPort *commsPort;
+    SerialDataWriter *commandSender;
+
+    QList<QSerialPortInfo> availableSerialPorts;
 };
 #endif // MAINWINDOW_H

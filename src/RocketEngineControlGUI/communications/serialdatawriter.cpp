@@ -32,6 +32,7 @@ void SerialDataWriter::run()
             serialPort->write(PING_COMMAND, BYTES_IN_COMMAND);
             emit sentCommand(ping);
         }
+        this->msleep(1);
     }
 }
 
