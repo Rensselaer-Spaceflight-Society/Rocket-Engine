@@ -9,6 +9,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->configureCharts();
     this->handleSerialPortRefresh();
+
+    // TODO: Add Serial Port Initialization
+
     connect(this->ui->RefreshSerialPorts, &QPushButton::clicked, this, &MainWindow::handleSerialPortRefresh);
     connect(this->ui->AbortButton, &QPushButton::clicked, this, &MainWindow::handleShutdown);
 }
@@ -29,6 +32,7 @@ MainWindow::~MainWindow()
 void MainWindow::handleSerialPortRefresh()
 {
     ui->SerialPortDropdown->clear();
+    ui->SerialPortDropdown->addItem("Select a Serial Port");
     ui->SerialPortDropdown->addItems(this->getSerialPorts());
 }
 

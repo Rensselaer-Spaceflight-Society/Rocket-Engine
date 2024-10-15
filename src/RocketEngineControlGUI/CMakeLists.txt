@@ -25,9 +25,10 @@ set(PROJECT_SOURCES
 qt_add_executable(RocketEngineControlGUI
     MANUAL_FINALIZATION
     ${PROJECT_SOURCES}
-    communications/dataio.h
+
     components/datachart.h components/datachart.cpp components/datachart.ui
     communications/serialdatawriter.h communications/serialdatawriter.cpp
+    communications/command.h
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

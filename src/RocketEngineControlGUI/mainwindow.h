@@ -30,6 +30,6 @@ protected:
 
 private:
     Ui::MainWindow *ui;
-
+    QSerialPort * commsPort;
 };
 #endif // MAINWINDOW_H
