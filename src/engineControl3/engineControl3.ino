@@ -3,16 +3,16 @@
 #include <stdlib.h>
 
 constexpr int BAUD_RATE = 9600;
-constexpr int CONTROL_ROOM_RESPONSE_SIZE = 6;
+constexpr int CONTROL_ROOM_RESPONSE_SIZE = 8;
 
 // Command Statements
 constexpr char CTRLACTV[] = "CtrlActi";
 constexpr char LOG_STRT[] = "LogStart";
-constexpr char INRTFLSH[] = "InertFlush";
-constexpr char PRESFUEL[] = "PressFuel";
-constexpr char IGN[] = "Ignite";
+constexpr char INRTFLSH[] = "InrtFlsh";
+constexpr char PRESFUEL[] = "PresFuel";
+constexpr char IGN[] = "Ignition";
 constexpr char SHTDWN[] = "Shutdown";
-constexpr char PNG[] = "Ping";
+constexpr char PNG[] = "PingPong";
 
 // Pin Values (Digital)
 constexpr int NITROGENVALVE = 25;
@@ -43,11 +43,14 @@ constexpr int LED1 = 5;
 constexpr int LED2 = 6;
 constexpr int LED3 = 7;
 
+//Constants
+constexpr float voltageToTempScale = 0.005;
+
 // Struct for Sensor Data
 struct Sensors {
     float loadCell;
-    float thermocouple[4];
-    float pressure[6];
+    int16_t thermocouple[4];
+    int16_t pressure[6];
 };
 
 Sensors sensorData = {0};
@@ -63,6 +66,10 @@ int lastPingTime = 0;
 void openValve(int pin) {
     digitalWrite(pin, HIGH);
 }
+int processThermoCoupleValue(int analogSignal){
+  float voltage = analogSignal * (5.0 / 1023.0);//assuming 5V ref
+  return voltage / voltageToTempScale;
+}
 
 void closeValve(int pin) {
     digitalWrite(pin, LOW);
@@ -75,15 +82,12 @@ void waitTime(int milliseconds) {
 }
 
 // Communication functions
-void checkComms(const char* expectedSignal, bool sendAck, const char* pingToSend = "NONE") {
+void checkComms(const char* expectedSignal) {
     incomingSignal = "";
     while (incomingSignal != expectedSignal) {
         if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
             Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
             incomingSignal = String(dataIn);
-        }
-        if (sendAck && pingToSend != "NONE") {
-            Serial.write(pingToSend); // Send custom ping message if needed
         }
     }
 }
@@ -98,10 +102,10 @@ void readSensor(Sensors& sensorData) {
     sensorData.pressure[4] = analogRead(PRESSSEN5);
     sensorData.pressure[5] = analogRead(PRESSSEN6);
 
-    sensorData.thermocouple[0] = digitalRead(THERMOCPL1CS);
-    sensorData.thermocouple[1] = digitalRead(THERMOCPL2CS);
-    sensorData.thermocouple[2] = digitalRead(THERMOCPL3CS);
-    sensorData.thermocouple[3] = digitalRead(THERMOCPL4CS);
+    sensorData.thermocouple[0] = processThermoCoupleValue(digitalRead(THERMOCPL1CS));
+    sensorData.thermocouple[1] = processThermoCoupleValue(digitalRead(THERMOCPL2CS));
+    sensorData.thermocouple[2] = processThermoCoupleValue(digitalRead(THERMOCPL3CS));
+    sensorData.thermocouple[3] = processThermoCoupleValue(digitalRead(THERMOCPL4CS));
 }
 
 void sendSensor(Sensors& sensorData) {
@@ -176,12 +180,14 @@ void setup() {
 
     // Start communication
     Serial.begin(BAUD_RATE);
-    checkComms(CTRLACTV, false);
+    checkComms(CTRLACTV);
     Serial.println("Comms Found");
+    Serial.write(CTRLACTV);
     digitalWrite(LED1, HIGH);
 
-    checkComms(LOG_STRT, true, CTRLACTV);
+    checkComms(LOG_STRT);
     digitalWrite(LED2, HIGH);
+    Serial.write(LOG_STRT);
 
     bool fuelPressed = false;
     bool inertFlushComplete = false;
@@ -197,21 +203,14 @@ void setup() {
             Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
             incomingSignal = String(dataIn);
         }
-        if(!fuelPressed && !inertFlushComplete){
-          Serial.write(LOG_STRT);
-        }
         if (incomingSignal == PRESFUEL && !fuelPressed) {
             pressFuel();
             fuelPressed = true;
-        }
-        if (fuelPressed && !inertFlushComplete) {
             Serial.write(PRESFUEL);
         }
         if (incomingSignal == INRTFLSH && !inertFlushComplete) {
             nitrogenFlush(10);
             inertFlushComplete = true;
-        }
-        if (fuelPressed && inertFlushComplete) {
             Serial.write(INRTFLSH);
         }
     }
@@ -222,25 +221,27 @@ void setup() {
 
 // Main loop function
 void loop() {
-    masterTime = millis();
-    nominalCheck();
-    sendSensor(sensorData);
+  masterTime = millis();
+  sendSensor(sensorData);
+  nominalCheck();
 
-    if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
-        Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
-        incomingSignal = String(dataIn);
-    }
-    if (incomingSignal == SHTDWN) {
-        shutdownSequence();
-        Serial.write(SHTDWN);
-    } else if (incomingSignal == PNG) {
-        timeSinceLastPing = 0;
-        lastPingTime = masterTime;
-        Serial.write(PNG);
-    }
 
-    timeSinceLastPing = masterTime - lastPingTime;
-    if (timeSinceLastPing > 250) {
-        shutdownSequence();
-    }
+  if (Serial.available() >= CONTROL_ROOM_RESPONSE_SIZE) {
+    Serial.readBytes(dataIn, CONTROL_ROOM_RESPONSE_SIZE);
+    incomingSignal = String(dataIn);
+  }
+  if (incomingSignal == SHTDWN) {
+    shutdownSequence();
+    Serial.write(SHTDWN);
+    incomingSignal = "";
+  } else if (incomingSignal == PNG) {
+    timeSinceLastPing = 0;
+    lastPingTime = masterTime;
+    Serial.write(PNG);
+    incomingSignal = "";
+  }
+  timeSinceLastPing = masterTime - lastPingTime;
+  if (timeSinceLastPing > 250) {
+    shutdownSequence();
+  }
 }

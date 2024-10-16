@@ -86,10 +86,10 @@ This is built on the Arduino platform for easy and plentiful I/O. Arduino provid
 The rocket engine has 8 sensors:
 - 1 Load Cell for measuring thrust
 - 4 Thermocouples
-    - 1 Inside the Combustion Chamber
-    - 1 Before the Injection Plate
-    - TODO
-    - TODO
+    - 1 At the Nozzle exit
+    - 1 On the Kerosene Inlet and Injector Plate
+    - 1 On the N2O inlet and injector Plate
+    - On the combustion chamber at the throat of the nozzle (the constriction)
 - 6 Pressure Transducers
     - 1 Inside the Combustion Chamber
         - According to David, the back of the combustion chamber should be cool enough to not destroy this sensor
@@ -169,8 +169,8 @@ Sensor data is sent in packets of 44 bytes (352 bits) of binary data with the fo
 typedef struct
 {
   float loadCell;
-  float thermocouple[4];
-  float pressure[6];
+  int_16 thermocouple[4];
+  int_16 pressure[6];
 } SensorData;
 ```
 
