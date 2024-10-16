@@ -29,6 +29,7 @@ qt_add_executable(RocketEngineControlGUI
     components/datachart.h components/datachart.cpp components/datachart.ui
     communications/serialdatawriter.h communications/serialdatawriter.cpp
     communications/command.h
+
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

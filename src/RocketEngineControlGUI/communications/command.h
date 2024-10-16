@@ -3,6 +3,12 @@
 
 #include <QString>
 
+#define TIME_PER_PING_MS 50
+#define BYTES_IN_COMMAND 8
+#define PING_COMMAND "PingPong"
+#define SHUTDOWN_COMMAND "ShutDown"
+
+
 enum class CommandPriority: u_int8_t {
     LOW,
     NORMAL,

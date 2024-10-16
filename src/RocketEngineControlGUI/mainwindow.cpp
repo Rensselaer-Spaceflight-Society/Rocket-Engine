@@ -1,7 +1,8 @@
-#include "mainwindow.h"
-#include "./ui_mainwindow.h"
 #include <QtCharts/QtCharts>
 #include <QSerialPort>
+
+#include "./ui_mainwindow.h"
+#include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,6 +21,10 @@ MainWindow::MainWindow(QWidget *parent)
     this->commsPort->setStopBits(QSerialPort::StopBits::OneStop);
 
     this->commandSender = new SerialDataWriter(this->commsPort);
+
+    // Disable the Abort and Countdown Button until a connection is established
+    ui->AbortButton->setDisabled(true);
+    ui->StartCountdown->setDisabled(true);
 
     connect(this->ui->RefreshSerialPorts, &QPushButton::clicked, this, &MainWindow::handleSerialPortRefresh);
     connect(this->ui->AbortButton, &QPushButton::clicked, this, &MainWindow::handleShutdown);
@@ -54,14 +59,18 @@ void MainWindow::handleShutdown()
 {
     ui->AbortButton->setDisabled(true);
     ui->AbortButton->setText("Shutdown Started");
-    ui->AbortButton->setStyleSheet("#AbortButton {\n	background-color: rgb(119, 118, 123); \n color: rgb(255, 255, 255);}");
-    // Shutdown Logic goes below here:
+    ui->AbortButton->setStyleSheet("#AbortButton {background-color: rgb(119, 118, 123); color: rgb(255, 255, 255);}");
+
+    Command shutdown = Command(SHUTDOWN_COMMAND, CommandPriority::HIGH);
+    this->commandSender->addNewCommandToQueue(shutdown);
+    ui->StartCountdown->setDisabled(true);
 }
 
 void MainWindow::handleSerialPortSelection(int index)
 {
     if(this->commsPort->isOpen()) this->commsPort->close();
-    this->commsPort->setPort(availableSerialPorts[index]);
+    // Adjust the index by -1 to account for the "Select a Serial Port Option"
+    this->commsPort->setPort(availableSerialPorts[index-1]);
     if(!this->commsPort->open(QIODevice::ReadWrite))
     {
         ui->ConnectionStatus->setText("Serial Port Failed to Open");
@@ -77,8 +86,7 @@ QStringList MainWindow::getSerialPorts()
 {
 
     QStringList portDropdownOptions;
-    this->availableSerialPorts = QSerialPortInfo::availablePorts();;
-
+    this->availableSerialPorts = QSerialPortInfo::availablePorts();
     for(auto const & port: this->availableSerialPorts)
     {
         if(port.hasVendorIdentifier())

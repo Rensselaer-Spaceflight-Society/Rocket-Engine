@@ -8,10 +8,6 @@
 
 #include "command.h"
 
-#define TIME_PER_PING_MS 50
-#define PING_COMMAND "PingPong"
-#define BYTES_IN_COMMAND 8
-
 class SerialDataWriter : public QThread
 {
     Q_OBJECT
