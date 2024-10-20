@@ -6,6 +6,7 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 CTestTestfile.cmake
+CMakeLists.txt.user
 Makefile
 *.cmake
 
@@ -60,6 +61,7 @@ _autosave-*
 *-save.pro
 *-save.kicad_pcb
 fp-info-cache
+*.lck
 
 \#auto_saved_files#
 

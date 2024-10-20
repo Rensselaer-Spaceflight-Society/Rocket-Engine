@@ -1,4 +1,4 @@
-# RPU Systems Design and Communications Protocol V1.0.0
+# RPU Systems Design and Communications Protocol V1.1.0
 
 > [!IMPORTANT]
 > Last Updated: 10/8/2024
@@ -6,18 +6,18 @@
 Below is a brief overview of the design and communications protocol between our laptop acting as our remote interface (i.e. the control room) and the Rocket Engine Test Stand itself.
 
 ## Table of Contents
- - [Control Room](#control-room)
- - [Test Stand Controller](#test-stand-controller)
- - [Powering the Test Stand](#powering-the-test-stand)
- - [Sensors](#sensors)
- - [Valves](#valves)
- - [Communications](#communications)
- - [Command and Control](#command-and-control)
- - [Sensor Data Transfer](#sensor-data-transfer)
- - [Control Flow](#control-flow)
- - [Arduino Pinout](#arduino-pinout)
- - [Additional Info](#additional-info)
- 
+
+- [Control Room](#control-room)
+- [Test Stand Controller](#test-stand-controller)
+- [Powering the Test Stand](#powering-the-test-stand)
+- [Sensors](#sensors)
+- [Valves](#valves)
+- [Communications](#communications)
+- [Command and Control](#command-and-control)
+- [Sensor Data Transfer](#sensor-data-transfer)
+- [Control Flow](#control-flow)
+- [Arduino Pinout](#arduino-pinout)
+- [Additional Info](#additional-info)
 
 ## Control Room
 
@@ -27,23 +27,13 @@ The software that remotely monitors the engine and allows us to send commands to
 - Receiving and Saving Data
 - Hold and Abort Signals
 - Displaying the Data in a Human Friendly Way
-    - Charts
-    - Text Outputs
-    - Color coding for if data is out of spec
+  - Charts
+  - Text Outputs
+  - Color coding for if data is out of spec
 
 ### Technologies
 
-All of these technologies are open for discussion, the main focus of systems this semester was the Rocket Engine side of things and developing systems to physically control the engine and read data. 
-
-There may be an argument to switch to something like Python and use something like PyQt to do the GUI to make this cross-platform and possibly simplify development. As of right now this is the technology stack:
-
-- C++ 
-- x86-64 Linux (Ubuntu 22.04 but should work generally on most systems)
-    - Linux makes C++ development and Serial port access easier
-- FTXUI
-    - A TUI (Terminal UI) for displaying data in a human readable fashion
-- CMake for building the project and managing deps
-
+We are using C++ and Qt 6.7.2 to build the control room software. You can install the Qt framework for Open Source Usage from https://www.qt.io/download-open-source.
 
 ## Test Stand Controller
 
@@ -75,15 +65,17 @@ This is built on the Arduino platform for easy and plentiful I/O. Arduino provid
 
 > [!NOTE]
 > Originally the rocket engine was supposed to be controlled via Raspberry Pi, we switched to the arduino platform for a couple reasons.
+>
 > - Setup is easier as there is no need to ssh into the arduino and run the control program, it starts up automatically on power on.
 > - The Raspberry Pi has no Analog pin headers, the pressure transducers are analog sensors, switching to Arduino removes the need for analog-digital converters.
 > - The Arduino takes less power, we can power it really easily via the VIN and GND pins compared to RasPI which is much harder to power
 > - Arduino has first class support for our serial communications, where as raspberry pi has support but is slightly more difficult to implement
 > - Arduino has no OS that is also has to run, it just runs our code and our code only.
 
-## Sensors 
+## Sensors
 
 The rocket engine has 8 sensors:
+
 - 1 Load Cell for measuring thrust
 - 4 Thermocouples
     - 1 At the Nozzle exit
@@ -91,13 +83,13 @@ The rocket engine has 8 sensors:
     - 1 On the N2O inlet and injector Plate
     - On the combustion chamber at the throat of the nozzle (the constriction)
 - 6 Pressure Transducers
-    - 1 Inside the Combustion Chamber
-        - According to David, the back of the combustion chamber should be cool enough to not destroy this sensor
-    - 1 Down Line of the Inert Gas System
-    - 2 Before the injector plate
-        - 1 for fuel
-        - 1 for oxidizer
-    - 2 After the valves for fuel and oxidizer
+  - 1 Inside the Combustion Chamber
+    - According to David, the back of the combustion chamber should be cool enough to not destroy this sensor
+  - 1 Down Line of the Inert Gas System
+  - 2 Before the injector plate
+    - 1 for fuel
+    - 1 for oxidizer
+  - 2 After the valves for fuel and oxidizer
 
 The pressure transducers are analog sensors that vary their voltage depending on the pressure they are detecting.
 
@@ -107,9 +99,8 @@ The thermocouple and load cell both have amplifiers that act as analog-digital c
 
 We are using three 12v solenoid valves that operate at 1.33 amps. This is simply too much power to send over a wire with our budget. See the power section for more information.
 
-Power will be delivered to the solenoids via solid-state relays, this allows the 
+Power will be delivered to the solenoids via solid-state relays, this allows the
 5v logic level of the Arduino power the relays reliably.
-
 
 ## Communications
 
@@ -170,10 +161,10 @@ typedef struct
 {
   float loadCell;
   float thermocouple[4];
+  float thermocouple[4];
   float pressure[6];
 } SensorData;
 ```
-
 
 ## Control Flow
 
@@ -189,16 +180,9 @@ typedef struct
 
 ## Arduino Pinout
 
-The Pinout is still being developed, the only finalized pins at the moment are:
+See the Schematic using KiCad for the most up to date Arduino Pins.
 
-- PIN 18: Output
-    - Serial1 TX pin
-- PIN 19: Input
-    - Serial1 RX pin
 
 ## Additional Info
 
 For additional info into how to build the Control Room software, configure the Arduino, and other parts of the project, consult the docs folder of the [GitHub Repository](https://github.com/Rensselaer-Spaceflight-Society/Rocket-Engine)
-
- 
-
