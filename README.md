@@ -169,8 +169,8 @@ Sensor data is sent in packets of 44 bytes (352 bits) of binary data with the fo
 typedef struct
 {
   float loadCell;
-  int_16 thermocouple[4];
-  int_16 pressure[6];
+  float thermocouple[4];
+  float pressure[6];
 } SensorData;
 ```
 

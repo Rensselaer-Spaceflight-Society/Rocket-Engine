@@ -51,7 +51,7 @@ struct Sensors
 {
     float loadCell;
     float thermocouple[4];
-    int16_t pressure[6];
+    float pressure[6];
 };
 
 Sensors sensorData = {0};
@@ -73,6 +73,14 @@ float processThermoCoupleValue(int analogSignal)
 {
     float voltage = analogSignal * (5.0 / 1023.0); // assuming 5V ref
     return voltage / voltageToTempScale;
+}
+
+float processPressureValue(int analogSignal)
+{
+    // Min 0.5 v -> 0 psi
+    // Max 4.5 v -> 500 psi
+    float voltage = analogSignal * (5.0 / 1023.0);
+    return (voltage - 0.5) * (500 / 4.0);
 }
 
 void closeValve(int pin)
@@ -106,12 +114,13 @@ void checkComms(const char *expectedSignal)
 void readSensor(Sensors &sensorData)
 {
     sensorData.loadCell = digitalRead(LOADCELL);
-    sensorData.pressure[0] = analogRead(PRESSSEN1);
-    sensorData.pressure[1] = analogRead(PRESSSEN2);
-    sensorData.pressure[2] = analogRead(PRESSSEN3);
-    sensorData.pressure[3] = analogRead(PRESSSEN4);
-    sensorData.pressure[4] = analogRead(PRESSSEN5);
-    sensorData.pressure[5] = analogRead(PRESSSEN6);
+    
+    sensorData.pressure[0] = processPressureValue(analogRead(PRESSSEN1));
+    sensorData.pressure[1] = processPressureValue(analogRead(PRESSSEN2));
+    sensorData.pressure[2] = processPressureValue(analogRead(PRESSSEN3));
+    sensorData.pressure[3] = processPressureValue(analogRead(PRESSSEN4));
+    sensorData.pressure[4] = processPressureValue(analogRead(PRESSSEN5));
+    sensorData.pressure[5] = processPressureValue(analogRead(PRESSSEN6));
 
     sensorData.thermocouple[0] = processThermoCoupleValue(analogRead(THERMOCPL1));
     sensorData.thermocouple[1] = processThermoCoupleValue(analogRead(THERMOCPL2));
@@ -120,24 +129,22 @@ void readSensor(Sensors &sensorData)
 }
 -
 
-void sendSensor(Sensors &sensorData)
+    void
+    sendSensor(Sensors &sensorData)
 {
     readSensor(sensorData); // Read sensor values before sending
     memcpy(dataOut, &sensorData, sizeof(Sensors));
     Serial.write(dataOut, sizeof(Sensors));
 }
 
-
 // Operations functions
 void pressFuel()
 {
 }
 
-
 void nominalCheck()
 {
 }
-
 
 void nitrogenFlush(int duration)
 {
@@ -147,7 +154,6 @@ void nitrogenFlush(int duration)
     closeValve(NITROGENVALVE);
     Serial.println("Inert gas flush ended");
 }
-
 
 void ignitionSequence()
 {
@@ -159,7 +165,6 @@ void ignitionSequence()
     openValve(OXIDIZERVALVE);
     Serial.println("Should be burning now");
 }
-
 
 void shutdownSequence()
 {
@@ -175,7 +180,6 @@ void shutdownSequence()
     openValve(NITROGENVALVE);
     Serial.println("Hopefully no more burning");
 }
-
 
 // Setup function
 void setup()
