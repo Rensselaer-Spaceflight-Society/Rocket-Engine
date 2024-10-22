@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->commsPort->setStopBits(QSerialPort::StopBits::OneStop);
 
     this->commandSender = new SerialDataWriter(this->commsPort);
+    this->commandSender->run();
 
     // Disable the Abort and Countdown Button until a connection is established
     ui->AbortButton->setDisabled(true);
@@ -29,11 +30,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this->ui->RefreshSerialPorts, &QPushButton::clicked, this, &MainWindow::handleSerialPortRefresh);
     connect(this->ui->AbortButton, &QPushButton::clicked, this, &MainWindow::handleShutdown);
     connect(this->ui->SerialPortDropdown, &QComboBox::currentIndexChanged, this, &MainWindow::handleSerialPortSelection);
+    connect(this, &MainWindow::issueCommand, this->commandSender, &SerialDataWriter::issueCommand);
+    connect(this, &MainWindow::startPings, this->commandSender, &SerialDataWriter::setStartPings);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
 {
-    if(keyEvent->key() == Qt::Key_Backspace)
+    if(keyEvent->key() == Qt::Key_Backspace
+        && this->ui->AbortButton->isEnabled())
     {
         this->handleShutdown();
     }
@@ -58,12 +62,12 @@ void MainWindow::handleSerialPortRefresh()
 void MainWindow::handleShutdown()
 {
     ui->AbortButton->setDisabled(true);
+    ui->StartCountdown->setDisabled(true);
     ui->AbortButton->setText("Shutdown Started");
     ui->AbortButton->setStyleSheet("#AbortButton {background-color: rgb(119, 118, 123); color: rgb(255, 255, 255);}");
 
-    Command shutdown = Command(SHUTDOWN_COMMAND, CommandPriority::HIGH);
-    this->commandSender->addNewCommandToQueue(shutdown);
-    ui->StartCountdown->setDisabled(true);
+    std::string shutdown = SHUTDOWN_COMMAND;
+    emit issueCommand(shutdown);
 }
 
 void MainWindow::handleSerialPortSelection(int index)
@@ -78,9 +82,12 @@ void MainWindow::handleSerialPortSelection(int index)
     else
     {
         ui->ConnectionStatus->setText("Serial Port Opened");
+        // Attempt connection with the test stand
+        std::string connectionCommand = CONTROL_ACTIVE_COMMAND;
+        emit issueCommand(connectionCommand);
     }
-
 }
+
 
 QStringList MainWindow::getSerialPorts()
 {

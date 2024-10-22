@@ -28,6 +28,10 @@ private slots:
     void handleSerialPortRefresh();
     void handleSerialPortSelection(int portIndex);
 
+signals:
+    void issueCommand(const std::string & command);
+    void startPings();
+
 protected:
     void keyPressEvent(QKeyEvent* keyEvent) override;
 

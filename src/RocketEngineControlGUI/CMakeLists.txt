@@ -28,7 +28,7 @@ qt_add_executable(RocketEngineControlGUI
 
     components/datachart.h components/datachart.cpp components/datachart.ui
     communications/serialdatawriter.h communications/serialdatawriter.cpp
-    communications/command.h
+
 
 )
 
