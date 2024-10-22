@@ -1,6 +1,8 @@
-#include "mainwindow.h"
-#include "./ui_mainwindow.h"
 #include <QtCharts/QtCharts>
+#include <QSerialPort>
+
+#include "./ui_mainwindow.h"
+#include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -9,45 +11,97 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->configureCharts();
     this->handleSerialPortRefresh();
+
+    // TODO: Finalize Comms Details with Firmware and Software
+    this->commsPort = new QSerialPort();
+    this->commsPort->setBaudRate(QSerialPort::BaudRate::Baud9600);
+    this->commsPort->setParity(QSerialPort::Parity::NoParity);
+    this->commsPort->setFlowControl(QSerialPort::FlowControl::NoFlowControl);
+    this->commsPort->setDataBits(QSerialPort::DataBits::Data8);
+    this->commsPort->setStopBits(QSerialPort::StopBits::OneStop);
+
+    this->commandSender = new SerialDataWriter(this->commsPort);
+    this->commandSender->run();
+
+    // Disable the Abort and Countdown Button until a connection is established
+    ui->AbortButton->setDisabled(true);
+    ui->StartCountdown->setDisabled(true);
+
     connect(this->ui->RefreshSerialPorts, &QPushButton::clicked, this, &MainWindow::handleSerialPortRefresh);
     connect(this->ui->AbortButton, &QPushButton::clicked, this, &MainWindow::handleShutdown);
+    connect(this->ui->SerialPortDropdown, &QComboBox::currentIndexChanged, this, &MainWindow::handleSerialPortSelection);
+    connect(this, &MainWindow::issueCommand, this->commandSender, &SerialDataWriter::issueCommand);
+    connect(this, &MainWindow::startPings, this->commandSender, &SerialDataWriter::setStartPings);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
 {
-    if(keyEvent->key() == Qt::Key_Backspace)
+    if(keyEvent->key() == Qt::Key_Backspace
+        && this->ui->AbortButton->isEnabled())
     {
         this->handleShutdown();
     }
+
+    QMainWindow::keyPressEvent(keyEvent);
 }
 
 MainWindow::~MainWindow()
 {
+    if(commsPort->isOpen()) commsPort->close();
+    delete commsPort;
     delete ui;
 }
 
 void MainWindow::handleSerialPortRefresh()
 {
     ui->SerialPortDropdown->clear();
+    ui->SerialPortDropdown->addItem("Select a Serial Port");
     ui->SerialPortDropdown->addItems(this->getSerialPorts());
 }
 
 void MainWindow::handleShutdown()
 {
     ui->AbortButton->setDisabled(true);
+    ui->StartCountdown->setDisabled(true);
     ui->AbortButton->setText("Shutdown Started");
-    ui->AbortButton->setStyleSheet("#AbortButton {\n	background-color: rgb(119, 118, 123); \n color: rgb(255, 255, 255);}");
-    // Shutdown Logic goes below here:
+    ui->AbortButton->setStyleSheet("#AbortButton {background-color: rgb(119, 118, 123); color: rgb(255, 255, 255);}");
+
+    std::string shutdown = SHUTDOWN_COMMAND;
+    emit issueCommand(shutdown);
 }
+
+void MainWindow::handleSerialPortSelection(int index)
+{
+    if(this->commsPort->isOpen()) this->commsPort->close();
+    // Adjust the index by -1 to account for the "Select a Serial Port Option"
+    this->commsPort->setPort(availableSerialPorts[index-1]);
+    if(!this->commsPort->open(QIODevice::ReadWrite))
+    {
+        ui->ConnectionStatus->setText("Serial Port Failed to Open");
+    }
+    else
+    {
+        ui->ConnectionStatus->setText("Serial Port Opened");
+        // Attempt connection with the test stand
+        std::string connectionCommand = CONTROL_ACTIVE_COMMAND;
+        emit issueCommand(connectionCommand);
+    }
+}
+
 
 QStringList MainWindow::getSerialPorts()
 {
-    QStringList ports;
-    QList<QSerialPortInfo> openPorts = QSerialPortInfo::availablePorts();
-    for(auto const & port: openPorts){
-        if(port.hasVendorIdentifier()) ports.append(port.portName() + ": " + port.manufacturer());
+
+    QStringList portDropdownOptions;
+    this->availableSerialPorts = QSerialPortInfo::availablePorts();
+    for(auto const & port: this->availableSerialPorts)
+    {
+        if(port.hasVendorIdentifier())
+        {
+            portDropdownOptions.append(port.portName() + ": " + port.manufacturer());
+        }
     }
-    return ports;
+    return portDropdownOptions;
 }
 
 void MainWindow::configureCharts()
