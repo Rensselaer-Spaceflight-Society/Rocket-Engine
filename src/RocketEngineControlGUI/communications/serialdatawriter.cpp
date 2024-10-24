@@ -27,7 +27,8 @@ void SerialDataWriter::run()
         }
         else // If there is no command to send then just send a ping
         {
-            this->safeDataWrite(commandToSend.data());
+            std::string ping = PING_COMMAND;
+            if(startPings) this->safeDataWrite(ping.data());
         }
     }
 }
@@ -45,11 +46,13 @@ void SerialDataWriter::safeDataWrite(char * data)
 
     if(bytesWritten < BYTES_IN_COMMAND){
         qDebug() << "Failed to Send Comand: " << commandToSend << "\n";
+        qDebug() << "Bytes Written: " << bytesWritten;
         emit commandFailed(commandToSend);
         return;
     }
 
     commandRetries++;
+    timeSinceLastCommand = 0;
     emit sentCommand(commandToSend);
 }
 

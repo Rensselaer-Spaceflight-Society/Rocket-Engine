@@ -5,7 +5,7 @@
 #include <QThread>
 #include <QDebug>
 
-#define COMMAND_WAIT_MS 50
+#define COMMAND_WAIT_MS 200
 #define BYTES_IN_COMMAND 8
 #define MAX_COMMAND_RETRIES 3
 #define CONTROL_ACTIVE_COMMAND "CtrlActi"

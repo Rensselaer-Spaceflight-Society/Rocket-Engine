@@ -21,7 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->commsPort->setStopBits(QSerialPort::StopBits::OneStop);
 
     this->commandSender = new SerialDataWriter(this->commsPort);
-    this->commandSender->run();
+    this->commandSender->wait();
+    this->commandSender->start();
 
     // Disable the Abort and Countdown Button until a connection is established
     ui->AbortButton->setDisabled(true);
@@ -47,7 +48,9 @@ void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
 
 MainWindow::~MainWindow()
 {
+    this->commandSender->exit();
     if(commsPort->isOpen()) commsPort->close();
+    delete commandSender;
     delete commsPort;
     delete ui;
 }
@@ -74,6 +77,7 @@ void MainWindow::handleSerialPortSelection(int index)
 {
     if(this->commsPort->isOpen()) this->commsPort->close();
     // Adjust the index by -1 to account for the "Select a Serial Port Option"
+    if(index-1 < 0) return;
     this->commsPort->setPort(availableSerialPorts[index-1]);
     if(!this->commsPort->open(QIODevice::ReadWrite))
     {
