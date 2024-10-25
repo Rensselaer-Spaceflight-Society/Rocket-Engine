@@ -60,7 +60,39 @@ void SerialWorker::run()
 
 void SerialWorker::readOperation()
 {
+<<<<<<< HEAD
 
+=======
+    while(serialPort->bytesAvailable() >= BYTES_IN_COMMAND){
+
+        if(bytesInDataBuffer == 0)
+        {
+            // If there is not data in the data buffer then we should read
+            // data from the serial port and check if its a command ack.
+            serialPort->read(dataBuffer, BYTES_IN_COMMAND);
+
+            // If the first BYTES_IN_COMMAND bytes in the data buffer match
+            // the most recently sent command then this is an acknowledgement
+            if(memcmp(dataBuffer, mostRecentlySentCommand.c_str(), BYTES_IN_COMMAND) == 0){
+                emit commandSuccess(commandToSend);
+                continue;
+            }else{
+                // If they do not match the command then it is likely data, in which case,
+            }
+        }
+        else
+        {
+            // If there is data in the buffer already then we need to
+            // read the rest of the sensor data if it is in the serial port's buffer
+            if(serialPort->bytesAvailable() >= sizeof(SensorData) - bytesInDataBuffer)
+            {
+
+            }
+        }
+
+
+    }
+>>>>>>> 85894266837c7fbd524f2e449e52bafd67f3484d
 }
 
 void SerialWorker::writeOperation()
