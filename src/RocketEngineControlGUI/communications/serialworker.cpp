@@ -11,6 +11,13 @@ SerialWorker::SerialWorker(QObject *parent)
     this->serialPort->setStopBits(QSerialPort::StopBits::OneStop);
 
     this->commandToSend = "";
+
+    connect(
+        this->serialPort.data(),
+        &QSerialPort::errorOccurred,
+        this,
+        &SerialWorker::handleSerialError
+    );
 }
 
 /**
@@ -18,17 +25,7 @@ SerialWorker::SerialWorker(QObject *parent)
  *
  * Loops until told to stop executing. On each loop yield for like
  * 10ms, then we want to check if there is data available in the serial
- * port, if there is then we want to pull the BYTES_IN_COMMAND number of
- * bytes, and check if those 8 bytes equal the command that was most
- * recently sent or if they equal a ping and if they are emit a signal
- * to handle them as such. If they are not a command acknowledgement
- * or ping ack, then it is likely data, and we can emit as such.
- * We should continue reading until the buffer is < BYTES_IN_COMMAND
- *
- * If we get a parity error, then we will read the whole buffer,
- * emit a parity error signal so that the potentially incorrect data
- * can be analyzed later but it won't be included in data logs or
- * as a possible command ack.
+ * port and handle reading if needed.
  *
  * After reading, we want to do our write operations, we check if
  * there is a command to send and it is time to send the command if
@@ -38,6 +35,63 @@ SerialWorker::SerialWorker(QObject *parent)
  * have a solid 2-way connection.
  */
 void SerialWorker::run()
+{
+    while(true)
+    {
+        // Yield to reduce tight loops
+        this->msleep(WORKER_LOOP_YIELD_MS);
+
+        // Handle the read operations
+        this->readOperation();
+
+        // Handle any write operations
+        this->writeOperation();
+    }
+}
+
+/**
+ * If there is then we want to pull the BYTES_IN_COMMAND number of
+ * bytes, and check if those 8 bytes equal the command that was most
+ * recently sent or if they equal a ping and if they are emit a signal
+ * to handle them as such. If they are not a command acknowledgement
+ * or ping ack, then it is likely data, and we can emit as such.
+ * We should continue reading until the buffer is < BYTES_IN_COMMAND
+*/
+
+void SerialWorker::readOperation()
+{
+    while(serialPort->bytesAvailable() >= BYTES_IN_COMMAND){
+
+        if(bytesInDataBuffer == 0)
+        {
+            // If there is not data in the data buffer then we should read
+            // data from the serial port and check if its a command ack.
+            serialPort->read(dataBuffer, BYTES_IN_COMMAND);
+
+            // If the first BYTES_IN_COMMAND bytes in the data buffer match
+            // the most recently sent command then this is an acknowledgement
+            if(memcmp(dataBuffer, mostRecentlySentCommand.c_str(), BYTES_IN_COMMAND) == 0){
+                emit commandSuccess(commandToSend);
+                continue;
+            }else{
+                // If they do not match the command then it is likely data, in which case,
+            }
+        }
+        else
+        {
+            // If there is data in the buffer already then we need to
+            // read the rest of the sensor data if it is in the serial port's buffer
+            if(serialPort->bytesAvailable() >= sizeof(SensorData) - bytesInDataBuffer)
+            {
+
+            }
+        }
+
+
+    }
+}
+
+void SerialWorker::writeOperation()
 {
 
 }
@@ -72,19 +126,31 @@ void SerialWorker::setStartPings(bool value)
 
 /*
 Error Type              | Signal to Emit           | Action Plan
-----------------------------------------------------------
-Parity Error            | parityErrorOccurred      | Log data for review and request retransmission
-Framing Error           | framingErrorOccurred     | Log and retry
-Overrun Error           | overrunErrorOccurred     | Log, adjust buffer size, or reduce rate
-Buffer Overflow Error	| bufferOverflowOccurred   | Log and increase buffer size
-Break Condition Error	| breakConditionOccurred   | Log, check physical connection
+-------------------------------------------------------------------------------
 Read Error              | readErrorOccurred        | Log and retry or notify user
-Write Error             | writeErrorOccurred       | Log and retry or notify user
 Resource Error          | resourceErrorOccurred    | Close port, attempt reconnection
-Timeout Error           | timeoutErrorOccurred     | Log, retry, or fail-safe
 Permission Error        | permissionErrorOccurred  | Notify user, elevate permissions
 */
 void SerialWorker::handleSerialError(QSerialPort::SerialPortError error)
 {
+    switch (error) {
+    case QSerialPort::NoError:
+        break;
 
+    case QSerialPort::ReadError:
+        emit readErrorOccurred();
+        break;
+
+    case QSerialPort::ResourceError:
+        emit resourceErrorOccurred();
+        break;
+
+    case QSerialPort::PermissionError:
+        emit permissionErrorOccurred();
+        break;
+
+    default:
+        qDebug() << "Unsupported Serial Port Error Occurred, Error Code: " << error ;
+        break;
+    }
 }
