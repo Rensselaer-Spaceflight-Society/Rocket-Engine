@@ -139,12 +139,27 @@ On Shutdown, the test stand should send a message that the engine was shutdown.
 
 Sensor data is sent in packets of 44 bytes of binary data with the following structure:
 
+// The order of sensors is:
+/*
+ * thermocouple[0] = injector plate & kerosene inlet
+ * thermocouple[1] = injector plate & oxidizer inlet
+ * thermocouple[2] = outside the cc at the throat
+ * thermocouple[3] = on the nozzle near the outlet
+ *
+ * pressureTransducer[0] = combustion chamber
+ * pressureTransducer[1] = kerosene feed-line pressure
+ * pressureTransducer[2] = kerosene tank pressure
+ * pressureTransducer[3] = kerosene line pressure
+ * pressureTransducer[4] = oxidizer tank pressure
+ * pressureTransducer[5] = oxidizer line pressure
+*/
+
 ```cpp
 typedef struct
 {
   float loadCell;
   float thermocouple[4];
-  float pressure[6];
+  float pressureTransducer[6];
 } SensorData;
 ```
 

@@ -14,11 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // TODO: Finalize Comms Details with Firmware and Software
     this->commsPort = new QSerialPort();
-    this->commsPort->setBaudRate(QSerialPort::BaudRate::Baud9600);
-    this->commsPort->setParity(QSerialPort::Parity::NoParity);
-    this->commsPort->setFlowControl(QSerialPort::FlowControl::NoFlowControl);
-    this->commsPort->setDataBits(QSerialPort::DataBits::Data8);
-    this->commsPort->setStopBits(QSerialPort::StopBits::OneStop);
+
 
     this->commandSender = new SerialDataWriter(this->commsPort);
     this->commandSender->wait();
