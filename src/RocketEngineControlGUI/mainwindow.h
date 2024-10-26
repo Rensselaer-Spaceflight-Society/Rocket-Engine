@@ -5,7 +5,7 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QStringList>
 
-#include "communications/serialdatawriter.h"
+#include "communications/serialworker.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,15 +30,15 @@ private slots:
 
 signals:
     void issueCommand(const std::string & command);
-    void startPings();
+    void startPings(bool value);
+    void serialPortChanged(QSerialPortInfo port);
 
 protected:
     void keyPressEvent(QKeyEvent* keyEvent) override;
 
 private:
     Ui::MainWindow *ui;
-    QSerialPort *commsPort;
-    SerialDataWriter *commandSender;
+    SerialWorker * commsCenter;
 
     QList<QSerialPortInfo> availableSerialPorts;
 };

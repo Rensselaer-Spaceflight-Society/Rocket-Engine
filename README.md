@@ -118,10 +118,9 @@ The control room and the test stand use 64 bit (8 byte) signals to communicate d
 attempts there still is no acknowledgement, then the control room should assume connection
 is lost and notify the user. If the test stand receives a command that it has already received then it should just send an acknowledgement instead of rerunning code.
 
-We are still deciding on what the test stand should do if connection is lost. This document will be updated when this is decided.
+If test stand connection is lost, then the test stand will automatically go into shutdown procedure.
 
-The acknowledgement is an 8 byte sequence:
-`Accepted`
+The acknowledgement is just a repeat of the command received.
 
 The following sequences are the different commands sent by the control computer and what
 they tell the test stand to do.
@@ -137,7 +136,7 @@ On Shutdown, the test stand should send a message that the engine was shutdown.
 
 ## Sensor Data Transfer
 
-Sensor data is sent in packets of 44 bytes of binary data with the following structure:
+Sensor data is sent in packets of 64 bytes of binary data with the following structure:
 
 // The order of sensors is:
 /*
@@ -157,11 +156,27 @@ Sensor data is sent in packets of 44 bytes of binary data with the following str
 ```cpp
 typedef struct
 {
+  char header[8] = "DataPack"; // Data recieved should be "DataPack" but cannot be assumed to be
   float loadCell;
   float thermocouple[4];
   float pressureTransducer[6];
+  char checksum[12];
 } SensorData;
 ```
+The checksum is a 12-byte XOR hash that verifies all the data is solid and can be found below:
+
+```cpp
+void checksum12(void *checksum, const void *data, int n) {
+    uint8_t* checksumPtr = (uint8_t *) checksum;
+    const uint8_t* dataPtr = (uint8_t *) data;
+    memset(checksum, 0, 12);
+    for (int i = 0; i < n; ++i) {
+        checksumPtr[i % 12] ^= dataPtr[i];
+        checksumPtr[(i + 1) % 12] ^= (dataPtr[i] >> 4) | (dataPtr[i] << 4);  // Simple mixing
+    }
+}
+```
+
 
 ## Control Flow
 

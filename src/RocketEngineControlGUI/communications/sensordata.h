@@ -1,6 +1,10 @@
 #ifndef SENSORDATA_H
 #define SENSORDATA_H
 
+#define EXPECTED_DATA_HEADER "DataPack"
+#define CHECKSUM_SIZE 12
+#define HEADER_SIZE 8
+
 // The order of sensors is:
 /*
  * thermocouple[0] = injector plate & kerosene inlet
@@ -17,9 +21,11 @@
 */
 
 typedef struct {
+    char header[HEADER_SIZE];
     float loadCell;
     float thermocouple[4];
     float pressureTransducer[6];
+    char checksum[CHECKSUM_SIZE];
 } SensorData;
 
 #endif // SENSORDATA_H

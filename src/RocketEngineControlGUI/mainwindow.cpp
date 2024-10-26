@@ -12,13 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->configureCharts();
     this->handleSerialPortRefresh();
 
-    // TODO: Finalize Comms Details with Firmware and Software
-    this->commsPort = new QSerialPort();
-
-
-    this->commandSender = new SerialDataWriter(this->commsPort);
-    this->commandSender->wait();
-    this->commandSender->start();
+    commsCenter = new SerialWorker(this);
 
     // Disable the Abort and Countdown Button until a connection is established
     ui->AbortButton->setDisabled(true);
@@ -27,8 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this->ui->RefreshSerialPorts, &QPushButton::clicked, this, &MainWindow::handleSerialPortRefresh);
     connect(this->ui->AbortButton, &QPushButton::clicked, this, &MainWindow::handleShutdown);
     connect(this->ui->SerialPortDropdown, &QComboBox::currentIndexChanged, this, &MainWindow::handleSerialPortSelection);
-    connect(this, &MainWindow::issueCommand, this->commandSender, &SerialDataWriter::issueCommand);
-    connect(this, &MainWindow::startPings, this->commandSender, &SerialDataWriter::setStartPings);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
@@ -44,10 +36,7 @@ void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
 
 MainWindow::~MainWindow()
 {
-    this->commandSender->exit();
-    if(commsPort->isOpen()) commsPort->close();
-    delete commandSender;
-    delete commsPort;
+    delete commsCenter;
     delete ui;
 }
 
@@ -71,21 +60,10 @@ void MainWindow::handleShutdown()
 
 void MainWindow::handleSerialPortSelection(int index)
 {
-    if(this->commsPort->isOpen()) this->commsPort->close();
+
     // Adjust the index by -1 to account for the "Select a Serial Port Option"
     if(index-1 < 0) return;
-    this->commsPort->setPort(availableSerialPorts[index-1]);
-    if(!this->commsPort->open(QIODevice::ReadWrite))
-    {
-        ui->ConnectionStatus->setText("Serial Port Failed to Open");
-    }
-    else
-    {
-        ui->ConnectionStatus->setText("Serial Port Opened");
-        // Attempt connection with the test stand
-        std::string connectionCommand = CONTROL_ACTIVE_COMMAND;
-        emit issueCommand(connectionCommand);
-    }
+    emit serialPortChanged(availableSerialPorts[index-1]);
 }
 
 
