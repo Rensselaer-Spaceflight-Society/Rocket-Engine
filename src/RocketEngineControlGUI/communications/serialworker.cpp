@@ -125,7 +125,7 @@ void SerialWorker::readOperation()
         {
             // If there are not bytes in the data buffer then we want to try and read BYTES_IN_COMMAND number of bytes
             // to see if its a command ack or data packet
-            bytesInDataBuffer = serialPort->read(dataBuffer, BYTES_IN_COMMAND);;
+            bytesInDataBuffer = serialPort->read(dataBuffer, BYTES_IN_COMMAND);
 
             if(!memcmp(mostRecentlySentCommand.data(), dataBuffer, BYTES_IN_COMMAND)){
                 // If this does match the most recent command sent then great emit and continue
@@ -211,7 +211,7 @@ void SerialWorker::writeOperation()
 void SerialWorker::checksum12(void *checksum, const void *data, int n) {
     uint8_t* checksumPtr = (uint8_t *) checksum;
     const uint8_t* dataPtr = (uint8_t *) data;
-    memset(checksum, 0, 12);
+    memset(checksumPtr, 0, 12);
     for (int i = 0; i < n; ++i) {
         checksumPtr[i % 12] ^= dataPtr[i];
         checksumPtr[(i + 1) % 12] ^= (dataPtr[i] >> 4) | (dataPtr[i] << 4);  // Simple mixing

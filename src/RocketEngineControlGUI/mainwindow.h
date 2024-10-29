@@ -13,15 +13,15 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
-    void configureCharts();
-    QStringList getSerialPorts();
+    ~MainWindow();   
 
 private slots:
     void handleShutdown();
@@ -34,6 +34,8 @@ signals:
     void serialPortChanged(QSerialPortInfo port);
 
 protected:
+    void configureCharts();
+    QStringList getSerialPorts();
     void keyPressEvent(QKeyEvent* keyEvent) override;
 
 private:
