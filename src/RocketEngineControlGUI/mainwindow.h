@@ -13,7 +13,17 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-
+enum class EngineStates : int8_t {
+    CONNECTION_FAILURE = -1,
+    NO_CONNECTION,
+    CONNECTION_ESTABLISHED,
+    COUNTDOWN_STARTED,
+    AUTO_HOLD,
+    PRESTART_NITROGEN_FLUSH,
+    PRESSUREIZED_FUEL,
+    IGNITION,
+    SHUTDOWN,
+};
 
 class MainWindow : public QMainWindow
 {
@@ -28,6 +38,14 @@ private slots:
     void handleSerialPortRefresh();
     void handleSerialPortSelection(int portIndex);
 
+    void handleCommandAttempt(std::string command);
+    void handleCommandFailed(std::string command);
+    void handleCommandSuccess(std::string command);
+    void handleDataAvailable(const QSharedPointer<SensorData> data);
+    void handleCorruptedData(const QSharedPointer<QByteArray> data);
+    void handlePortOpenFailed();
+    void handlePortOpenSuccess();
+
 signals:
     void issueCommand(const std::string & command);
     void startPings(bool value);
@@ -41,6 +59,7 @@ protected:
 private:
     Ui::MainWindow *ui;
     SerialWorker * commsCenter;
+    EngineStates currentState = EngineStates::NO_CONNECTION;
 
     QList<QSerialPortInfo> availableSerialPorts;
 };
