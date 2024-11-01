@@ -1,7 +1,7 @@
 # RPU Systems Design and Communications Protocol V1.1.0
 
 > [!IMPORTANT]
-> Last Updated: 9/22/2024
+> Last Updated: 10/8/2024
 
 Below is a brief overview of the design and communications protocol between our laptop acting as our remote interface (i.e. the control room) and the Rocket Engine Test Stand itself.
 
@@ -77,8 +77,11 @@ This is built on the Arduino platform for easy and plentiful I/O. Arduino provid
 The rocket engine has 8 sensors:
 
 - 1 Load Cell for measuring thrust
-- 4 Thermocouples placed before the injector plate
-    - Each one placed at on the injector plate next to the fuel inlets.
+- 4 Thermocouples
+    - 1 At the Nozzle exit
+    - 1 On the Kerosene Inlet and Injector Plate
+    - 1 On the N2O inlet and injector Plate
+    - On the combustion chamber at the throat of the nozzle (the constriction)
 - 6 Pressure Transducers
   - 1 Inside the Combustion Chamber
     - According to David, the back of the combustion chamber should be cool enough to not destroy this sensor
@@ -180,14 +183,15 @@ void checksum12(void *checksum, const void *data, int n) {
 
 ## Control Flow
 
-1. The test stand and the control computer will come online, the control computer will start sending out the signal `CtrlActi` signal. When the test stand receives this, it will send the acknowledgement. On receiving the acknowledgement, the control stand will recognize a connection being solid.
-2. The control computer will send the `LogStart` command to tell the test stand to start logging, the test stands sends the acknowledgement, and then will start sending sensor data.
-3. At T-10s We will send the `InrtFlsh` command to trigger the test-stand to do the inert flush. 
-4. At T-5s We will send the `PresFuel` command to trigger the opening of fuel pressurization valve
-5. At T-0.5s We will send the `Ignition` command to initiate the ignition sequence
-6. If the test stand detects an anomaly / the end of the test, then it will shutdown and send a message that it shutdown.
-7. If the test stand receives the `Shutdown` message, then it should run the shutdown procedure and alert that it shutdown.
-
+1. Test Stand comes online, sets up all the pins for the engine
+1. Control Room comes online, and sends the `CtrlActi` signal while waiting for a `LogStart` signal
+1. Control Room sends the `LogStart` signal, and the Test Stand begins sending Sensor Data every quarter second, and the `LogStart` signal.
+1. Control Room sees the `LogStart` signal, and sends the `PressFuel` signal, which once seen by the Test Stand is sent back after the Fuel Tank is pressurized
+1. Control Room sees the `PressFuel` signal, and sends the `InertFlush` signal, which once seen by the Test Stand is returned after a brief Inert Flush
+1. Control Room sees the `InertFlush` signal and sends the `Ignite` signal, which once seen by the Test Stand is returned after the ignition sequence begins
+1. After Ignition, the Test Stand sends sensor data as fast as it can for the duration of operation, whilst also checking if conditions are nominal
+1. Assuming conditions are nominal, the Test Stand and the Control Room send the `Ping` Signal back and forth to ensure a stable connection.
+1. If Conditions were unstable, there has been a significant amount of time since the Test Stand has received a `Ping`, or the Control Room has sent the `Shutdown` signal, the Test Stand intiates a Shutdown Sequence
 
 ## Arduino Pinout
 
