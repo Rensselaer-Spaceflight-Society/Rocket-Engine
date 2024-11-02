@@ -1,8 +1,6 @@
 #ifndef LOGHANDLER_H
 #define LOGHANDLER_H
 
-#include <exception>
-
 #include <QFile>
 #include <QSharedPointer>
 #include <QDateTime>
@@ -44,6 +42,7 @@ protected:
 
 private:
     QFile dataLog, eventLog, corruptionLog;
+    QTextStream dataStream, eventStream, corruptionStream;
 };
 
 #endif // LOGHANDLER_H
