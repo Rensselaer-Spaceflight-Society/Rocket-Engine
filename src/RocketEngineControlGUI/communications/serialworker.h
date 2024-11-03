@@ -39,6 +39,7 @@ protected:
     void writeOperation();
     void checksum12(void * checksum, const void * data, int n);
     void processSensorData();
+    void metricUnitConversions(SensorData & data);
 
 public slots:
     void onPortNameChange(const QSerialPortInfo & port);

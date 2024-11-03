@@ -245,11 +245,19 @@ void SerialWorker::processSensorData()
         // Copy to SensorData Struct and emit as Data if valid
         QSharedPointer<SensorData> sensorData = QSharedPointer<SensorData>(new SensorData);
         memcpy(dataBuffer, sensorData.data(), sizeof(SensorData));
+        // Convert to metric units
+        this->metricUnitConversions(*sensorData);
+
         emit dataAvailable(sensorData);
     }
 
     // Indicate that the data buffer has been processed and is now empty.
     bytesInDataBuffer = 0;
+}
+
+void SerialWorker::metricUnitConversions(SensorData & data)
+{
+    throw std::runtime_error("NOT IMPLEMENTED");
 }
 
 void SerialWorker::onPortNameChange(const QSerialPortInfo & port)

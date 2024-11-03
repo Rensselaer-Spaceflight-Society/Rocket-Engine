@@ -6,6 +6,7 @@
 #include <QStringList>
 
 #include "communications/serialworker.h"
+#include "logging/loghandler.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -46,6 +47,12 @@ private slots:
     void handlePortOpenFailed();
     void handlePortOpenSuccess();
 
+    // Serial Error Handlers
+    void handleReadErrorOccurred();
+    void handleResourceErrorOccurred();
+    void handlePermissionErrorOccurred();
+    void handleGenericErrorOccurred(QSerialPort::SerialPortError error);
+
 signals:
     void issueCommand(const std::string & command);
     void startPings(bool value);
@@ -59,6 +66,7 @@ protected:
 private:
     Ui::MainWindow *ui;
     SerialWorker * commsCenter;
+    LogHandler logger;
     EngineStates currentState = EngineStates::NO_CONNECTION;
 
     QList<QSerialPortInfo> availableSerialPorts;
