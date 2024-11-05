@@ -23,9 +23,18 @@ LogHandler::LogHandler(
         corruptedDataFileName = QString("corrupted-data-%1.csv").arg(datetime);
     }
 
+    // Make the folder if it doesn't already exist
+
+    QDir dir(outputPath);
+    if (!dir.exists()) {
+        dir.mkpath(".");  // Create the directory and any necessary parent directories
+    }
+
     QString dataFilePath = outputPath + "/" + dataFileName;
     QString eventFilePath = outputPath + "/" + eventFileName;
     QString corruptedDataFilePath = outputPath + "/" + corruptedDataFileName;
+
+    qDebug() << dataFilePath;
 
     dataLog.setFileName(dataFilePath);
     eventLog.setFileName(eventFilePath);
@@ -36,7 +45,7 @@ LogHandler::LogHandler(
     if(!fileOpened)
     {
         throw std::runtime_error("Sensor Data Log failed to Open, check that the destination folder exists and you have"
-                                 "permissions to write to the folder.");
+                                 " permissions to write to the folder.");
     }
 
     fileOpened = openFile(this->eventLog);
@@ -44,7 +53,7 @@ LogHandler::LogHandler(
     if(!fileOpened)
     {
         throw std::runtime_error("Event Log failed to Open, check that the destination folder exists and you have"
-                                 "permissions to write to the folder.");
+                                 " permissions to write to the folder.");
     }
 
     fileOpened = openFile(this->corruptionLog);
@@ -52,7 +61,7 @@ LogHandler::LogHandler(
     if(!fileOpened)
     {
         throw std::runtime_error("Corrupted Data Log failed to Open, check that the destination folder exists and you have"
-                                 "permissions to write to the folder.");
+                                 " permissions to write to the folder.");
     }
 
     dataStream.setDevice(&dataLog);

@@ -2,6 +2,7 @@
 #define LOGHANDLER_H
 
 #include <QFile>
+#include <QDir>
 #include <QSharedPointer>
 #include <QDateTime>
 #include <QException>

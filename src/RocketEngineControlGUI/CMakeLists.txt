@@ -31,6 +31,7 @@ qt_add_executable(RocketEngineControlGUI
     communications/serialworker.h communications/serialworker.cpp
     communications/sensordata.h
     logging/loghandler.h logging/loghandler.cpp
+    components/alertdialog.h components/alertdialog.cpp components/alertdialog.ui
 
 
 )

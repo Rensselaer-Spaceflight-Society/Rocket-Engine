@@ -3,7 +3,7 @@
 
 #include "./ui_mainwindow.h"
 #include "mainwindow.h"
-#define DATA_OUTPUT_PATH "../data"
+#define DATA_OUTPUT_PATH "../../data"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,103 +19,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->AbortButton->setDisabled(true);
     ui->StartCountdown->setDisabled(true);
 
-    connect(
-        this->ui->RefreshSerialPorts,
-        &QPushButton::clicked,
-        this,
-        &MainWindow::handleSerialPortRefresh
-    );
+    this->setupConnections();
 
-    connect(
-        this->ui->AbortButton,
-        &QPushButton::clicked,
-        this,
-        &MainWindow::handleShutdown
-    );
-
-    connect(
-        this->ui->SerialPortDropdown,
-        &QComboBox::currentIndexChanged,
-        this,
-        &MainWindow::handleSerialPortSelection
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::commandAttempt,
-        this,
-        &MainWindow::handleCommandAttempt
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::commandFailed,
-        this,
-        &MainWindow::handleCommandFailed
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::commandSuccess,
-        this,
-        &MainWindow::handleCommandSuccess
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::dataAvailable,
-        this,
-        &MainWindow::handleDataAvailable
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::corruptedData,
-        this,
-        &MainWindow::handleCorruptedData
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::portOpenFailed,
-        this,
-        &MainWindow::handlePortOpenFailed
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::portOpenSuccess,
-        this,
-        &MainWindow::handlePortOpenSuccess
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::readErrorOccurred,
-        this,
-        &MainWindow::handleReadErrorOccurred
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::resourceErrorOccurred,
-        this,
-        &MainWindow::handleResourceErrorOccurred
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::permissionErrorOccurred,
-        this,
-        &MainWindow::handlePermissionErrorOccurred
-    );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::genericErrorOccurred,
-        this,
-        &MainWindow::handleGenericErrorOccurred
-    );
+    this->userAlert = new AlertDialog();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
@@ -132,6 +38,7 @@ void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
 MainWindow::~MainWindow()
 {
     delete commsCenter;
+    delete userAlert;
     delete ui;
 }
 
@@ -149,6 +56,8 @@ void MainWindow::handleShutdown()
     ui->AbortButton->setText("Shutdown Started");
     ui->AbortButton->setStyleSheet("#AbortButton {background-color: rgb(119, 118, 123); color: rgb(255, 255, 255);}");
 
+
+    this->currentState = EngineStates::PENDING_SHUTDOWN;
     std::string shutdown = SHUTDOWN_COMMAND;
     emit issueCommand(shutdown);
 }
@@ -176,8 +85,16 @@ void MainWindow::handleCommandFailed(std::string command)
             + " times without acknowledgement."
     );
 
-    // Alert the user to check hardware and reconnect
-    throw std::runtime_error("NOT IMPLEMENTED");
+    // Alert the user
+    userAlert->setAlertDescription("Communications Lost");
+    userAlert->setAlertTitle(
+        "The command: "
+        + QString::fromStdString(command)
+        + " has failed to be sent and acknowledged by the test stand."
+        + " Please check the communications hardware and try again. "
+        + " Engine shutdown has been started. "
+    );
+    userAlert->show();
 
     // Try to shutdown assuming the connection from the rocket is the one that is severed
     handleShutdown();
@@ -243,28 +160,44 @@ void MainWindow::handleReadErrorOccurred()
 {
     logger.logEvent(EventType::SerialError, "Read error occured. Check Hardware.");
     // Alert the user to the error somehow
-    throw std::runtime_error("NOT IMPLEMENTED");
+
+    userAlert->setAlertDescription("Serial Port Read Error");
+    userAlert->setAlertTitle("There was a read error in the serial port. Please check the USB-Serial device and try again. ");
+    userAlert->show();
 }
 
 void MainWindow::handleResourceErrorOccurred()
 {
     logger.logEvent(EventType::SerialError, "Resource error, try restarting the computer or UART device.");
     // Alert the user to the error somehow
-    throw std::runtime_error("NOT IMPLEMENTED");
+
+    userAlert->setAlertDescription("Serial Resource Error");
+    userAlert->setAlertTitle("There was a serial resource error. This is likely due to another program"
+                             " trying to read the serial port. Please close other programs and try again.");
+    userAlert->show();
 }
 
 void MainWindow::handlePermissionErrorOccurred()
 {
     logger.logEvent(EventType::SerialError, "Permissions Error: Check user serial permissions and restart software.");
     // Alert the user to the error somehow
-    throw std::runtime_error("NOT IMPLEMENTED");
+
+    userAlert->setAlertDescription("Serial Permissions Error");
+    userAlert->setAlertTitle("The current user does not have the permissions to access the specified serial port"
+                             " please check your permissions and try again.");
+    userAlert->show();
 }
 
 void MainWindow::handleGenericErrorOccurred(QSerialPort::SerialPortError error)
 {
     logger.logEvent(EventType::SerialError, "Other Serial Error Occurred, Error Code: " + QString::number(error));
     // Alert the user to the error somehow
-    throw std::runtime_error("NOT IMPLEMENTED");
+
+    userAlert->setAlertDescription("Generic Serial Error Occurred");
+    userAlert->setAlertTitle(
+        "An undefined serial error with code: "
+        + QString::number(error) + "occurred. Please check serial hardware and try again.");
+    userAlert->show();
 }
 
 
@@ -312,3 +245,114 @@ void MainWindow::configureCharts()
     ui->FuelFeedPressureChart->setChartType(ChartType::Pressure);
 }
 
+void MainWindow::setupConnections()
+{
+    connect(
+        this->ui->RefreshSerialPorts,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::handleSerialPortRefresh
+        );
+
+    connect(
+        this->ui->AbortButton,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::handleShutdown
+        );
+
+    connect(
+        this->ui->SerialPortDropdown,
+        &QComboBox::currentIndexChanged,
+        this,
+        &MainWindow::handleSerialPortSelection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::commandAttempt,
+        this,
+        &MainWindow::handleCommandAttempt,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::commandFailed,
+        this,
+        &MainWindow::handleCommandFailed,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::commandSuccess,
+        this,
+        &MainWindow::handleCommandSuccess,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::dataAvailable,
+        this,
+        &MainWindow::handleDataAvailable,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::corruptedData,
+        this,
+        &MainWindow::handleCorruptedData,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::portOpenFailed,
+        this,
+        &MainWindow::handlePortOpenFailed,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::portOpenSuccess,
+        this,
+        &MainWindow::handlePortOpenSuccess,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::readErrorOccurred,
+        this,
+        &MainWindow::handleReadErrorOccurred,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::resourceErrorOccurred,
+        this,
+        &MainWindow::handleResourceErrorOccurred,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::permissionErrorOccurred,
+        this,
+        &MainWindow::handlePermissionErrorOccurred,
+        Qt::QueuedConnection
+        );
+
+    connect(
+        this->commsCenter,
+        &SerialWorker::genericErrorOccurred,
+        this,
+        &MainWindow::handleGenericErrorOccurred,
+        Qt::QueuedConnection
+        );
+}

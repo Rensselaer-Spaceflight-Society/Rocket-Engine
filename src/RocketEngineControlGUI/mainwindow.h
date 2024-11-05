@@ -7,6 +7,7 @@
 
 #include "communications/serialworker.h"
 #include "logging/loghandler.h"
+#include "components/alertdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,6 +24,7 @@ enum class EngineStates : int8_t {
     PRESTART_NITROGEN_FLUSH,
     PRESSUREIZED_FUEL,
     IGNITION,
+    PENDING_SHUTDOWN,
     SHUTDOWN,
 };
 
@@ -62,10 +64,12 @@ protected:
     void configureCharts();
     QStringList getSerialPorts();
     void keyPressEvent(QKeyEvent* keyEvent) override;
+    void setupConnections();
 
 private:
     Ui::MainWindow *ui;
     SerialWorker * commsCenter;
+    AlertDialog * userAlert;
     LogHandler logger;
     EngineStates currentState = EngineStates::NO_CONNECTION;
 
