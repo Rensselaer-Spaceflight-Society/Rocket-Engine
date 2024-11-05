@@ -96,6 +96,8 @@ void MainWindow::handleCommandFailed(std::string command)
     );
     userAlert->show();
 
+    currentState = EngineStates::CONNECTION_FAILURE;
+
     // Try to shutdown assuming the connection from the rocket is the one that is severed
     handleShutdown();
 }
@@ -221,15 +223,15 @@ void MainWindow::configureCharts()
     ui->LoadCellChart->setChartTitle("Load Cell");
     ui->LoadCellChart->setChartType(ChartType::Force);
 
-    ui->FuelInlet1Chart->setChartTitle("Fuel Inlet 1 Temp");
-    ui->FuelInlet1Chart->setChartType(ChartType::Temperature);
-    ui->FuelInlet2Chart->setChartTitle("Fuel Inlet 2 Temp");
-    ui->FuelInlet2Chart->setChartType(ChartType::Temperature);
+    ui->FuelInletChart->setChartTitle("Fuel Inlet Temp");
+    ui->FuelInletChart->setChartType(ChartType::Temperature);
+    ui->OxidizerInletChart->setChartTitle("Oxidizer Inlet Temp");
+    ui->OxidizerInletChart->setChartType(ChartType::Temperature);
 
-    ui->OxidizerInlet1Chart->setChartTitle("Oxidizer Inlet 1 Temp");
-    ui->OxidizerInlet1Chart->setChartType(ChartType::Temperature);
-    ui->OxidizerInlet2Chart->setChartTitle("Oxidizer Inlet 2 Temp");
-    ui->OxidizerInlet2Chart->setChartType(ChartType::Temperature);
+    ui->EngineThroatChart->setChartTitle("Throat Temperature");
+    ui->EngineThroatChart->setChartType(ChartType::Temperature);
+    ui->NozzleExitChart->setChartTitle("Nozzle Exit Temperature");
+    ui->NozzleExitChart->setChartType(ChartType::Temperature);
 
     ui->OxidizerTankPressureChart->setChartTitle("Oxidizer Tank Pressure");
     ui->OxidizerTankPressureChart->setChartType(ChartType::Pressure);
@@ -239,9 +241,9 @@ void MainWindow::configureCharts()
     ui->FuelTankPressureChart->setChartType(ChartType::Pressure);
     ui->FuelLinePressureChart->setChartTitle("Fuel Line Pressure");
     ui->FuelLinePressureChart->setChartType(ChartType::Pressure);
-    ui->NitrogenTankPressureChart->setChartTitle("Nitrogen Tank Pressure");
-    ui->NitrogenTankPressureChart->setChartType(ChartType::Pressure);
-    ui->FuelFeedPressureChart->setChartTitle("Nitrogen Line Pressure");
+    ui->CombustionChamberPressureChart->setChartTitle("Combustion Chamber Pressure");
+    ui->CombustionChamberPressureChart->setChartType(ChartType::Pressure);
+    ui->FuelFeedPressureChart->setChartTitle("Kerosene Feed Line Pressure");
     ui->FuelFeedPressureChart->setChartType(ChartType::Pressure);
 }
 
