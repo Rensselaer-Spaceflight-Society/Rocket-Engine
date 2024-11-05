@@ -47,9 +47,9 @@ void MainWindow::handleCountdown()
     ui->AbortButton->setDisabled(false);
     ui->CountdownButton->setText("Countdown Started");
 
-    // Set the countdown to 5 seconds in milliseconds
-    int count = 5000; // 5000 ms = 5 seconds
-    ui->CountdowLabel->setText("5:00");
+    // Set the countdown to 5 minutes in milliseconds
+    int count = 300000; // 300,000 ms = 5 minutes
+    ui->CountdowLabel->setText("5:00:00");
 
     // Check if countdownTimer already exists; stop and delete it if necessary
     if (countdownTimer) {
@@ -60,14 +60,17 @@ void MainWindow::handleCountdown()
     // Create and start the countdown timer
     countdownTimer = new QTimer(this);
     connect(countdownTimer, &QTimer::timeout, this, [this, count]() mutable {
-        count -= 10; // Decrease by 100 ms (0.1 seconds)
+        count -= 10; // Decrease by 10 ms (0.01 seconds)
 
-        // Calculate seconds and milliseconds for display
-        int seconds = count / 1000;
-        int centiseconds = (count % 1000) / 10; // Convert milliseconds to centiseconds
+        // Calculate minutes, seconds, and centiseconds
+        int minutes = count / 60000;
+        int seconds = (count % 60000) / 1000;
+        int centiseconds = (count % 1000) / 10;
 
-        // Update the countdown label in "seconds:centiseconds" format
-        ui->CountdowLabel->setText(QString::number(seconds) + ":" + QString::number(centiseconds).rightJustified(2, '0'));
+        // Update the countdown label in "minutes:seconds:centiseconds" format
+        ui->CountdowLabel->setText(QString::number(minutes).rightJustified(2, '0') + ":" +
+                                   QString::number(seconds).rightJustified(2, '0') + ":" +
+                                   QString::number(centiseconds).rightJustified(2, '0'));
 
         // If countdown reaches 0, stop the timer
         if (count <= 0) {
@@ -80,8 +83,9 @@ void MainWindow::handleCountdown()
         }
     });
 
-    countdownTimer->start(10); // 100 ms interval for smoother countdown with milliseconds
+    countdownTimer->start(10); // 10 ms interval for countdown by centiseconds
 }
+
 
 
 
