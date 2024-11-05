@@ -41,8 +41,16 @@ void MainWindow::handleSerialPortRefresh()
     ui->SerialPortDropdown->addItems(this->getSerialPorts());
 }
 
+bool isPaused = false;
+
 void MainWindow::handleCountdown()
 {
+    if (isPaused) {
+        // Resume countdown if it was paused
+        resumeCountdown();
+        return;
+    }
+
     ui->CountdownButton->setDisabled(true);
     ui->AbortButton->setDisabled(false);
     ui->CountdownButton->setText("Countdown Started");
@@ -60,7 +68,15 @@ void MainWindow::handleCountdown()
     // Create and start the countdown timer
     countdownTimer = new QTimer(this);
     connect(countdownTimer, &QTimer::timeout, this, [this, count]() mutable {
-        count -= 10; // Decrease by 10 ms (0.01 seconds)
+        count -= 10;
+
+        if (count == 30000) {
+            countdownTimer->stop();
+            isPaused = true;
+            ui->CountdownButton->setEnabled(true);
+            ui->CountdownButton->setText("Resume Countdown");
+            return;
+        }
 
         // Calculate minutes, seconds, and centiseconds
         int minutes = count / 60000;
@@ -86,7 +102,13 @@ void MainWindow::handleCountdown()
     countdownTimer->start(10); // 10 ms interval for countdown by centiseconds
 }
 
-
+void MainWindow::resumeCountdown()
+{
+    isPaused = false;
+    ui->CountdownButton->setDisabled(true);
+    ui->CountdownButton->setText("Countdown Resumed");
+    countdownTimer->start(10); // Resume countdown with a 10 ms interval
+}
 
 
 void MainWindow::handleShutdown()
