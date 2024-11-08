@@ -120,8 +120,6 @@ is lost and notify the user. If the test stand receives a command that it has al
 
 We are still deciding on what the test stand should do if connection is lost. This document will be updated when this is decided.
 
-### Countdown
-
 The countdown is activated by clicking on the "Start Countdown" button, which will start the countdown from 5 minutes. Once the countdown gets to 30 second, the countdown pauses until you click on the same button that will now read "Resume Countdown". Once you click on it and the countdown reaches 0, it emits a countdown to the main thread where we will begin communication with the rocket. If you click on "Stop Countdown" at any point, the timer will stop at that specific time. Clicking on "Start Countdown" will restart from 5 minutes.
 
 The acknowledgement is an 8 byte sequence:
