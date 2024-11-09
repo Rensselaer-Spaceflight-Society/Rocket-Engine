@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QtSerialPort/QSerialPortInfo>
-#include <QStringList>
+#include <QString>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,6 +26,11 @@ private slots:
     void handleSerialPortRefresh();
     void handleCountdown();
     void resumeCountdown();
+
+signals:
+    void ignitionStart();
+    void inertFlush();
+    void presFuel();
 
 protected:
     void keyPressEvent(QKeyEvent* keyEvent) override;
