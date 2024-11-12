@@ -65,11 +65,13 @@ protected:
     QStringList getSerialPorts();
     void keyPressEvent(QKeyEvent* keyEvent) override;
     void setupConnections();
+    void updateUIWithSensorData(const SensorData & data);
 
 private:
     Ui::MainWindow *ui;
     SerialWorker * commsCenter;
     AlertDialog * userAlert;
+    double dataPacketCount = 0;
     LogHandler logger;
     EngineStates currentState = EngineStates::NO_CONNECTION;
 

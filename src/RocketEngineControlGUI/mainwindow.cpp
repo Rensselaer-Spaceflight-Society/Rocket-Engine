@@ -83,7 +83,7 @@ void MainWindow::handleCommandFailed(std::string command)
         QString::fromStdString(command) + " was sent "
             + QString::number(MAX_COMMAND_RETRIES)
             + " times without acknowledgement."
-    );
+        );
 
     // Alert the user
     userAlert->setAlertDescription("Communications Lost");
@@ -93,7 +93,7 @@ void MainWindow::handleCommandFailed(std::string command)
         + " has failed to be sent and acknowledged by the test stand."
         + " Please check the communications hardware and try again. "
         + " Engine shutdown has been started. "
-    );
+        );
     userAlert->show();
 
     currentState = EngineStates::CONNECTION_FAILURE;
@@ -108,7 +108,7 @@ void MainWindow::handleCommandSuccess(std::string command)
     logger.logEvent(
         EventType::AcknowledgementReceived,
         QString("Received Ack for: ") + QString::fromStdString(command)
-    );
+        );
 
     // Then we want to transition the state to the next state and update any text
 
@@ -120,8 +120,11 @@ void MainWindow::handleDataAvailable(const QSharedPointer<SensorData> data)
     // Log the data in the data log
     logger.logData(data);
 
+    // Update the data packet count
+    dataPacketCount += 1.0;
+
     // Update the graphs and the data table
-    throw std::runtime_error("NOT IMPLEMENTED");
+    this->updateUIWithSensorData(*data);
 }
 
 void MainWindow::handleCorruptedData(const QSharedPointer<QByteArray> data)
@@ -130,7 +133,7 @@ void MainWindow::handleCorruptedData(const QSharedPointer<QByteArray> data)
     logger.logEvent(
         EventType::CorruptedData,
         QString::number(data->size())+ " Bytes of Corrupted Data recieved and logged. "
-    );
+        );
 
     // Log the corrupted data
     logger.logCorruptedData(data);
@@ -142,7 +145,7 @@ void MainWindow::handlePortOpenFailed()
     logger.logEvent(
         EventType::SerialError,
         "Serial Port Failed to Open."
-    );
+        );
 
     // Update the screen
     this->ui->ConnectionStatus->setText("Serial Port Failed to Open");
@@ -216,6 +219,73 @@ QStringList MainWindow::getSerialPorts()
         }
     }
     return portDropdownOptions;
+}
+
+void MainWindow::updateUIWithSensorData(const SensorData & data)
+{
+    throw std::runtime_error("NOT IMPLEMENTED");
+
+    /*
+     * thermocouple[0] = injector plate & kerosene inlet
+     * thermocouple[1] = injector plate & oxidizer inlet
+     * thermocouple[2] = outside the cc at the throat
+     * thermocouple[3] = on the nozzle near the outlet
+     *
+     * pressureTransducer[0] = combustion chamber
+     * pressureTransducer[1] = kerosene feed-line pressure
+     * pressureTransducer[2] = kerosene tank pressure
+     * pressureTransducer[3] = kerosene line pressure
+     * pressureTransducer[4] = oxidizer tank pressure
+     * pressureTransducer[5] = oxidizer line pressure
+    */
+
+    // TODO: Add Coloring to the Labels for Values out of spec
+
+    // Load Cell
+    this->ui->LoadCellValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " N");
+    this->ui->LoadCellChart->append(dataPacketCount, data.loadCell);
+
+    // Kerosene Inlet
+    this->ui->FuelInletTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
+    this->ui->FuelInletChart->append(dataPacketCount, data.thermocouple[0]);
+
+    // Oxidizer Inlet
+    this->ui->OxidizerInletTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
+    this->ui->OxidizerInletChart->append(dataPacketCount, data.thermocouple[1]);
+
+    // Engine Throat
+    this->ui->EngineThroatTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
+    this->ui->EngineThroatChart->append(dataPacketCount, data.thermocouple[2]);
+
+    // Nozzle Near Exit
+    this->ui->NozzleExitTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
+    this->ui->NozzleExitChart->append(dataPacketCount, data.thermocouple[3]);
+
+    // Combustion Chamber
+    this->ui->CompustionChamberPresureValue->setText(QString::number(data.pressureTransducer[0], 'g', 2));
+    this->ui->CombustionChamberPressureChart->append(dataPacketCount, data.pressureTransducer[0]);
+
+    // Fuel Feed Line Pressure
+    this->ui->FuelFeedPressureValue->setText(QString::number(data.pressureTransducer[1], 'g', 2));
+    this->ui->FuelFeedPressureChart->append(dataPacketCount, data.pressureTransducer[1]);
+
+    // Kerosene Tank Pressure
+    this->ui->KeroseneTankPressureValue->setText(QString::number(data.pressureTransducer[2], 'g', 2));
+    this->ui->FuelTankPressureChart->append(dataPacketCount, data.pressureTransducer[2]);
+
+    // Kerosene Line Pressure
+    this->ui->FuelLinePressureValue->setText(QString::number(data.pressureTransducer[3], 'g', 2));
+    this->ui->FuelLinePressureChart->append(dataPacketCount, data.pressureTransducer[3]);
+
+    // Oxidizer Tank Pressure
+    this->ui->OxidizerTankPressureValue->setText(QString::number(data.pressureTransducer[4], 'g', 2));
+    this->ui->OxidizerTankPressureChart->append(dataPacketCount, data.pressureTransducer[4]);
+
+    // Oxidizer Line pressure
+    this->ui->OxidizerLinePressureValue->setText(QString::number(data.pressureTransducer[5], 'g', 2));
+    this->ui->OxidizerLinePressureChart->append(dataPacketCount, data.pressureTransducer[5]);
+
+
 }
 
 void MainWindow::configureCharts()

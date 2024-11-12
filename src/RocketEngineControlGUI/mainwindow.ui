@@ -495,7 +495,7 @@ Pressure</string>
       </widget>
      </item>
      <item row="6" column="2">
-      <widget class="QLabel" name="OxidizerTempValue">
+      <widget class="QLabel" name="OxidizerInletTempValue">
        <property name="font">
         <font>
          <pointsize>14</pointsize>
@@ -513,7 +513,7 @@ Pressure</string>
       </widget>
      </item>
      <item row="20" column="0">
-      <widget class="QLabel" name="FeedPressureLabel">
+      <widget class="QLabel" name="FuelFeedPressureLabel">
        <property name="text">
         <string> Kerosene Nitrogen 
  Feed Pressure</string>
@@ -569,7 +569,7 @@ Pressure</string>
       </widget>
      </item>
      <item row="20" column="2">
-      <widget class="QLabel" name="KeroseneFeedPressureValue">
+      <widget class="QLabel" name="FuelFeedPressureValue">
        <property name="font">
         <font>
          <pointsize>14</pointsize>
