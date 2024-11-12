@@ -34,8 +34,6 @@ LogHandler::LogHandler(
     QString eventFilePath = outputPath + "/" + eventFileName;
     QString corruptedDataFilePath = outputPath + "/" + corruptedDataFileName;
 
-    qDebug() << dataFilePath;
-
     dataLog.setFileName(dataFilePath);
     eventLog.setFileName(eventFilePath);
     corruptionLog.setFileName(corruptedDataFilePath);

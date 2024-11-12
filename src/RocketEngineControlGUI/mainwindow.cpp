@@ -223,8 +223,6 @@ QStringList MainWindow::getSerialPorts()
 
 void MainWindow::updateUIWithSensorData(const SensorData & data)
 {
-    throw std::runtime_error("NOT IMPLEMENTED");
-
     /*
      * thermocouple[0] = injector plate & kerosene inlet
      * thermocouple[1] = injector plate & oxidizer inlet

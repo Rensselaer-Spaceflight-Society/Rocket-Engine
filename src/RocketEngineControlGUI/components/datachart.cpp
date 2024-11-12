@@ -68,7 +68,7 @@ void DataChart::setChartType(ChartType chartType)
     }
 }
 
-void DataChart::append(double xValue, double yValue)
+void DataChart::append(float xValue, float yValue)
 {
     lowerSeries->append(xValue, 0);
     upperSeries->append(xValue, yValue);
