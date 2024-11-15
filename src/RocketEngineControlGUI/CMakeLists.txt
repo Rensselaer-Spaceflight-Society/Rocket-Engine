@@ -19,16 +19,21 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        communications/serialcommunicator.cpp
 )
 
 
 qt_add_executable(RocketEngineControlGUI
     MANUAL_FINALIZATION
     ${PROJECT_SOURCES}
-    communications/dataio.h
-    communications/serialcommunicator.h communications/serialcommunicator.cpp
+
     components/datachart.h components/datachart.cpp components/datachart.ui
+
+    communications/serialworker.h communications/serialworker.cpp
+    communications/sensordata.h
+    logging/loghandler.h logging/loghandler.cpp
+    components/alertdialog.h components/alertdialog.cpp components/alertdialog.ui
+
+
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

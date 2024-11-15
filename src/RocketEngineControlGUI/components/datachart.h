@@ -21,7 +21,7 @@ class DataChart : public QWidget
 public:
     explicit DataChart(QWidget *parent = nullptr);
     ~DataChart();
-    void append(double xValue, double yValue);
+    void append(float xValue, float yValue);
     void setChartType(ChartType chartType);
     void setChartTitle(const QString& title);
 
