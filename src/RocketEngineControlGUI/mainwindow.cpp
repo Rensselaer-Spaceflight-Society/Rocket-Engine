@@ -58,6 +58,7 @@ void MainWindow::handleShutdown()
 
 
     this->currentState = EngineStates::PENDING_SHUTDOWN;
+    this->ui->EngineStatus->setText("Pending Shutdown");
     std::string shutdown = SHUTDOWN_COMMAND;
     emit issueCommand(shutdown);
 }
@@ -110,9 +111,77 @@ void MainWindow::handleCommandSuccess(std::string command)
         QString("Received Ack for: ") + QString::fromStdString(command)
         );
 
-    // Then we want to transition the state to the next state and update any text
+    // We don't need to do anything if its a ping command
+    if(command == PING_COMMAND) return;
 
-    throw std::runtime_error("NOT IMPLEMENTED");
+    // If we recieve that the engine has shutdown, then immediately move to the shutdown state.
+    if(command == SHUTDOWN_COMMAND)
+    {
+        currentState = EngineStates::SHUTDOWN;
+        this->ui->EngineStatus->setText("Engine Shutdown");
+        return;
+    }
+
+
+    // Advance from No Connection to the Connection Established State
+    if((currentState == EngineStates::NO_CONNECTION ||
+         currentState == EngineStates::CONNECTION_FAILURE) &&
+        command == CONTROL_ACTIVE_COMMAND)
+    {
+        currentState = EngineStates::CONNECTION_ESTABLISHED;
+        // Unlock the buttons
+        ui->StartCountdown->setEnabled(true);
+        ui->AbortButton->setEnabled(true);
+        ui->EngineStatus->setText("Connection Established");
+        return;
+    }
+    // Advance from the Connection Established to the Log Start State
+    if((currentState == EngineStates::CONNECTION_ESTABLISHED ||
+         currentState == EngineStates::SHUTDOWN)
+        && command == LOG_START_COMMAND)
+    {
+        currentState = EngineStates::COUNTDOWN_STARTED;
+        this->ui->EngineStatus->setText("Logging Data");
+    }
+    // The engine will then enter the AutoHold State from the Countdown Timer
+
+    // Advance from the AutoHold State to the Inert Flush State
+    if((currentState == EngineStates::AUTO_HOLD) && command == INERT_GAS_FLUSH_COMMAND)
+    {
+        currentState = EngineStates::PRESTART_NITROGEN_FLUSH;
+        this->ui->EngineStatus->setText("Inert Gas Flush");
+    }
+
+    // Then the next state to advance to is the fuel pressurization state
+    if((currentState == EngineStates::PRESTART_NITROGEN_FLUSH) && command == PRESURIZE_FUEL_COMMAND)
+    {
+        currentState = EngineStates::PRESSUREIZED_FUEL;
+        this->ui->EngineStatus->setText("Fuel Pressurized");
+    }
+
+    // Then the next state to transition to will be the ignition state
+    if((currentState == EngineStates::PRESSUREIZED_FUEL) && command == IGNITION_COMMAND)
+    {
+        currentState = EngineStates::IGNITION;
+        this->ui->EngineStatus->setText("Engine Ignition");
+    }
+
+    // If none of the above states are reached then the wrong command was sent for the current state
+    logger.logEvent(
+        EventType::Error,
+        QString::fromStdString(command) +
+            " was recieved in engine state: " +
+            QString::number(static_cast<int8_t>(currentState))
+        );
+
+    userAlert->setAlertDescription("Invalid Acknowledgement Receieved");
+    userAlert->setAlertTitle(
+        "The acknowledgement: " + QString::fromStdString(command) +
+        " was recieved but was not expected because the engine was in state: " +
+        QString::number(static_cast<int8_t>(currentState))
+        );
+    userAlert->show();
+
 }
 
 void MainWindow::handleDataAvailable(const QSharedPointer<SensorData> data)
@@ -148,7 +217,7 @@ void MainWindow::handlePortOpenFailed()
         );
 
     // Update the screen
-    this->ui->ConnectionStatus->setText("Serial Port Failed to Open");
+    this->ui->EngineStatus->setText("Serial Port Failed to Open");
 }
 
 void MainWindow::handlePortOpenSuccess()
@@ -157,7 +226,7 @@ void MainWindow::handlePortOpenSuccess()
 
     // Update the screen
 
-    this->ui->ConnectionStatus->setText("Serial Port Opened");
+    this->ui->EngineStatus->setText("Serial Port Opened");
 }
 
 // Serial Error Handlers

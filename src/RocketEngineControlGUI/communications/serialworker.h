@@ -22,6 +22,10 @@
 // OTHERWISE WE COULD HAVE FUN BUFFER OVERFLOWS
 #define CONTROL_ACTIVE_COMMAND "CtrlActi"
 #define PING_COMMAND "PingPong"
+#define LOG_START_COMMAND "LogStart"
+#define INERT_GAS_FLUSH_COMMAND "InrtFlsh"
+#define PRESURIZE_FUEL_COMMAND "PresFuel"
+#define IGNITION_COMMAND "Ignition"
 #define SHUTDOWN_COMMAND "ShutDown"
 
 // Forward Declaration of the MainWindow to avoid circular include dependencies

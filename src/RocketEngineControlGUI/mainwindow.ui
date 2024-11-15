@@ -1176,7 +1176,7 @@ Pressure</string>
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="ConnectionStatus">
+      <widget class="QLabel" name="EngineStatus">
        <property name="font">
         <font>
          <pointsize>16</pointsize>
