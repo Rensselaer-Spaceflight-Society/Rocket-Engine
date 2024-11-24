@@ -32,29 +32,31 @@ protected:
         auto i = command_queue->begin();
         QByteArray data = i->getCommand().toUtf8();
 
-        if (COMPORT->isOpen() && COMPORT->isRequestToSend() && i != command_queue->end()) {
-            qDebug() << "Sending:" << i->getCommand();
-            COMPORT->write(data);
-            COMPORT->flush();
-            COMPORT->waitForBytesWritten(2000);
+        int retryCount = 0;
 
-            // Simulate receiving an acknowledgment
-            if (COMPORT->waitForReadyRead(2000)) {
-                QByteArray receivedData = COMPORT->readAll();
-                qDebug() << "Received data:" << receivedData;
+        while (retryCount < maxRetries) {
+            if (COMPORT->isOpen() && COMPORT->isRequestToSend() && i != command_queue->end()) {
+                qDebug() << "Sending:" << i->getCommand();
+                COMPORT->write(data);
+                COMPORT->flush();
+                COMPORT->waitForBytesWritten(2000);
     
-                if (receivedData == data) { // If acknowledgment matches
-                    command_queue->erase(i);
-                    *retransmit_bool = false;
-                } else {
-                    *retransmit_bool = true;
-                }
-            } else {
-                qDebug() << "No acknowledgment received. Retransmitting...";
-                *retransmit_bool = true;
-            } 
-        else {
-            qDebug() << "Error with serial port during send/receive.";
+                // Simulate receiving an acknowledgment
+                if (COMPORT->waitForReadyRead(2000)) {
+                    QByteArray receivedData = COMPORT->readAll();
+                    qDebug() << "Received data:" << receivedData;
+        
+                    if (receivedData == data) command_queue->erase(i);
+                } else qDebug() << "No acknowledgment received. Retransmitting...";
+            else {
+                qDebug() << "Error with serial port during send/receive.";
+                break;
+            }
+            retryCount++
+        }
+        if (retryCount == maxRetries) {
+            qDebug() << "Max retries reached. Command discarded.";
+            command_queue->erase(i);
         }
         emit operationFinished();
     }    
@@ -62,7 +64,6 @@ protected:
 private:
     QSerialPort* COMPORT;
     QList<command>* command_queue;
-    bool* retransmit_bool;
 };
 
 #endif // SERIAL_HANDLER_H
