@@ -24,7 +24,21 @@ signals:
 
 protected:
     void run() override {
-        
+        if (command_queue->isEmpty()) {
+            qDebug() << "No commands in the queue";
+            return;
+        }
+
+        auto i = command_queue->begin();
+        QByteArray data = i->getCommand().toUtf8();
+
+        if (COMPORT->isOpen() && COMPORT->isRequestToSend() && i != command_queue->end()) {
+            qDebug() << "Sending:" << i->getCommand();
+            COMPORT->write(data);
+            COMPORT->flush();
+            COMPORT->waitForBytesWritten(2000);
+        }
+    }    
 
 private:
     QSerialPort* COMPORT;
