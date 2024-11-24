@@ -38,6 +38,22 @@ protected:
             COMPORT->flush();
             COMPORT->waitForBytesWritten(2000);
         }
+
+        // Simulate receiving an acknowledgment
+        if (COMPORT->waitForReadyRead(2000)) {
+            QByteArray receivedData = COMPORT->readAll();
+            qDebug() << "Received data:" << receivedData;
+
+            if (receivedData == data) { // If acknowledgment matches
+                command_queue->erase(i);
+                *retransmit_bool = false;
+            } else {
+                *retransmit_bool = true;
+            }
+        } else {
+            qDebug() << "No acknowledgment received. Retransmitting...";
+            *retransmit_bool = true;
+        }
     }    
 
 private:
