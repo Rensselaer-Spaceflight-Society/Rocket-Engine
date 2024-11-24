@@ -46,13 +46,27 @@ protected:
                     QByteArray receivedData = COMPORT->readAll();
                     qDebug() << "Received data:" << receivedData;
         
-                    if (receivedData == data) command_queue->erase(i);
-                } else qDebug() << "No acknowledgment received. Retransmitting...";
+                    if (receivedData == data) { // If acknowledgment matches
+                        qDebug() << "Acknowledgment received. Removing command from queue.";
+                        command_queue->erase(i);
+                        retransmit_bool = false;
+                        break;
+                    } else {
+                        qDebug() << "Data mismatch. Marking retransmission.";
+                        retransmit_bool = true;
+                    }
+                } else {
+                    qDebug() << "No acknowledgment received. Marking retransmission.";
+                    retransmit_bool = true;
+                }
             else {
                 qDebug() << "Error with serial port during send/receive.";
                 break;
             }
-            retryCount++
+            if (retransmit_bool) {
+                retryCount++;
+                qDebug() << "Retry count increased to:" << retryCount;
+            }
         }
         if (retryCount == maxRetries) {
             qDebug() << "Max retries reached. Command discarded.";
@@ -64,6 +78,7 @@ protected:
 private:
     QSerialPort* COMPORT;
     QList<command>* command_queue;
+    bool retransmit_bool;
 };
 
 #endif // SERIAL_HANDLER_H
