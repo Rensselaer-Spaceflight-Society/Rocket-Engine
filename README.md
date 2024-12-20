@@ -117,54 +117,69 @@ Communications should be handled over the the Serial1 Port on the Arduino, Seria
 
 ## Command and Control
 
-The control room and the test stand use 64 bit (8 byte) signals to communicate different actions / states to each other the signals are as follows.
+The control room and the test stand use 64 bit (8 byte) signals to communicate different actions / states to each other the signals are as follows. When the test stand receives a command it should send an acknowledgement. If the control room fails to receive an acknowledgement it should reattempt sending the command up to **5** times. If after these
+attempts there still is no acknowledgement, then the control room should assume connection
+is lost and notify the user. If the test stand receives a command that it has already received then it should just send an acknowledgement instead of rerunning code.
 
+If test stand connection is lost, then the test stand will automatically go into shutdown procedure.
 
-- Control Room Signals (sent from Control Room to Test Stand)
-    - CtrlActi
-        - Sent to begin communication between the Control Room to the Test Stand.
-    - LogStart
-        - Short for Logging Start, indicates to the test stand to start reading and sending sensor data
-    - PressFuel
-        - Short for Pressurise Fuel, indicates to the test stand to pressurize the fuel tank.
-    - InertGas
-        - Triggers the Inert Gas Flush before ignition.
-    - Ignition
-        - Triggers the ignition and startup sequence
-    - ShutDown
-        - Triggers the shutdown sequence, closing the valves and performing an inert gas flush.
+The acknowledgement is just a repeat of the command received.
 
-- Test Stand Signals (sent from Test Stand to Control Room)
-    - CtrlActi
-        - Short for Control Active, sent after the Test Stand has received the Control Room's 'CtrlActi' signal, and indicates that a connection has been established.
-    - LogStart
-        - Sent after the Test Stand has received the Control Room's 'LogStart' signal, and indicates that sensor data is being sent.
-    - PressFuel
-        - Sent after the Test Stand has received the Control Room's 'PressFuel' signal, and indicates that the fuel has been pressurized.
-    - InertFlush
-        - Sent after the Test Stand has received the Control Room's 'InertFlush' signal, and indicates that that a brief burst of nitrogen was pushed through the chamber.
-    - Ignite
-        - Sent after the Test Stand has received the Control Room's 'Ignite' signal, and indicates that the ignition sequence has begun
-    - Ping
-        - Sent during Engine Firing after the Test Stand has recieved the Control Room's 'Ping' Signal, indicating that the Test Stand and Control Room have a clear connection
-    - Shutdown
-        - Sent after the Test Stand has recived the Control Room's 'Shutdown' signal, and indicates that the shutdown sequence has begun.
+The following sequences are the different commands sent by the control computer and what
+they tell the test stand to do.
 
-        
+- `CtrlActi` Control Computer Active, tells the test stand that a communication link is active.
+- `LogStart` Tells the test stand to start the logging of sensor data and communicating that down the line.
+- `InrtFlsh` Tells the test stand to perform an inert gas flush
+- `PresFuel` Tells the test stand to open the pressure valve to the Kerosene
+- `Ignition` Tells the test stand to open the valves and light the Steel Wool following the ignition protocol
+- `Shutdown` Tells the test stand to close the oxidizer valve first, then the fuel valve.
+
+On Shutdown, the test stand should send a message that the engine was shutdown.
 
 ## Sensor Data Transfer
 
-Sensor data is sent in packets of 44 bytes (352 bits) of binary data with the following structure:
+Sensor data is sent in packets of 64 bytes of binary data with the following structure:
+
+// The order of sensors is:
+/*
+ * thermocouple[0] = injector plate & kerosene inlet
+ * thermocouple[1] = injector plate & oxidizer inlet
+ * thermocouple[2] = outside the cc at the throat
+ * thermocouple[3] = on the nozzle near the outlet
+ *
+ * pressureTransducer[0] = combustion chamber
+ * pressureTransducer[1] = kerosene feed-line pressure
+ * pressureTransducer[2] = kerosene tank pressure
+ * pressureTransducer[3] = kerosene line pressure
+ * pressureTransducer[4] = oxidizer tank pressure
+ * pressureTransducer[5] = oxidizer line pressure
+*/
 
 ```cpp
 typedef struct
 {
+  char header[8] = "DataPack"; // Data recieved should be "DataPack" but cannot be assumed to be
   float loadCell;
   float thermocouple[4];
-  float thermocouple[4];
-  float pressure[6];
+  float pressureTransducer[6];
+  char checksum[12];
 } SensorData;
 ```
+The checksum is a 12-byte XOR hash that verifies all the data is solid and can be found below:
+
+```cpp
+void checksum12(void *checksum, const void *data, int n) {
+    uint8_t* checksumPtr = (uint8_t *) checksum;
+    const uint8_t* dataPtr = (uint8_t *) data;
+    memset(checksum, 0, 12);
+    for (int i = 0; i < n; ++i) {
+        checksumPtr[i % 12] ^= dataPtr[i];
+        checksumPtr[(i + 1) % 12] ^= (dataPtr[i] >> 4) | (dataPtr[i] << 4);  // Simple mixing
+    }
+}
+```
+
 
 ## Control Flow
 
