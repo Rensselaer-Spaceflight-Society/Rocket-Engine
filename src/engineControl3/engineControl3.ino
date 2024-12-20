@@ -16,10 +16,10 @@ constexpr char PNG[] = "PingPong";
 
 // Pin Values (Digital)
 constexpr int NITROGENVALVE = 25;
-constexpr int OXIDIZERVALVE = 26;
+constexpr int PRESFUELVALVE = 26;
 constexpr int FUELVALVE = 27;
-constexpr int IGNITERVALVE = 28;
-constexpr int PRESFUELVALVE = 15;
+constexpr int OXIDIZERVALVE = 28;
+constexpr int IGNITERVALVE = 29;
 
 // Analog Pins for Pressure Transducers
 constexpr int PRESSSEN1 = 0;
@@ -39,9 +39,9 @@ constexpr int THERMOCPL3 = 8;
 constexpr int THERMOCPL4 = 9;
 
 // LED Ports (Digital)
-constexpr int LED1 = 5;
-constexpr int LED2 = 6;
-constexpr int LED3 = 7;
+constexpr int LED1 = 30;
+constexpr int LED2 = 31;
+constexpr int LED3 = 32;
 
 // Constants
 constexpr float voltageToTempScale = 0.005;
@@ -127,7 +127,6 @@ void readSensor(Sensors &sensorData)
     sensorData.thermocouple[2] = processThermoCoupleValue(analogRead(THERMOCPL3));
     sensorData.thermocouple[3] = processThermoCoupleValue(analogRead(THERMOCPL4));
 }
--
 
     void
     sendSensor(Sensors &sensorData)
