@@ -12725,6 +12725,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Solenoids:Solenoid")
 		(lib_id "Solenoids:Solenoid")
 		(at 273.05 128.27 0)
 		(unit 1)
@@ -12734,7 +12735,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "5e30803e-d61a-4be5-98c8-23e9191b0d7e")
-		(property "Reference" "Solenoid4"
+		(property "Reference" "Oxidizer"
 			(at 273.05 120.65 0)
 			(effects
 				(font
@@ -12786,7 +12787,7 @@
 		(instances
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "Solenoid4")
+					(reference "Oxidizer")
 					(unit 1)
 				)
 			)
@@ -12879,6 +12880,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Solenoids:Solenoid")
 		(lib_id "Solenoids:Solenoid")
 		(at 251.46 128.27 0)
 		(unit 1)
@@ -12888,7 +12890,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "69840068-f0f0-42c9-9582-6fab6e2e060d")
-		(property "Reference" "Solenoid3"
+		(property "Reference" "Fuel"
 			(at 251.46 120.65 0)
 			(effects
 				(font
@@ -12940,7 +12942,7 @@
 		(instances
 			(project ""
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "Solenoid3")
+					(reference "Fuel")
 					(unit 1)
 				)
 			)
@@ -13181,6 +13183,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Solenoids:Solenoid")
 		(lib_id "Solenoids:Solenoid")
 		(at 195.58 128.27 0)
 		(unit 1)
@@ -13190,7 +13193,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7fd7b3a6-e7b8-4319-82ba-4abcea9e82f0")
-		(property "Reference" "Solenoid1"
+		(property "Reference" "NitrogenFlush"
 			(at 195.58 120.65 0)
 			(effects
 				(font
@@ -13242,7 +13245,7 @@
 		(instances
 			(project ""
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "Solenoid1")
+					(reference "NitrogenFlush")
 					(unit 1)
 				)
 			)
@@ -14678,6 +14681,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Solenoids:Solenoid")
 		(lib_id "Solenoids:Solenoid")
 		(at 223.52 128.27 0)
 		(unit 1)
@@ -14687,7 +14691,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ea4be11f-bd1c-49b5-b1ad-f41aca5b9109")
-		(property "Reference" "Solenoid2"
+		(property "Reference" "FuelPressure"
 			(at 223.52 120.65 0)
 			(effects
 				(font
@@ -14739,7 +14743,7 @@
 		(instances
 			(project ""
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "Solenoid2")
+					(reference "FuelPressure")
 					(unit 1)
 				)
 			)
