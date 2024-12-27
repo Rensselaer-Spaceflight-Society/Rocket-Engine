@@ -2,13 +2,14 @@
 #define __COMMANDS_H_
 
 #include "sensors.h"
+#include <string.h>
 
 #define COMMAND_SIZE_BYTES 8
 #define MAX_PING_DELAY_MS 50
 #define MAX_COMMAND_REPEATS 3
-#define NITROGEN_FLUSH_DELAY_MS 200
-#define FUEL_VALVE_OPEN_DELAY_MS 100
-#define SPARK_DELAY_MS 50
+#define NITROGEN_FLUSH_DELAY_MS 5000
+#define FUEL_VALVE_OPEN_DELAY_MS 1000
+#define SPARK_DELAY_MS 500
 
 
 constexpr char COMMS_ESTABLISHED[] = "CtrlActi";
@@ -55,21 +56,19 @@ void closeValve(int pin) {
 }
 
 void startShutdown() {
-  closeValve(IGNITERVALVE);
-  closeValve(PRESFUELVALVE);
-  closeValve(OXIDIZERVALVE);
-  closeValve(FUELVALVE);
+  resetPins();
   openValve(NITROGENVALVE);
 }
 
-void handleCommand(String &command, EngineStates &currentState, unsigned int &lastPingTime, unsigned int &lastEventTime, int &commandRepeats) {
-  if (command == PING_COMMAND) {
+void handleCommand(char * command, EngineStates &currentState, unsigned int &lastPingTime, unsigned int &lastEventTime, int &commandRepeats) {
+  if (!strcmp(command, PING_COMMAND)) {
     lastPingTime = millis();
     SerialPort.write(PING_COMMAND, COMMAND_SIZE_BYTES);
     return;
   }
 
-  if (command == COMMS_ESTABLISHED) {
+  if (!strcmp(command, COMMS_ESTABLISHED)) {
+    // SerialPort.println("Comms Pathway");
     // If we are already in the Comms_Est state, then just reply
     if (currentState == EngineStates::CONNECTION_ESTABLISHED) {
       SerialPort.write(COMMS_ESTABLISHED, COMMAND_SIZE_BYTES);
@@ -80,6 +79,7 @@ void handleCommand(String &command, EngineStates &currentState, unsigned int &la
     //If we are in the startup (No Connection) state, then we should transition to the comms established state
     if (currentState == EngineStates::NO_CONNECTION) {
       commandRepeats = 0;
+      resetPins();
       SerialPort.write(COMMS_ESTABLISHED, COMMAND_SIZE_BYTES);
       currentState = EngineStates::CONNECTION_ESTABLISHED;
       return;
@@ -90,9 +90,10 @@ void handleCommand(String &command, EngineStates &currentState, unsigned int &la
     currentState = EngineStates::CONNECTION_LOST;
     lastEventTime = millis();
     SerialPort.write(CONNECTION_LOST, COMMAND_SIZE_BYTES);
+    return;
   }
 
-  if (command == LOG_START) {
+  if (!strcmp(command, LOG_START)) {
     // This is a repeat command of a command we have seen before
     if (currentState == EngineStates::LOG_START) {
       commandRepeats++;
@@ -110,9 +111,10 @@ void handleCommand(String &command, EngineStates &currentState, unsigned int &la
 
     // In any other state, this is an invalid command.
     SerialPort.write(INVALID_COMMAND, COMMAND_SIZE_BYTES);
+    return;
   }
 
-  if (command == INERT_FLUSH) {
+  if (!strcmp(command, INERT_FLUSH)) {
     if (currentState == EngineStates::PRE_BURN_NITROGEN_FLUSH_STARTED
         || currentState == EngineStates::PRE_BURN_NITROGEN_FLUSH_FINISHED) {
       commandRepeats++;
@@ -120,8 +122,9 @@ void handleCommand(String &command, EngineStates &currentState, unsigned int &la
       return;
     }
 
-    if (currentState == EngineStates::LOG_START) {
+    if (currentState == EngineStates::LOG_START || currentState == EngineStates::SHUTDOWN_CONFIRMED) {
       commandRepeats = 0;
+      resetPins();
       SerialPort.write(INERT_FLUSH, COMMAND_SIZE_BYTES);
       openValve(NITROGENVALVE);
       lastEventTime = millis();
@@ -131,9 +134,10 @@ void handleCommand(String &command, EngineStates &currentState, unsigned int &la
 
     // In any other state, this is an invalid command.
     SerialPort.write(INVALID_COMMAND, COMMAND_SIZE_BYTES);
+    return;
   }
 
-  if (command == PRES_FUEL) {
+  if (!strcmp(command, PRES_FUEL)) {
     if (currentState == EngineStates::FUEL_PRESSURIZATION) {
       commandRepeats++;
       SerialPort.write(PRES_FUEL, COMMAND_SIZE_BYTES);
@@ -150,9 +154,10 @@ void handleCommand(String &command, EngineStates &currentState, unsigned int &la
 
     // In any other state, this is an invalid command.
     SerialPort.write(INVALID_COMMAND, COMMAND_SIZE_BYTES);
+    return;
   }
 
-  if (command == IGNITION) {
+  if (!strcmp(command, IGNITION)) {
     if (currentState == EngineStates::FUEL_OPEN
         || currentState == EngineStates::SPARK
         || currentState == EngineStates::IGNITION) {
@@ -172,9 +177,10 @@ void handleCommand(String &command, EngineStates &currentState, unsigned int &la
 
     // In any other state, this is an invalid command.
     SerialPort.write(INVALID_COMMAND, COMMAND_SIZE_BYTES);
+    return;
   }
 
-  if (command == SHUTDOWN) {
+  if (!strcmp(command, SHUTDOWN)) {
     if (currentState == EngineStates::SHUTDOWN_NITROGEN_FLUSH_STARTED) {
       SerialPort.write(SHUTDOWN, COMMAND_SIZE_BYTES);
       return;
@@ -188,7 +194,16 @@ void handleCommand(String &command, EngineStates &currentState, unsigned int &la
     currentState = EngineStates::SHUTDOWN_NITROGEN_FLUSH_STARTED;
     lastEventTime = millis();
     SerialPort.write(SHUTDOWN, COMMAND_SIZE_BYTES);
+    return;
   }
+
+  SerialPort.write(INVALID_COMMAND, COMMAND_SIZE_BYTES);
+  // Flush the input buffer if we get an unknown command
+  SerialPort.end();
+  SerialPort.begin(BAUD_RATE);
+  while(!Serial){}
+
+  
 }
 
 
