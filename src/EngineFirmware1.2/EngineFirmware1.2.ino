@@ -24,6 +24,9 @@ int commandRepeats = 0;
 
 void setup() {
   SerialPort.begin(BAUD_RATE);
+  while(!SerialPort){
+    ;
+  }
   setupPins();
   resetPins();
   lastPingTime = millis();
@@ -32,9 +35,11 @@ void setup() {
 void loop() {
   // Handle any incomming commands
   if (SerialPort.available() >= COMMAND_SIZE_BYTES) {
+    // SerialPort.print(SerialPort.available());
     SerialPort.readBytes(dataIn, COMMAND_SIZE_BYTES);
-    String command = String(dataIn);
-    handleCommand(command, currentState, lastPingTime, lastEventTime, commandRepeats);
+    // SerialPort.println(SerialPort.available());
+    dataIn[8] = 0; // Null Terminator
+    handleCommand(dataIn, currentState, lastPingTime, lastEventTime, commandRepeats);
   }
 
   // Read Sensor Data, Send it back, and validate it
@@ -56,6 +61,7 @@ void loop() {
   // Handle Lost Connection
   if (commandRepeats > MAX_COMMAND_REPEATS) {
     startShutdown();
+    commandRepeats = 0;
     currentState = EngineStates::CONNECTION_LOST;
     lastEventTime = millis();
     SerialPort.write(CONNECTION_LOST, COMMAND_SIZE_BYTES);
@@ -98,7 +104,6 @@ void loop() {
   if (currentState == EngineStates::SPARK) {
     int currentTime = millis();
     if ((currentTime - lastEventTime) > SPARK_DELAY_MS) {
-      closeValve(IGNITERVALVE);
       openValve(OXIDIZERVALVE);
       currentState = EngineStates::IGNITION;
     }
