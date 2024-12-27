@@ -30,6 +30,7 @@ void setup() {
   setupPins();
   resetPins();
   lastPingTime = millis();
+  SerialPort.println("Online");
 }
 
 void loop() {
