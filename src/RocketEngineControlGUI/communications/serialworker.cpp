@@ -2,10 +2,10 @@
 #include "mainwindow.h"
 
 SerialWorker::SerialWorker(MainWindow * window, QObject *parent)
-    : QThread{parent}, mainWindow(window)
+    : mainWindow(window)
 {
     serialPort = new QSerialPort();
-    serialPort->moveToThread(this);
+    dataBuffer = new QByteArray(sizeof(SensorData), 0);
     // TODO: Configure Serial Port to match the test stand config
     this->serialPort->setBaudRate(QSerialPort::BaudRate::Baud9600);
     this->serialPort->setParity(QSerialPort::Parity::NoParity);
@@ -15,197 +15,12 @@ SerialWorker::SerialWorker(MainWindow * window, QObject *parent)
 
     this->commandToSend = "";
 
-    connect(
-        mainWindow,
-        &MainWindow::issueCommand,
-        this,
-        &SerialWorker::issueCommand,
-        Qt::QueuedConnection
-    );
-
-    connect(
-        mainWindow,
-        &MainWindow::startPings,
-        this,
-        &SerialWorker::setStartPings,
-        Qt::QueuedConnection
-    );
-
-    connect(
-        mainWindow,
-        &MainWindow::serialPortChanged,
-        this,
-        &SerialWorker::onPortNameChange,
-        Qt::QueuedConnection
-    );
-
-    connect(
-        this->serialPort,
-        &QSerialPort::errorOccurred,
-        this,
-        &SerialWorker::handleSerialError
-    );
-
-
 }
 
-/**
- * @brief Is the main method for the serial worker thread.
- *
- * Loops until told to stop executing. On each loop yield for like
- * 10ms, then we want to check if there is data available in the serial
- * port and handle reading if needed.
- *
- * After reading, we want to do our write operations, we check if
- * there is a command to send and it is time to send the command if
- * both are true, then we should send the command. If there is no
- * command and its time to send a command and we have said to start
- * pings then we will issue a ping command to make sure we still
- * have a solid 2-way connection.
- */
-void SerialWorker::run()
+SerialWorker::~SerialWorker()
 {
-    while(true)
-    {
-        // Yield to reduce tight loops
-        this->msleep(WORKER_LOOP_YIELD_MS);
-
-        // Handle the read operations
-        this->readOperation();
-
-        // Handle any write operations
-        this->writeOperation();
-    }
-}
-
-/**
- * If there is then we want to pull the BYTES_IN_COMMAND number of
- * bytes, and check if those 8 bytes equal the command that was most
- * recently sent or if they equal a ping and if they are emit a signal
- * to handle them as such. If they are not a command acknowledgement
- * or ping ack, then it is likely data, and we can emit as such.
- * We should continue reading until the buffer is < BYTES_IN_COMMAND
-*/
-
-void SerialWorker::readOperation()
-{
-    while(serialPort->bytesAvailable() >= BYTES_IN_COMMAND)
-    {
-        // If the current data packet is not yet finished then we
-        // want to try and fill the data buffer if possible.
-        if(bytesInDataBuffer)
-        {
-            // The number of bytes to read is either the number available
-            // or is the number left to fill the buffer
-            int numberOfBytesToRead = std::min(
-                (unsigned long long) serialPort->bytesAvailable(),
-                (unsigned long long) sizeof(dataBuffer) - bytesInDataBuffer
-            );
-
-            // Then attempt a read
-            int bytesRead = serialPort->read(
-                &dataBuffer[bytesInDataBuffer],
-                numberOfBytesToRead
-            );
-
-            if(bytesRead == -1)
-            {
-                qDebug() << "Read Error from Serial Port \n";
-                return;
-            }
-
-            bytesInDataBuffer += bytesRead;
-
-            if(bytesInDataBuffer == sizeof(dataBuffer))
-            {
-                this->processSensorData();
-            }
-        }
-        else
-        {
-            // If there are not bytes in the data buffer then we want to try and read BYTES_IN_COMMAND number of bytes
-            // to see if its a command ack or data packet
-            bytesInDataBuffer = serialPort->read(dataBuffer, BYTES_IN_COMMAND);
-
-            if(!memcmp(mostRecentlySentCommand.data(), dataBuffer, BYTES_IN_COMMAND)){
-                // If this does match the most recent command sent then great emit and continue
-                emit commandSuccess(mostRecentlySentCommand);
-                bytesInDataBuffer = 0;
-                // Well now this command has been sent and received and we can resend pings
-                mostRecentlySentCommand = "";
-                commandToSend = "";
-                commandRetries = 0;
-                continue;
-            }
-
-            std::string dataPacketHeader = EXPECTED_DATA_HEADER;
-            // If the header says that this is data, then we let the code above handle reading the rest of the data
-            // and processing it.
-            if(!memcmp(dataPacketHeader.data(), dataBuffer, BYTES_IN_COMMAND)) continue;
-
-            // Then lastly if this data is not sensor data or a command ack then its likely corrupted
-            // Emit as such
-            QSharedPointer<QByteArray> data = QSharedPointer<QByteArray>(new QByteArray(dataBuffer, BYTES_IN_COMMAND));
-            bytesInDataBuffer = 0;
-            emit corruptedData(data);
-        }
-    }
-}
-
-void SerialWorker::writeOperation()
-{
-    // If not enough time has elapsed then increment the
-    // time since last command and wait
-    if(timeSinceLastCommand < COMMAND_WAIT_MS)
-    {
-        timeSinceLastCommand += WORKER_LOOP_YIELD_MS;
-        return;
-    }
-
-    // If a command has exceeded the max retries and we have not gotten
-    // an acknowledgement then the command has failed.
-    if(commandRetries > MAX_COMMAND_RETRIES)
-    {
-        emit commandFailed(commandToSend);
-        commandToSend = "";
-        commandRetries = 0;
-        return;
-    }
-
-    // If there is a command to write
-    if(commandToSend != "")
-    {
-        // Try writing
-        int bytesWritten = serialPort->write(commandToSend.data(), BYTES_IN_COMMAND);
-        if(bytesWritten < BYTES_IN_COMMAND)
-        {
-            qDebug() << "Serial Command: " << commandToSend <<
-                " Failed to send on attempt: " << commandRetries + 1 <<
-                " only " << bytesWritten << "/" << BYTES_IN_COMMAND << "written \n";
-        }
-
-        // Then emit that there was an attempt and update variables
-        emit commandAttempt(commandToSend);
-        commandRetries++;
-        timeSinceLastCommand = 0;
-        mostRecentlySentCommand = commandToSend;
-        return;
-    }
-
-    // If there is no command to write then try sending a ping.
-    int bytesWritten = serialPort->write(PING_COMMAND, BYTES_IN_COMMAND);
-    if(bytesWritten < BYTES_IN_COMMAND)
-    {
-        qDebug() << "Serial Command: " << PING_COMMAND <<
-            " Failed to send on attempt: " << commandRetries + 1 <<
-            " only " << bytesWritten << "/" << BYTES_IN_COMMAND << "written \n";
-    }
-
-    // Then update variables and emit attempt of ping
-    emit commandAttempt(std::string(PING_COMMAND));
-    commandRetries++;
-    timeSinceLastCommand = 0;
-    mostRecentlySentCommand = PING_COMMAND;
+    delete serialPort;
+    delete dataBuffer;
 }
 
 void SerialWorker::checksum12(void *checksum, const void *data, int n) {
@@ -220,47 +35,34 @@ void SerialWorker::checksum12(void *checksum, const void *data, int n) {
 
 void SerialWorker::processSensorData()
 {
-    // Compute Checksum
-    uint8_t incomingChecksum [CHECKSUM_SIZE];
-    this->checksum12(incomingChecksum, dataBuffer, sizeof(SensorData) - CHECKSUM_SIZE);
+    // 1. Compute the checksum of the incomming data
+    QByteArray incommingDataChecksum(CHECKSUM_SIZE, 0);
+    checksum12(incommingDataChecksum.data(), dataBuffer->data(), sizeof(SensorData)-CHECKSUM_SIZE);
 
-    // Check if it matches what was given to us
-    if(
-        memcmp(
-            incomingChecksum,
-            &dataBuffer[sizeof(SensorData) - CHECKSUM_SIZE],
-            CHECKSUM_SIZE
-        )
-    ) // If the checksums do not match then handle it as if its corrupted
+    // 2. Compare the computed checksum and the existing one
+    const char * receivedChecksumPointer = dataBuffer->data() + sizeof(SensorData)-CHECKSUM_SIZE;
+    if(!memcmp(incommingDataChecksum.data(), receivedChecksumPointer, CHECKSUM_SIZE))
     {
-        // Copy into ByteArray and emit as corrupted if Checksum fails
-        QSharedPointer<QByteArray> corruptedDataPtr = QSharedPointer<QByteArray>(
-            new QByteArray(dataBuffer, sizeof(SensorData))
-        );
-
-        emit corruptedData(corruptedDataPtr);
+        // If the checksums match that means data wasn't modified in transit so we send to be graphed
+        SensorData data = {0};
+        memcpy(&data, dataBuffer->data(), sizeof(SensorData));
+        emit dataAvailable(data);
     }
     else
     {
-        // Copy to SensorData Struct and emit as Data if valid
-        QSharedPointer<SensorData> sensorData = QSharedPointer<SensorData>(new SensorData);
-        memcpy(dataBuffer, sensorData.data(), sizeof(SensorData));
-
-        emit dataAvailable(sensorData);
+        // If the checksums don't match then we emit as corrupted data
+        QByteArray corruptedDataBuffer = *dataBuffer;
+        emit corruptedData(corruptedDataBuffer);
     }
-
-    // Indicate that the data buffer has been processed and is now empty.
-    bytesInDataBuffer = 0;
 }
 
-void SerialWorker::onPortNameChange(const QSerialPortInfo & port)
+void SerialWorker::onPortNameChange(const QSerialPortInfo &port)
 {
-    // Close the port if its open
-    if(this->serialPort->isOpen())
-        this->serialPort->close();
+    if(serialPort->isOpen())
+        serialPort->close();
 
-    // Then try to update and reopen the port
-    serialPort->setPort(port);
+    serialPort -> setPort(port);
+
     if(serialPort->open(QIODevice::ReadWrite))
     {
         emit portOpenSuccess();
@@ -271,47 +73,94 @@ void SerialWorker::onPortNameChange(const QSerialPortInfo & port)
     }
 }
 
-void SerialWorker::issueCommand(const std::string & command)
-{
-    commandToSend = command;
-    commandRetries = 0;
-    timeSinceLastCommand = COMMAND_WAIT_MS;
-}
-
 void SerialWorker::setStartPings(bool value)
 {
-    this->startPings = value;
+    startPings = value;
 }
 
-/*
-Error Type              | Signal to Emit           | Action Plan
--------------------------------------------------------------------------------
-Read Error              | readErrorOccurred        | Log and retry or notify user
-Resource Error          | resourceErrorOccurred    | Close port, attempt reconnection
-Permission Error        | permissionErrorOccurred  | Notify user, elevate permissions
-*/
+void SerialWorker::issueCommand(const QString &command)
+{
+    commandToSend = command;
+}
+
+void SerialWorker::handleReadReady()
+{
+    // If there is not already sensor data in the buffer and there is not a full command
+    // wait until there is a full command
+    if(dataBuffer->size() == 0 && serialPort->bytesAvailable() < BYTES_IN_COMMAND) return;
+
+    // If there is already sensor data then we should try to fill the buffer and process it
+    if(dataBuffer->size() > 0)
+    {
+        dataBuffer->append(serialPort->read(sizeof(SensorData)-dataBuffer->size()));
+        if(dataBuffer->size() == sizeof(SensorData))
+        {
+            processSensorData();
+            // After processing clear the buffer to indicate that we can move to the next packet
+            dataBuffer->clear();
+        }
+        // If we cannot fill the buffer, then we return and wait until the read ready signal is sent
+        // to continue to fill the buffer
+        return;
+    }
+
+    // If there is not already sensor data then we read 8 bytes and check its value to see if its a
+    // data header, engine signal, or corrupted data
+    dataBuffer->append(serialPort->read(BYTES_IN_COMMAND));
+
+    // Then check if its a sensor data header and if it is then just leave it in the buffer and wait for more
+    // data
+
+    if(!memcmp(dataBuffer->data(), EXPECTED_DATA_HEADER, BYTES_IN_COMMAND)) return;
+
+    // Check if its any of the signals and emit if it is
+    for(const auto & signal: EngineSignals) {
+        if(!memcmp(dataBuffer->data(), signal.data(), BYTES_IN_COMMAND))
+        {
+            commandToSend = "";
+            commandRetries = 0;
+            emit signalReceived(signal);
+            return;
+        }
+    }
+
+    // If the data is not an engine signal then we have an invalid signal and we can copy the buffer and emit as
+    // corrupted data and clear the data buffer
+
+    QByteArray bufferCopy = *dataBuffer;
+    emit corruptedData(bufferCopy);
+    dataBuffer->clear();
+
+}
+
 void SerialWorker::handleSerialError(QSerialPort::SerialPortError error)
 {
-    switch (error) {
-    case QSerialPort::NoError:
-        break;
-
-    case QSerialPort::ReadError:
-        emit readErrorOccurred();
-        break;
-
-    case QSerialPort::ResourceError:
-        emit resourceErrorOccurred();
-        break;
-
-    case QSerialPort::PermissionError:
-        emit permissionErrorOccurred();
-        break;
-
-    case QSerialPort::UnknownError:
-    default:
-        emit genericErrorOccurred(error);
-        break;
-
-    }
+    emit serialErrorOccurred(error, serialPort->errorString());
 }
+
+void SerialWorker::handleTimeout()
+{
+    // If the serial port is not open then don't try to write
+    if(!(serialPort->isOpen())) return;
+
+    // If we have a command to send then send that command
+    if(!(commandToSend.isEmpty()))
+    {
+        // But if we have exceeded the max command attempts then say this command failed
+        if(commandRetries >= MAX_COMMAND_RETRIES)
+        {
+            emit commandFailed(commandToSend);
+        }
+
+        serialPort->write(commandToSend.toUtf8());
+        commandRetries++;
+        emit commandAttempt(commandToSend);
+    }
+
+    // Don't start sending pings until startPings is set to be true
+    if(!startPings) return;
+
+    serialPort->write(PING_COMMAND);
+    emit commandAttempt(PING_COMMAND);
+}
+

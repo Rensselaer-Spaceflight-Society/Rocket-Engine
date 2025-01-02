@@ -20,6 +20,7 @@ constexpr char IGNITION[] = "Ignition";
 constexpr char SHUTDOWN[] = "Shutdown";
 constexpr char PING_COMMAND[] = "PingPong";
 
+constexpr char NITROGEN_FLUSH_FINISHED[] = "FlushFin";
 constexpr char SHUTDOWN_CONFIRMED[] = "ShutConf";
 constexpr char INVALID_COMMAND[] = "InvldCom";
 constexpr char CONNECTION_LOST[] = "ConnLost";
@@ -61,8 +62,11 @@ void startShutdown() {
 }
 
 void handleCommand(char * command, EngineStates &currentState, unsigned int &lastPingTime, unsigned int &lastEventTime, int &commandRepeats) {
+  
+  lastPingTime = millis(); // Any command (even invalid ones) can act as a ping since the ping is just meant to make
+  // sure that the comms link is still solid in both direction, and any response will allow us to understand this.
+
   if (!strcmp(command, PING_COMMAND)) {
-    lastPingTime = millis();
     SerialPort.write(PING_COMMAND, COMMAND_SIZE_BYTES);
     return;
   }
@@ -95,7 +99,7 @@ void handleCommand(char * command, EngineStates &currentState, unsigned int &las
 
   if (!strcmp(command, LOG_START)) {
     // This is a repeat command of a command we have seen before
-    if (currentState == EngineStates::LOG_START) {
+    if (currentState == EngineStates::LOG_START || currentState == EngineStates::SHUTDOWN_CONFIRMED) {
       commandRepeats++;
       SerialPort.write(LOG_START, COMMAND_SIZE_BYTES);
       return;
@@ -198,6 +202,7 @@ void handleCommand(char * command, EngineStates &currentState, unsigned int &las
   }
 
   SerialPort.write(INVALID_COMMAND, COMMAND_SIZE_BYTES);
+  SerialPort.write(command, COMMAND_SIZE_BYTES);
   // Flush the input buffer if we get an unknown command
   SerialPort.end();
   SerialPort.begin(BAUD_RATE);

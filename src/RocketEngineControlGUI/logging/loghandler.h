@@ -12,7 +12,7 @@
 
 enum class EventType: uint8_t {
     CommandSent = 0,
-    AcknowledgementReceived,
+    SignalReceived,
     CommandFailed,
     SerialError,
     CorruptedData,
@@ -34,9 +34,10 @@ public:
     ~LogHandler();
 
 public slots:
-    void logData(const QSharedPointer<SensorData> data);
-    void logEvent(EventType eventType, const QString & message);
-    void logCorruptedData(const QSharedPointer<QByteArray> corruptedData);
+    void logData(int countdownClockMS, const SensorData & data);
+    void logEvent(int countdownClockMS, EventType eventType, const QString & message);
+    void logCorruptedData(int countdownClockMS, const QByteArray & corruptedData);
+    static QString formatCountdown(int countdownMS);
 
 protected:
     bool openFile(QFile & fileToOpen);

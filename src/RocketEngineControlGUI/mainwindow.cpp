@@ -14,14 +14,23 @@ MainWindow::MainWindow(QWidget *parent)
     this->handleSerialPortRefresh();
 
     commsCenter = new SerialWorker(this);
+    this->userAlert = new AlertDialog();
+    countdown = new QTimer();
+    pingCheck = new QTimer();
 
     // Disable the Abort and Countdown Button until a connection is established
     ui->AbortButton->setDisabled(true);
-    ui->StartCountdown->setDisabled(true);
-
     this->setupConnections();
 
-    this->userAlert = new AlertDialog();
+}
+
+MainWindow::~MainWindow()
+{
+    delete commsCenter;
+    delete userAlert;
+    delete countdown;
+    delete pingCheck;
+    delete ui;
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
@@ -35,13 +44,6 @@ void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
     QMainWindow::keyPressEvent(keyEvent);
 }
 
-MainWindow::~MainWindow()
-{
-    delete commsCenter;
-    delete userAlert;
-    delete ui;
-}
-
 void MainWindow::handleSerialPortRefresh()
 {
     ui->SerialPortDropdown->clear();
@@ -49,18 +51,83 @@ void MainWindow::handleSerialPortRefresh()
     ui->SerialPortDropdown->addItems(this->getSerialPorts());
 }
 
+void MainWindow::handleStartCountdown()
+{
+    // Handle the case of when this is a reconnection button
+    if(currentState == EngineStates::NO_CONNECTION)
+    {
+        emit setPings(false);
+        emit issueCommand(CONTROL_ACTIVE_COMMAND);
+        ui->StartCountdown->setDisabled(true);
+        ui->AbortButton->setDisabled(true);
+        ui->StartCountdown->setText("Start Countdown");
+        return;
+    }
+
+    // Handle the hold continue
+    if(currentState == EngineStates::HOLDING)
+    {
+        currentState = beforeHoldState;
+        return;
+    }
+
+    // Allow for reset if we are in shutdown confirmed state
+    if(currentState == EngineStates::SHUTDOWN_COMPLETE)
+    {
+        currentState = EngineStates::CONNECTION_ESTABLISHED;
+        countdownMs = -COUNTDOWN_LENGTH_MS;
+        pastAutoHold = false;
+        // TODO: Reset Graphs, Create New Log Files
+        throw std::runtime_error("RESET NOT IMPLEMENTED");
+    }
+
+    // Set the burn duration from the text input
+    bool doubleConversionOk;
+    QString burnDurationString = ui->BurnDurationInput->text();
+    double burnDuration = burnDurationString.toDouble(&doubleConversionOk);
+
+    if(!doubleConversionOk) {
+        userAlert->setAlertTitle("Invalid Burn Duration");
+        userAlert->setAlertDescription("Unable to parse the burn duration into a number, please check input. ");
+        userAlert->show();
+        return;
+    }
+
+    burnDurationMs = (int) (burnDuration*1000);
+
+    if(burnDuration <= 0) {
+        userAlert->setAlertTitle("Invalid Burn Duration");
+        userAlert->setAlertDescription("Burn duration cannot be negative. ");
+        userAlert->show();
+        return;
+    }
+
+    // Issue the log start command to start logs
+    emit issueCommand(LOG_START_COMMAND);
+    emit setPings(true);
+}
+
 void MainWindow::handleShutdown()
 {
+
+    // If we are pre-ignition then the shutdown button acts as a countdown hold
+    if(currentState < EngineStates::HOLDING)
+    {
+        beforeHoldState = currentState; // Know which state we should return to after the hold is cleared
+        currentState = EngineStates::HOLDING;
+        ui->AbortButton->setText("Shutdown Engine");
+        ui->StartCountdown->setText("Continue Countdown");
+        ui->StartCountdown->setEnabled(true);
+        return;
+    }
+
+    // If we are in a hold or ignition state and the shutdown button is clicked then we should
+    // transition into a shutdown state
+    currentState = EngineStates::PENDING_SHUTDOWN;
+    emit issueCommand(SHUTDOWN_COMMAND);
+    ui->EngineStatus->setText("Pending Shutdown");
+    ui->AbortButton->setText("Pending Shutdown");
     ui->AbortButton->setDisabled(true);
-    ui->StartCountdown->setDisabled(true);
-    ui->AbortButton->setText("Shutdown Started");
-    ui->AbortButton->setStyleSheet("#AbortButton {background-color: rgb(119, 118, 123); color: rgb(255, 255, 255);}");
-
-
-    this->currentState = EngineStates::PENDING_SHUTDOWN;
-    this->ui->EngineStatus->setText("Pending Shutdown");
-    std::string shutdown = SHUTDOWN_COMMAND;
-    emit issueCommand(shutdown);
 }
 
 void MainWindow::handleSerialPortSelection(int index)
@@ -70,18 +137,19 @@ void MainWindow::handleSerialPortSelection(int index)
     emit serialPortChanged(availableSerialPorts[index-1]);
 }
 
-void MainWindow::handleCommandAttempt(std::string command)
+void MainWindow::handleCommandAttempt(const QString & command)
 {
     // Log the attempt since the serial worker should handle repetition
-    logger.logEvent(EventType::CommandSent, QString::fromStdString(command)+ " Sent to Motor");
+    logger.logEvent(countdownMs, EventType::CommandSent, command + " Sent to Motor");
 }
 
-void MainWindow::handleCommandFailed(std::string command)
+void MainWindow::handleCommandFailed(const QString & command)
 {
     // Log the failure in comms
     logger.logEvent(
+        countdownMs,
         EventType::CommandFailed,
-        QString::fromStdString(command) + " was sent "
+        command + " was sent "
             + QString::number(MAX_COMMAND_RETRIES)
             + " times without acknowledgement."
         );
@@ -90,128 +158,242 @@ void MainWindow::handleCommandFailed(std::string command)
     userAlert->setAlertDescription("Communications Lost");
     userAlert->setAlertTitle(
         "The command: "
-        + QString::fromStdString(command)
+        + command
         + " has failed to be sent and acknowledged by the test stand."
         + " Please check the communications hardware and try again. "
         + " Engine shutdown has been started. "
         );
     userAlert->show();
 
-    currentState = EngineStates::CONNECTION_FAILURE;
+    currentState = EngineStates::NO_CONNECTION;
 
     // Try to shutdown assuming the connection from the rocket is the one that is severed
     handleShutdown();
+    ui->StartCountdown->setText("Attempt Reconnection");
 }
 
-void MainWindow::handleCommandSuccess(std::string command)
+void MainWindow::hanldleSignalReceived(const QString & signal)
 {
-    // Log the success
-    logger.logEvent(
-        EventType::AcknowledgementReceived,
-        QString("Received Ack for: ") + QString::fromStdString(command)
-        );
+    timeSinceLastPing = 0; // All command responses indicate that two way comms are still active
+    logger.logEvent(countdownMs, EventType::SignalReceived, signal + " was received. ");
 
-    // We don't need to do anything if its a ping command
-    if(command == PING_COMMAND) return;
+    // If the signal is a ping then we have already done all that we need to
+    if(signal == PING_COMMAND) return;
 
-    // If we recieve that the engine has shutdown, then immediately move to the shutdown state.
-    if(command == SHUTDOWN_COMMAND)
+    if(signal == INVALID_COMMAND)
     {
-        currentState = EngineStates::SHUTDOWN;
-        this->ui->EngineStatus->setText("Engine Shutdown");
+        logger.logEvent(countdownMs, EventType::Warning, "The engine indicated that it received an invalid command.");
+        return;
+    }
+
+    if(signal == CONNECTION_LOST)
+    {
+        logger.logEvent(countdownMs, EventType::Error, "The engine has indicated that it has lost connection. Automatic Shutdown Occurred.");
+        currentState = EngineStates::NO_CONNECTION;
+        userAlert->setAlertTitle("Connection Lost");
+        userAlert->setAlertDescription("The engine has indicated it has lost connection. Automatic Shutdown has started. Please check comms hardware.");
+        userAlert->show();
+        ui->EngineStatus->setText("No Connection");
+        return;
+    }
+
+    // We ignore no connection because if we ever are in the no connection state after
+    // startup then the engine should automatically perform shutdown, and we want to
+    // stay in the no connection state
+    if(signal == SHUTDOWN_COMMAND && currentState != EngineStates::NO_CONNECTION)
+    {
+        logger.logEvent(countdownMs, EventType::Info, "Engine Shutdown Started");
+        currentState = EngineStates::SHUTDOWN_STARTED;
+        ui->AbortButton->setText("Shutdown Started");
+        ui->AbortButton->setDisabled(true);
+        ui->StartCountdown->setDisabled(true);
+        ui->EngineStatus->setText("Shutdown Started");
+        return;
+    }
+
+    if(currentState == EngineStates::NO_CONNECTION)
+    {
+        if(signal == CONTROL_ACTIVE_COMMAND)
+        {
+            currentState = EngineStates::CONNECTION_ESTABLISHED;
+            ui->StartCountdown->setEnabled(true);
+            ui->AbortButton->setEnabled(true);
+            ui->StartCountdown->setText("Start Countdown");
+            ui->AbortButton->setText("Hold Countdown");
+            ui->EngineStatus->setText("Connection Established");
+            return;
+        }
+    }
+
+    if(currentState == EngineStates::CONNECTION_ESTABLISHED)
+    {
+        if(signal == LOG_START_COMMAND)
+        {
+            currentState = EngineStates::COUNTDOWN_STARTED;
+            countdown->start(EVENT_POLL_DURATION_MS);
+            ui->StartCountdown->setDisabled(true);
+            ui->EngineStatus->setText("Logging Started");
+            return;
+        }
+    }
+
+    if(currentState == EngineStates::COUNTDOWN_STARTED)
+    {
+        if(signal == INERT_GAS_FLUSH_COMMAND)
+        {
+            currentState = EngineStates::NITROGEN_FLUSH_STARTED;
+            ui->EngineStatus->setText("Inert Flush Started");
+            return;
+        }
+    }
+
+    if(currentState == EngineStates::NITROGEN_FLUSH_STARTED)
+    {
+        if(signal == INERT_FLUSH_FINISHED)
+        {
+            currentState = EngineStates::NITROGEN_FLUSH_DONE;
+            ui->EngineStatus->setText("Inert Flush Finished");
+            return;
+        }
+    }
+
+    if(currentState == EngineStates::NITROGEN_FLUSH_DONE)
+    {
+        if(signal == PRESURIZE_FUEL_COMMAND)
+        {
+            currentState = EngineStates::PRESSUREIZED_FUEL;
+            ui->EngineStatus->setText("Fuel Pressurized");
+            return;
+        }
+    }
+
+    if(currentState == EngineStates::PRESSUREIZED_FUEL)
+    {
+        if(signal == IGNITION_COMMAND)
+        {
+            currentState = EngineStates::IGNITION;
+            ui->EngineStatus->setText("Engine Ignition");
+            return;
+        }
+    }
+
+    if(currentState == EngineStates::SHUTDOWN_STARTED)
+    {
+        if(signal == SHUTDOWN_CONFIRMED)
+        {
+            logger.logEvent(countdownMs, EventType::Info, "Engine Shutdown Completed");
+            countdown->stop();
+            currentState = EngineStates::SHUTDOWN_COMPLETE;
+            ui->AbortButton->setText("Shutdown Complete");
+            ui->EngineStatus->setText("Shutdown Complete");
+            ui->StartCountdown->setText("Reset Test");
+            ui->StartCountdown->setEnabled(true);
+            return;
+        }
+    }
+}
+
+void MainWindow::handleCountdownUpdate()
+{
+    // If we are holding then we shouldn't be updating the countdown;
+    if(currentState == EngineStates::HOLDING) {
         return;
     }
 
 
-    // Advance from No Connection to the Connection Established State
-    if((currentState == EngineStates::NO_CONNECTION ||
-         currentState == EngineStates::CONNECTION_FAILURE) &&
-        command == CONTROL_ACTIVE_COMMAND)
+    countdownMs += EVENT_POLL_DURATION_MS;
+    QString countdownTimerText = LogHandler::formatCountdown(countdownMs);
+    ui->CountdowLabel->setText(countdownTimerText);
+
+    if(currentState == EngineStates::COUNTDOWN_STARTED && countdownMs > AUTO_HOLD_POINT_MS && !pastAutoHold)
     {
-        currentState = EngineStates::CONNECTION_ESTABLISHED;
-        // Unlock the buttons
+        beforeHoldState = currentState;
+        currentState = beforeHoldState;
+        ui->AbortButton->setText("Shutdown");
+        ui->StartCountdown->setText("Continue Countdown");
         ui->StartCountdown->setEnabled(true);
-        ui->AbortButton->setEnabled(true);
-        ui->EngineStatus->setText("Connection Established");
+        pastAutoHold = true;
         return;
     }
-    // Advance from the Connection Established to the Log Start State
-    if((currentState == EngineStates::CONNECTION_ESTABLISHED ||
-         currentState == EngineStates::SHUTDOWN)
-        && command == LOG_START_COMMAND)
-    {
-        currentState = EngineStates::COUNTDOWN_STARTED;
-        this->ui->EngineStatus->setText("Logging Data");
-    }
-    // The engine will then enter the AutoHold State from the Countdown Timer
 
-    // Advance from the AutoHold State to the Inert Flush State
-    if((currentState == EngineStates::AUTO_HOLD) && command == INERT_GAS_FLUSH_COMMAND)
+    // Handle the Inert Flush When we reach that point
+    if(currentState == EngineStates::COUNTDOWN_STARTED && countdownMs > INERT_FLUSH_POINT_MS)
     {
-        currentState = EngineStates::PRESTART_NITROGEN_FLUSH;
-        this->ui->EngineStatus->setText("Inert Gas Flush");
+        emit issueCommand(INERT_GAS_FLUSH_COMMAND);
+        return;
     }
 
-    // Then the next state to advance to is the fuel pressurization state
-    if((currentState == EngineStates::PRESTART_NITROGEN_FLUSH) && command == PRESURIZE_FUEL_COMMAND)
+    // Handle Fuel Pressurization after the Nitrogen Flush
+    if(currentState == EngineStates::NITROGEN_FLUSH_DONE && countdownMs > PRESURIZE_FUEL_POINT_MS)
     {
-        currentState = EngineStates::PRESSUREIZED_FUEL;
-        this->ui->EngineStatus->setText("Fuel Pressurized");
+        emit issueCommand(PRESURIZE_FUEL_COMMAND);
+        return;
     }
 
-    // Then the next state to transition to will be the ignition state
-    if((currentState == EngineStates::PRESSUREIZED_FUEL) && command == IGNITION_COMMAND)
+
+    // Handle Ignition after Fuel Pressurization
+    if(currentState == EngineStates::PRESSUREIZED_FUEL && countdownMs > IGNITION_START_POINT_MS)
     {
-        currentState = EngineStates::IGNITION;
-        this->ui->EngineStatus->setText("Engine Ignition");
+        emit issueCommand(IGNITION_COMMAND);
+        return;
     }
 
-    // If none of the above states are reached then the wrong command was sent for the current state
-    logger.logEvent(
-        EventType::Error,
-        QString::fromStdString(command) +
-            " was recieved in engine state: " +
-            QString::number(static_cast<int8_t>(currentState))
-        );
+    // Handle Shutdown After We Have Burned for the Full Duration
+    if(currentState == EngineStates::IGNITION && countdownMs > burnDurationMs)
+    {
+        emit issueCommand(SHUTDOWN_COMMAND);
+        currentState = EngineStates::PENDING_SHUTDOWN;
+        ui->AbortButton->setText("Pending Shutdown");
+        ui->EngineStatus->setText("Pending Shutdown");
+        ui->AbortButton->setDisabled(true);
+    }
+}
 
-    userAlert->setAlertDescription("Invalid Acknowledgement Receieved");
-    userAlert->setAlertTitle(
-        "The acknowledgement: " + QString::fromStdString(command) +
-        " was recieved but was not expected because the engine was in state: " +
-        QString::number(static_cast<int8_t>(currentState))
-        );
+void MainWindow::handlePingCheck()
+{
+    timeSinceLastPing+=EVENT_POLL_DURATION_MS;
+
+    if(timeSinceLastPing < MAX_PING_NON_RESPONSE_DELAY_MS || currentState < EngineStates::CONNECTION_ESTABLISHED) return;
+
+    currentState = EngineStates::NO_CONNECTION;
+    handleShutdown();
+
+    ui->EngineStatus->setText("Connection Lost");
+
+    userAlert->setAlertTitle("Connection Lost");
+    userAlert->setAlertDescription("Engine has failed to respond to pings, please check hardware.");
     userAlert->show();
 
+    ui->StartCountdown->setText("Attempt Reconnection");
 }
 
-void MainWindow::handleDataAvailable(const QSharedPointer<SensorData> data)
+void MainWindow::handleDataAvailable(const SensorData & data)
 {
     // Log the data in the data log
-    logger.logData(data);
-
-    // Update the data packet count
-    dataPacketCount += 1.0;
+    logger.logData(countdownMs, data);
 
     // Update the graphs and the data table
-    this->updateUIWithSensorData(*data);
+    this->updateUIWithSensorData(data);
 }
 
-void MainWindow::handleCorruptedData(const QSharedPointer<QByteArray> data)
+void MainWindow::handleCorruptedData(const QByteArray & data)
 {
     // Log the corrupted data event
     logger.logEvent(
+        countdownMs,
         EventType::CorruptedData,
-        QString::number(data->size())+ " Bytes of Corrupted Data recieved and logged. "
+        QString::number(data.size())+ " Bytes of Corrupted Data recieved and logged. "
         );
 
     // Log the corrupted data
-    logger.logCorruptedData(data);
+    logger.logCorruptedData(countdownMs, data);
 }
 
 void MainWindow::handlePortOpenFailed()
 {
     // Log the event
     logger.logEvent(
+        countdownMs,
         EventType::SerialError,
         "Serial Port Failed to Open."
         );
@@ -220,60 +402,28 @@ void MainWindow::handlePortOpenFailed()
     this->ui->EngineStatus->setText("Serial Port Failed to Open");
 }
 
+void MainWindow::handleSerialError(QSerialPort::SerialPortError error, const QString & errorStr)
+{
+    userAlert->setAlertTitle("Serial Error Occurred Code: " + QString::number(error));
+    userAlert->setAlertDescription("A serial error occurred: " + errorStr + " Please check that the serial hardware and that there is not any other programs using the serial port.");
+    userAlert->show();
+}
+
 void MainWindow::handlePortOpenSuccess()
 {
-    logger.logEvent(EventType::Info, "Serial Port opened Successfully");
+    logger.logEvent(
+        countdownMs,
+        EventType::Info,
+        "Serial Port opened Successfully"
+        );
 
     // Update the screen
 
     this->ui->EngineStatus->setText("Serial Port Opened");
+
+    // Try to connect to the engine
+    emit issueCommand(CONTROL_ACTIVE_COMMAND);
 }
-
-// Serial Error Handlers
-void MainWindow::handleReadErrorOccurred()
-{
-    logger.logEvent(EventType::SerialError, "Read error occured. Check Hardware.");
-    // Alert the user to the error somehow
-
-    userAlert->setAlertDescription("Serial Port Read Error");
-    userAlert->setAlertTitle("There was a read error in the serial port. Please check the USB-Serial device and try again. ");
-    userAlert->show();
-}
-
-void MainWindow::handleResourceErrorOccurred()
-{
-    logger.logEvent(EventType::SerialError, "Resource error, try restarting the computer or UART device.");
-    // Alert the user to the error somehow
-
-    userAlert->setAlertDescription("Serial Resource Error");
-    userAlert->setAlertTitle("There was a serial resource error. This is likely due to another program"
-                             " trying to read the serial port. Please close other programs and try again.");
-    userAlert->show();
-}
-
-void MainWindow::handlePermissionErrorOccurred()
-{
-    logger.logEvent(EventType::SerialError, "Permissions Error: Check user serial permissions and restart software.");
-    // Alert the user to the error somehow
-
-    userAlert->setAlertDescription("Serial Permissions Error");
-    userAlert->setAlertTitle("The current user does not have the permissions to access the specified serial port"
-                             " please check your permissions and try again.");
-    userAlert->show();
-}
-
-void MainWindow::handleGenericErrorOccurred(QSerialPort::SerialPortError error)
-{
-    logger.logEvent(EventType::SerialError, "Other Serial Error Occurred, Error Code: " + QString::number(error));
-    // Alert the user to the error somehow
-
-    userAlert->setAlertDescription("Generic Serial Error Occurred");
-    userAlert->setAlertTitle(
-        "An undefined serial error with code: "
-        + QString::number(error) + "occurred. Please check serial hardware and try again.");
-    userAlert->show();
-}
-
 
 QStringList MainWindow::getSerialPorts()
 {
@@ -307,51 +457,51 @@ void MainWindow::updateUIWithSensorData(const SensorData & data)
     */
 
     // TODO: Add Coloring to the Labels for Values out of spec
+    float time = (float) countdownMs / 1000;
 
     // Load Cell
     this->ui->LoadCellValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " N");
-    this->ui->LoadCellChart->append(dataPacketCount, data.loadCell);
+    this->ui->LoadCellChart->append(time, data.loadCell);
 
     // Kerosene Inlet
     this->ui->FuelInletTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
-    this->ui->FuelInletChart->append(dataPacketCount, data.thermocouple[0]);
+    this->ui->FuelInletChart->append(time, data.thermocouple[0]);
 
     // Oxidizer Inlet
     this->ui->OxidizerInletTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
-    this->ui->OxidizerInletChart->append(dataPacketCount, data.thermocouple[1]);
+    this->ui->OxidizerInletChart->append(time, data.thermocouple[1]);
 
     // Engine Throat
     this->ui->EngineThroatTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
-    this->ui->EngineThroatChart->append(dataPacketCount, data.thermocouple[2]);
+    this->ui->EngineThroatChart->append(time, data.thermocouple[2]);
 
     // Nozzle Near Exit
     this->ui->NozzleExitTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
-    this->ui->NozzleExitChart->append(dataPacketCount, data.thermocouple[3]);
+    this->ui->NozzleExitChart->append(time, data.thermocouple[3]);
 
     // Combustion Chamber
     this->ui->CompustionChamberPresureValue->setText(QString::number(data.pressureTransducer[0], 'g', 2));
-    this->ui->CombustionChamberPressureChart->append(dataPacketCount, data.pressureTransducer[0]);
+    this->ui->CombustionChamberPressureChart->append(time, data.pressureTransducer[0]);
 
     // Fuel Feed Line Pressure
     this->ui->FuelFeedPressureValue->setText(QString::number(data.pressureTransducer[1], 'g', 2));
-    this->ui->FuelFeedPressureChart->append(dataPacketCount, data.pressureTransducer[1]);
+    this->ui->FuelFeedPressureChart->append(time, data.pressureTransducer[1]);
 
     // Kerosene Tank Pressure
     this->ui->KeroseneTankPressureValue->setText(QString::number(data.pressureTransducer[2], 'g', 2));
-    this->ui->FuelTankPressureChart->append(dataPacketCount, data.pressureTransducer[2]);
+    this->ui->FuelTankPressureChart->append(time, data.pressureTransducer[2]);
 
     // Kerosene Line Pressure
     this->ui->FuelLinePressureValue->setText(QString::number(data.pressureTransducer[3], 'g', 2));
-    this->ui->FuelLinePressureChart->append(dataPacketCount, data.pressureTransducer[3]);
+    this->ui->FuelLinePressureChart->append(time, data.pressureTransducer[3]);
 
     // Oxidizer Tank Pressure
     this->ui->OxidizerTankPressureValue->setText(QString::number(data.pressureTransducer[4], 'g', 2));
-    this->ui->OxidizerTankPressureChart->append(dataPacketCount, data.pressureTransducer[4]);
+    this->ui->OxidizerTankPressureChart->append(time, data.pressureTransducer[4]);
 
     // Oxidizer Line pressure
     this->ui->OxidizerLinePressureValue->setText(QString::number(data.pressureTransducer[5], 'g', 2));
-    this->ui->OxidizerLinePressureChart->append(dataPacketCount, data.pressureTransducer[5]);
-
+    this->ui->OxidizerLinePressureChart->append(time, data.pressureTransducer[5]);
 
 }
 
@@ -386,112 +536,5 @@ void MainWindow::configureCharts()
 
 void MainWindow::setupConnections()
 {
-    connect(
-        this->ui->RefreshSerialPorts,
-        &QPushButton::clicked,
-        this,
-        &MainWindow::handleSerialPortRefresh
-        );
 
-    connect(
-        this->ui->AbortButton,
-        &QPushButton::clicked,
-        this,
-        &MainWindow::handleShutdown
-        );
-
-    connect(
-        this->ui->SerialPortDropdown,
-        &QComboBox::currentIndexChanged,
-        this,
-        &MainWindow::handleSerialPortSelection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::commandAttempt,
-        this,
-        &MainWindow::handleCommandAttempt,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::commandFailed,
-        this,
-        &MainWindow::handleCommandFailed,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::commandSuccess,
-        this,
-        &MainWindow::handleCommandSuccess,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::dataAvailable,
-        this,
-        &MainWindow::handleDataAvailable,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::corruptedData,
-        this,
-        &MainWindow::handleCorruptedData,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::portOpenFailed,
-        this,
-        &MainWindow::handlePortOpenFailed,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::portOpenSuccess,
-        this,
-        &MainWindow::handlePortOpenSuccess,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::readErrorOccurred,
-        this,
-        &MainWindow::handleReadErrorOccurred,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::resourceErrorOccurred,
-        this,
-        &MainWindow::handleResourceErrorOccurred,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::permissionErrorOccurred,
-        this,
-        &MainWindow::handlePermissionErrorOccurred,
-        Qt::QueuedConnection
-        );
-
-    connect(
-        this->commsCenter,
-        &SerialWorker::genericErrorOccurred,
-        this,
-        &MainWindow::handleGenericErrorOccurred,
-        Qt::QueuedConnection
-        );
 }

@@ -15,17 +15,25 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+#define EVENT_POLL_DURATION_MS 10
+#define COUNTDOWN_LENGTH_MS -60000 // Negative for Countdown
+#define AUTO_HOLD_POINT_MS -30000 // Holds at T-30s
+#define INERT_FLUSH_POINT_MS -10000 // Inert Flush at T-10s
+#define PRESURIZE_FUEL_POINT_MS -5000 // Fuel Pressurization at T-5s
+#define IGNITION_START_POINT_MS -1500 // Ignition Starts at T-1.5s
+
 enum class EngineStates : int8_t {
-    CONNECTION_FAILURE = -1,
-    NO_CONNECTION,
+    NO_CONNECTION = -1,
     CONNECTION_ESTABLISHED,
     COUNTDOWN_STARTED,
-    AUTO_HOLD,
-    PRESTART_NITROGEN_FLUSH,
+    NITROGEN_FLUSH_STARTED,
+    NITROGEN_FLUSH_DONE,
     PRESSUREIZED_FUEL,
+    HOLDING,
     IGNITION,
     PENDING_SHUTDOWN,
-    SHUTDOWN,
+    SHUTDOWN_STARTED,
+    SHUTDOWN_COMPLETE,
 };
 
 class MainWindow : public QMainWindow
@@ -37,27 +45,30 @@ public:
     ~MainWindow();   
 
 private slots:
+    void handleStartCountdown();
+    void handleCountdownUpdate();
+
+    void handlePingCheck();
+
     void handleShutdown();
     void handleSerialPortRefresh();
     void handleSerialPortSelection(int portIndex);
 
-    void handleCommandAttempt(std::string command);
-    void handleCommandFailed(std::string command);
-    void handleCommandSuccess(std::string command);
-    void handleDataAvailable(const QSharedPointer<SensorData> data);
-    void handleCorruptedData(const QSharedPointer<QByteArray> data);
+    void handleCommandAttempt(const QString & command);
+    void handleCommandFailed(const QString & command);
+    void hanldleSignalReceived(const QString & signal);
+
+    void handleDataAvailable(const SensorData & data);
+    void handleCorruptedData(const QByteArray & data);
+
     void handlePortOpenFailed();
     void handlePortOpenSuccess();
 
-    // Serial Error Handlers
-    void handleReadErrorOccurred();
-    void handleResourceErrorOccurred();
-    void handlePermissionErrorOccurred();
-    void handleGenericErrorOccurred(QSerialPort::SerialPortError error);
+    void handleSerialError(QSerialPort::SerialPortError error, const QString & errorString);
 
 signals:
-    void issueCommand(const std::string & command);
-    void startPings(bool value);
+    void issueCommand(const QString & command);
+    void setPings(bool value);
     void serialPortChanged(QSerialPortInfo port);
 
 protected:
@@ -71,10 +82,15 @@ private:
     Ui::MainWindow *ui;
     SerialWorker * commsCenter;
     AlertDialog * userAlert;
-    double dataPacketCount = 0;
+    QTimer * countdown;
+    QTimer * pingCheck;
     LogHandler logger;
     EngineStates currentState = EngineStates::NO_CONNECTION;
-
+    EngineStates beforeHoldState = currentState;
     QList<QSerialPortInfo> availableSerialPorts;
+    bool pastAutoHold = false;
+    int countdownMs = COUNTDOWN_LENGTH_MS;
+    int burnDurationMs = -1;
+    int timeSinceLastPing = 0;
 };
 #endif // MAINWINDOW_H

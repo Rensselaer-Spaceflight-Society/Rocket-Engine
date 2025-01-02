@@ -2,79 +2,98 @@
 #define SERIALWORKER_H
 
 #include <cmath>
-#include <string>
 
 #include <QThread>
-#include <QSerialPort>
-#include <QSharedPointer>
-#include <QScopedPointer>
 #include <QDebug>
+#include <QSerialPort>
 
 #include "sensordata.h"
 
 
 #define COMMAND_WAIT_MS 200
-#define WORKER_LOOP_YIELD_MS 10
+#define COMMAND_SEND_TIMEOUT_DURRATION_MS 10
 #define BYTES_IN_COMMAND 8
 #define MAX_COMMAND_RETRIES 3
+#define MAX_PING_NON_RESPONSE_DELAY_MS 250
 
 // IMPORTANT: ALL COMMANDS MUST BE BYTES_IN_COMMAND NUMBER OF CHARS
 // OTHERWISE WE COULD HAVE FUN BUFFER OVERFLOWS
-#define CONTROL_ACTIVE_COMMAND "CtrlActi"
-#define PING_COMMAND "PingPong"
-#define LOG_START_COMMAND "LogStart"
-#define INERT_GAS_FLUSH_COMMAND "InrtFlsh"
-#define PRESURIZE_FUEL_COMMAND "PresFuel"
-#define IGNITION_COMMAND "Ignition"
-#define SHUTDOWN_COMMAND "ShutDown"
+constexpr char CONTROL_ACTIVE_COMMAND[] = "CtrlActi";
+constexpr char PING_COMMAND[] = "PingPong";
+constexpr char LOG_START_COMMAND[] = "LogStart";
+constexpr char INERT_GAS_FLUSH_COMMAND[] = "InrtFlsh";
+constexpr char PRESURIZE_FUEL_COMMAND[] = "PresFuel";
+constexpr char IGNITION_COMMAND[] = "Ignition";
+constexpr char SHUTDOWN_COMMAND[] = "ShutDown";
+
+// Signals that define state of engine
+// These are never sent to the engine, they are only recieved
+constexpr char INERT_FLUSH_FINISHED[] = "FlushFin";
+constexpr char SHUTDOWN_CONFIRMED[] = "ShutConf";
+constexpr char INVALID_COMMAND[] = "InvldCom";
+constexpr char CONNECTION_LOST[] = "ConnLost";
+
+const QString EngineSignals[] = {
+    CONTROL_ACTIVE_COMMAND,
+    PING_COMMAND,
+    LOG_START_COMMAND,
+    INERT_GAS_FLUSH_COMMAND,
+    PRESURIZE_FUEL_COMMAND,
+    IGNITION_COMMAND,
+    SHUTDOWN_COMMAND,
+    INERT_FLUSH_FINISHED,
+    SHUTDOWN_CONFIRMED,
+    INVALID_COMMAND,
+    CONNECTION_LOST,
+};
+
+#define NUM_ENGINE_SIGNALS sizeof(EngineSignals) / sizeof(EngineSignals[0])
 
 // Forward Declaration of the MainWindow to avoid circular include dependencies
 class MainWindow;
 
-class SerialWorker : public QThread
+class SerialWorker : public QObject
 {
     Q_OBJECT
 public:
     explicit SerialWorker(MainWindow * window, QObject *parent = nullptr);
-    void run() override;
+    ~SerialWorker();
 
 protected:
-    void readOperation();
-    void writeOperation();
     void checksum12(void * checksum, const void * data, int n);
     void processSensorData();
 
 public slots:
     void onPortNameChange(const QSerialPortInfo & port);
-    void issueCommand(const std::string & command);
     void setStartPings(bool value);
+    void issueCommand(const QString & command);
+
+private slots:
+    void handleReadReady();
     void handleSerialError(QSerialPort::SerialPortError error);
+    void handleTimeout();
 
 signals:
-    void commandAttempt(std::string command);
-    void commandFailed(std::string command);
-    void commandSuccess(std::string command);
-    void dataAvailable(const QSharedPointer<SensorData> data);
-    void corruptedData(const QSharedPointer<QByteArray> data);
+    void commandAttempt(const QString & command);
+    void commandFailed(const QString & command);
+
+    void signalReceived(const QString & command);
+
+    void dataAvailable(const SensorData &data);
+    void corruptedData(const QByteArray &data);
+
     void portOpenFailed();
     void portOpenSuccess();
-
-    // Serial Error Signals
-    void readErrorOccurred();
-    void resourceErrorOccurred();
-    void permissionErrorOccurred();
-    void genericErrorOccurred(QSerialPort::SerialPortError error);
+    void serialErrorOccurred(QSerialPort::SerialPortError &error, const QString &message);
 
 private:
-    QSerialPort* serialPort;
-    std::string commandToSend;
-    std::string mostRecentlySentCommand;
-    char dataBuffer[sizeof(SensorData)];
-    size_t bytesInDataBuffer;
-    bool startPings = false;
-    size_t timeSinceLastCommand = COMMAND_WAIT_MS;
-    size_t commandRetries = 0;
     MainWindow * mainWindow;
+    QSerialPort * serialPort;
+    QByteArray * dataBuffer;
+    QString commandToSend;
+    QString mostRecentlySentCommand;
+    bool startPings = false;
+    size_t commandRetries = 0;
 };
 
 #endif // SERIALWORKER_H

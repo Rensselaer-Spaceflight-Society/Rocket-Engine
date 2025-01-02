@@ -34,6 +34,8 @@ private:
     QValueAxis * axisX;
     QValueAxis * axisY;
     double maxYValue = 1;
+    double minXValue = 0;
+    double maxXValue = 1;
 };
 
 #endif // DATACHART_H

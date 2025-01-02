@@ -30,7 +30,6 @@ void setup() {
   setupPins();
   resetPins();
   lastPingTime = millis();
-  SerialPort.println("Online");
 }
 
 void loop() {
@@ -88,6 +87,7 @@ void loop() {
     if ((currentTime - lastEventTime) > NITROGEN_FLUSH_DELAY_MS) {
       closeValve(NITROGENVALVE);
       currentState = EngineStates::PRE_BURN_NITROGEN_FLUSH_FINISHED;
+      SerialPort.write(NITROGEN_FLUSH_FINISHED, COMMAND_SIZE_BYTES);
     }
   }
 

@@ -72,9 +72,11 @@ void DataChart::append(float xValue, float yValue)
 {
     lowerSeries->append(xValue, 0);
     upperSeries->append(xValue, yValue);
-    if(yValue > maxYValue) maxYValue = yValue;
-    axisX->setRange(0, (int) (xValue));
-    axisY->setRange(0, (int) (maxYValue));
+    maxXValue = std::fmax(maxXValue, xValue);
+    minXValue = std::fmin(minXValue, xValue);
+    maxYValue = std::fmax(maxYValue, yValue);
+    axisX->setRange(minXValue, (int) maxXValue + 1);
+    axisY->setRange(0, (int) (maxYValue) + 1);
 }
 
 DataChart::~DataChart()
