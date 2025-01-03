@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QSerialPort>
+#include <QTimer>
 
 #include "sensordata.h"
 
@@ -90,6 +91,7 @@ private:
     MainWindow * mainWindow;
     QSerialPort * serialPort;
     QByteArray * dataBuffer;
+    QTimer* commandTimer;
     QString commandToSend;
     QString mostRecentlySentCommand;
     bool startPings = false;

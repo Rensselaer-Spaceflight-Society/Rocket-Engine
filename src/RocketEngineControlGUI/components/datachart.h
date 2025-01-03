@@ -24,6 +24,7 @@ public:
     void append(float xValue, float yValue);
     void setChartType(ChartType chartType);
     void setChartTitle(const QString& title);
+    void reset();
 
 private:
     Ui::DataChart *ui;

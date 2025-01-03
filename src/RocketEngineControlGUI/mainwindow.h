@@ -77,6 +77,7 @@ protected:
     void keyPressEvent(QKeyEvent* keyEvent) override;
     void setupConnections();
     void updateUIWithSensorData(const SensorData & data);
+    void resetCharts();
 
 private:
     Ui::MainWindow *ui;

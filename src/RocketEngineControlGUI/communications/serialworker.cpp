@@ -2,10 +2,11 @@
 #include "mainwindow.h"
 
 SerialWorker::SerialWorker(MainWindow * window, QObject *parent)
-    : mainWindow(window)
+    : mainWindow(window),
+    serialPort(new QSerialPort(this)),
+    dataBuffer(new QByteArray(sizeof(SensorData), 0)),
+    commandTimer(new QTimer(this))
 {
-    serialPort = new QSerialPort();
-    dataBuffer = new QByteArray(sizeof(SensorData), 0);
     // TODO: Configure Serial Port to match the test stand config
     this->serialPort->setBaudRate(QSerialPort::BaudRate::Baud9600);
     this->serialPort->setParity(QSerialPort::Parity::NoParity);
@@ -15,6 +16,11 @@ SerialWorker::SerialWorker(MainWindow * window, QObject *parent)
 
     this->commandToSend = "";
 
+    connect(commandTimer, &QTimer::timeout, this, &SerialWorker::handleTimeout);
+    connect(serialPort, &QSerialPort::readyRead, this, &SerialWorker::handleReadReady);
+    connect(serialPort, &QSerialPort::errorOccurred, this, &SerialWorker::handleSerialError);
+
+    commandTimer->start(COMMAND_SEND_TIMEOUT_DURRATION_MS);
 }
 
 SerialWorker::~SerialWorker()

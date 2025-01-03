@@ -79,6 +79,17 @@ void DataChart::append(float xValue, float yValue)
     axisY->setRange(0, (int) (maxYValue) + 1);
 }
 
+void DataChart::reset()
+{
+    minXValue = 0;
+    maxXValue = 1;
+    maxYValue = 1;
+    lowerSeries->clear();
+    upperSeries->clear();
+    axisX->setRange(minXValue, maxXValue);
+    axisY->setRange(0, maxYValue);
+}
+
 DataChart::~DataChart()
 {
     delete axisX;

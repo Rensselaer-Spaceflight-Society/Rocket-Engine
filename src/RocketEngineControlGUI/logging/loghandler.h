@@ -26,23 +26,23 @@ class LogHandler
 {
 public:
     LogHandler(
-        QString outputPath,
-        QString dataFileName = "default",
-        QString eventFileName = "default",
-        QString corruptedDataFileName = "default"
+        QString outputPath
     );
     ~LogHandler();
+    bool initialize();
+    static QString formatCountdown(int countdownMS);
+    bool restartLogs();
 
 public slots:
     void logData(int countdownClockMS, const SensorData & data);
     void logEvent(int countdownClockMS, EventType eventType, const QString & message);
     void logCorruptedData(int countdownClockMS, const QByteArray & corruptedData);
-    static QString formatCountdown(int countdownMS);
 
 protected:
     bool openFile(QFile & fileToOpen);
 
 private:
+    QString outputPath;
     QFile dataLog, eventLog, corruptionLog;
     QTextStream dataStream, eventStream, corruptionStream;
 };

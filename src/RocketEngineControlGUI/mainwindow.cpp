@@ -7,19 +7,26 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow), logger(DATA_OUTPUT_PATH)
+    , ui(new Ui::MainWindow), logger(DATA_OUTPUT_PATH), userAlert(new AlertDialog()), commsCenter(new SerialWorker(this))
 {
     ui->setupUi(this);
+
     this->configureCharts();
     this->handleSerialPortRefresh();
 
-    commsCenter = new SerialWorker(this);
-    this->userAlert = new AlertDialog();
     countdown = new QTimer();
     pingCheck = new QTimer();
 
+    if(!logger.initialize())
+    {
+        userAlert->setAlertTitle("Logging Failed to Start");
+        userAlert->setAlertDescription("One or more of the log files failed to open, please check permissions and try again. ");
+        userAlert->show();
+    }
+
     // Disable the Abort and Countdown Button until a connection is established
     ui->AbortButton->setDisabled(true);
+    ui->StartCountdown->setDisabled(true);
     this->setupConnections();
 
 }
@@ -78,7 +85,13 @@ void MainWindow::handleStartCountdown()
         countdownMs = -COUNTDOWN_LENGTH_MS;
         pastAutoHold = false;
         // TODO: Reset Graphs, Create New Log Files
-        throw std::runtime_error("RESET NOT IMPLEMENTED");
+        resetCharts();
+        if(!logger.restartLogs())
+        {
+            userAlert->setAlertTitle("The logger failed to restart the logs");
+            userAlert->setAlertDescription("The logger failed to reset the logs, please check file permissions.");
+            userAlert->show();
+        }
     }
 
     // Set the burn duration from the text input
@@ -221,6 +234,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
             ui->StartCountdown->setText("Start Countdown");
             ui->AbortButton->setText("Hold Countdown");
             ui->EngineStatus->setText("Connection Established");
+            emit setPings(true);
             return;
         }
     }
@@ -534,7 +548,47 @@ void MainWindow::configureCharts()
     ui->FuelFeedPressureChart->setChartType(ChartType::Pressure);
 }
 
+void MainWindow::resetCharts()
+{
+    ui->LoadCellChart->reset();
+    ui->FuelInletChart->reset();
+    ui->OxidizerInletChart->reset();
+    ui->EngineThroatChart->reset();
+    ui->NozzleExitChart->reset();
+    ui->OxidizerTankPressureChart->reset();
+    ui->OxidizerLinePressureChart->reset();
+    ui->FuelTankPressureChart->reset();
+    ui->FuelLinePressureChart->reset();
+    ui->CombustionChamberPressureChart->reset();
+    ui->FuelFeedPressureChart->reset();
+}
+
 void MainWindow::setupConnections()
 {
+    // Connections from MainWindow to SerialWorker
+    connect(this, &MainWindow::issueCommand, commsCenter, &SerialWorker::issueCommand);
+    connect(this, &MainWindow::serialPortChanged, commsCenter, &SerialWorker::onPortNameChange);
+    connect(this, &MainWindow::setPings, commsCenter, &SerialWorker::setStartPings);
+
+    // Connecting Timers
+    connect(countdown, &QTimer::timeout, this, &MainWindow::handleCountdownUpdate);
+    connect(pingCheck, &QTimer::timeout, this, &MainWindow::handlePingCheck);
+
+    // Connecting UI
+    connect(ui->StartCountdown, &QPushButton::clicked, this, &MainWindow::handleStartCountdown);
+    connect(ui->AbortButton, &QPushButton::clicked, this, &MainWindow::handleShutdown);
+    connect(ui->RefreshSerialPorts, &QPushButton::clicked, this, &MainWindow::handleSerialPortRefresh);
+    connect(ui->SerialPortDropdown, &QComboBox::currentIndexChanged, this, &MainWindow::handleSerialPortSelection);
+
+    // Connecting SerialWorker to MainWindow
+    connect(commsCenter, &SerialWorker::serialErrorOccurred, this, &MainWindow::handleSerialError);
+    connect(commsCenter, &SerialWorker::commandAttempt, this, &MainWindow::handleCommandAttempt);
+    connect(commsCenter, &SerialWorker::commandFailed, this, &MainWindow::handleCommandFailed);
+    connect(commsCenter, &SerialWorker::portOpenFailed, this, &MainWindow::handlePortOpenFailed);
+    connect(commsCenter, &SerialWorker::portOpenSuccess, this, &MainWindow::handlePortOpenSuccess);
+    connect(commsCenter, &SerialWorker::corruptedData, this, &MainWindow::handleCorruptedData);
+    connect(commsCenter, &SerialWorker::signalReceived, this, &MainWindow::hanldleSignalReceived);
+    connect(commsCenter, &SerialWorker::dataAvailable, this, &MainWindow::handleDataAvailable);
+
 
 }

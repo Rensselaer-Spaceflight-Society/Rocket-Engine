@@ -1,27 +1,25 @@
 #include "loghandler.h"
 
 LogHandler::LogHandler(
-    QString outputPath,
-    QString dataFileName,
-    QString eventFileName,
-    QString corruptedDataFileName
+    QString outputPath
 )
 {
+    this->outputPath = outputPath;
+}
+
+LogHandler::~LogHandler()
+{
+    if(eventLog.isOpen()) eventLog.close();
+    if(dataLog.isOpen()) dataLog.close();
+    if(corruptionLog.isOpen()) corruptionLog.close();
+}
+
+bool LogHandler::initialize()
+{
     QString datetime = QDateTime::currentDateTime().toString("yyyy-mm-dd-HH:mm:ss");
-    if(dataFileName == "default")
-    {
-        dataFileName = QString("sensor-data-%1.csv").arg(datetime);
-    }
-
-    if(eventFileName == "default")
-    {
-        eventFileName = QString("event-log-%1.csv").arg(datetime);
-    }
-
-    if(corruptedDataFileName == "default")
-    {
-        corruptedDataFileName = QString("corrupted-data-%1.csv").arg(datetime);
-    }
+    QString dataFileName = QString("sensor-data-%1.csv").arg(datetime);
+    QString eventFileName = QString("event-log-%1.csv").arg(datetime);
+    QString corruptedDataFileName = QString("corrupted-data-%1.csv").arg(datetime);
 
     // Make the folder if it doesn't already exist
 
@@ -42,24 +40,24 @@ LogHandler::LogHandler(
 
     if(!fileOpened)
     {
-        throw std::runtime_error("Sensor Data Log failed to Open, check that the destination folder exists and you have"
-                                 " permissions to write to the folder.");
+        qDebug() << "The sensor data log failed to open for writing";
+        return false;
     }
 
     fileOpened = openFile(this->eventLog);
 
     if(!fileOpened)
     {
-        throw std::runtime_error("Event Log failed to Open, check that the destination folder exists and you have"
-                                 " permissions to write to the folder.");
+        qDebug() << "The event log file failed to open for writing";
+        return false;
     }
 
     fileOpened = openFile(this->corruptionLog);
 
     if(!fileOpened)
     {
-        throw std::runtime_error("Corrupted Data Log failed to Open, check that the destination folder exists and you have"
-                                 " permissions to write to the folder.");
+        qDebug() << "The corrupted data log file failed to open for writting";
+        return false;
     }
 
     dataStream.setDevice(&dataLog);
@@ -81,13 +79,8 @@ LogHandler::LogHandler(
 
     corruptionStream << "UNIX Time (ms), " << "Local Time, " << "Countdown Time, " << "Byte Length, "
                      << "Data" << "\n";
-}
 
-LogHandler::~LogHandler()
-{
-    eventLog.close();
-    dataLog.close();
-    corruptionLog.close();
+    return true;
 }
 
 QString LogHandler::formatCountdown(int countdownMS)
@@ -110,6 +103,15 @@ QString LogHandler::formatCountdown(int countdownMS)
         .arg(minutes, 2, 10, QChar('0'))        // 2 digits for minutes, zero-padded
         .arg(seconds, 2, 10, QChar('0'))        // 2 digits for seconds, zero-padded
         .arg(remainingMilliseconds, 3, 10, QChar('0')); // 3 digits for milliseconds, zero-padded
+}
+
+bool LogHandler::restartLogs()
+{
+    if(eventLog.isOpen()) eventLog.close();
+    if(dataLog.isOpen()) dataLog.close();
+    if(corruptionLog.isOpen()) corruptionLog.close();
+
+    return initialize();
 }
 
 void LogHandler::logData(int countdownClockMS, const SensorData & data)
