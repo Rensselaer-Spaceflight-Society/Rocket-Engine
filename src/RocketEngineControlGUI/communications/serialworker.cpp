@@ -14,7 +14,7 @@ SerialWorker::SerialWorker(MainWindow * window, QObject *parent)
     this->serialPort->setDataBits(QSerialPort::DataBits::Data8);
     this->serialPort->setStopBits(QSerialPort::StopBits::OneStop);
 
-    this->commandToSend = "";
+    this->commandToSend.clear();
 
     connect(commandTimer, &QTimer::timeout, this, &SerialWorker::handleTimeout);
     connect(serialPort, &QSerialPort::readyRead, this, &SerialWorker::handleReadReady);
@@ -91,6 +91,7 @@ void SerialWorker::issueCommand(const QString &command)
 
 void SerialWorker::handleReadReady()
 {
+    qDebug() <<  "Read Ready Called";
     // If there is not already sensor data in the buffer and there is not a full command
     // wait until there is a full command
     if(dataBuffer->size() == 0 && serialPort->bytesAvailable() < BYTES_IN_COMMAND) return;
@@ -123,7 +124,7 @@ void SerialWorker::handleReadReady()
     for(const auto & signal: EngineSignals) {
         if(!memcmp(dataBuffer->data(), signal.data(), BYTES_IN_COMMAND))
         {
-            commandToSend = "";
+            commandToSend.clear();
             commandRetries = 0;
             emit signalReceived(signal);
             return;
@@ -155,10 +156,15 @@ void SerialWorker::handleTimeout()
         // But if we have exceeded the max command attempts then say this command failed
         if(commandRetries >= MAX_COMMAND_RETRIES)
         {
+            commandRetries = 0;
             emit commandFailed(commandToSend);
+            commandToSend.clear();
         }
 
+        qDebug() << commandToSend.toUtf8();
+
         serialPort->write(commandToSend.toUtf8());
+        serialPort->flush();
         commandRetries++;
         emit commandAttempt(commandToSend);
     }

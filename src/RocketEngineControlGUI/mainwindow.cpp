@@ -168,8 +168,8 @@ void MainWindow::handleCommandFailed(const QString & command)
         );
 
     // Alert the user
-    userAlert->setAlertDescription("Communications Lost");
-    userAlert->setAlertTitle(
+    userAlert->setAlertTitle("Communications Lost");
+    userAlert->setAlertDescription(
         "The command: "
         + command
         + " has failed to be sent and acknowledged by the test stand."
@@ -418,6 +418,8 @@ void MainWindow::handlePortOpenFailed()
 
 void MainWindow::handleSerialError(QSerialPort::SerialPortError error, const QString & errorStr)
 {
+    if(error == 0) return;
+
     userAlert->setAlertTitle("Serial Error Occurred Code: " + QString::number(error));
     userAlert->setAlertDescription("A serial error occurred: " + errorStr + " Please check that the serial hardware and that there is not any other programs using the serial port.");
     userAlert->show();
