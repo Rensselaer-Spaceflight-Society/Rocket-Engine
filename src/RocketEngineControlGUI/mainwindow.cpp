@@ -74,6 +74,8 @@ void MainWindow::handleStartCountdown()
     // Handle the hold continue
     if(currentState == EngineStates::HOLDING)
     {
+        ui->StartCountdown->setDisabled(true);
+        ui->AbortButton->setText("Hold Countdown");
         currentState = beforeHoldState;
         return;
     }
@@ -187,6 +189,7 @@ void MainWindow::handleCommandFailed(const QString & command)
 
 void MainWindow::hanldleSignalReceived(const QString & signal)
 {
+    qDebug() << "Signal Received: " << signal;
     timeSinceLastPing = 0; // All command responses indicate that two way comms are still active
     logger.logEvent(countdownMs, EventType::SignalReceived, signal + " was received. ");
 
@@ -322,8 +325,8 @@ void MainWindow::handleCountdownUpdate()
     if(currentState == EngineStates::COUNTDOWN_STARTED && countdownMs > AUTO_HOLD_POINT_MS && !pastAutoHold)
     {
         beforeHoldState = currentState;
-        currentState = beforeHoldState;
-        ui->AbortButton->setText("Shutdown");
+        currentState = EngineStates::HOLDING;
+        ui->AbortButton->setText("Shutdown Engine");
         ui->StartCountdown->setText("Continue Countdown");
         ui->StartCountdown->setEnabled(true);
         pastAutoHold = true;
@@ -392,6 +395,7 @@ void MainWindow::handleDataAvailable(const SensorData & data)
 
 void MainWindow::handleCorruptedData(const QByteArray & data)
 {
+    qDebug() << "Corrupted Data: " << data;
     // Log the corrupted data event
     logger.logEvent(
         countdownMs,

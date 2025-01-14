@@ -91,7 +91,7 @@ void SerialWorker::issueCommand(const QString &command)
 
 void SerialWorker::handleReadReady()
 {
-    qDebug() << "Read Ready: " << serialPort->bytesAvailable();
+    // qDebug() << "Read Ready: " << serialPort->bytesAvailable();
     // If there is not already sensor data in the buffer and there is not a full command
     // wait until there is a full command
     if(dataBuffer->size() == 0 && serialPort->bytesAvailable() < BYTES_IN_COMMAND) return;
@@ -127,6 +127,7 @@ void SerialWorker::handleReadReady()
             commandToSend.clear();
             commandRetries = 0;
             emit signalReceived(signal);
+            dataBuffer->clear();
             return;
         }
     }

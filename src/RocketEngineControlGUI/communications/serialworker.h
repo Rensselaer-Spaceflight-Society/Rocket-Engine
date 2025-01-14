@@ -10,12 +10,10 @@
 
 #include "sensordata.h"
 
-
-#define COMMAND_WAIT_MS 200
-#define COMMAND_SEND_TIMEOUT_DURRATION_MS 100
+#define COMMAND_SEND_TIMEOUT_DURRATION_MS 250
 #define BYTES_IN_COMMAND 8
 #define MAX_COMMAND_RETRIES 5
-#define MAX_PING_NON_RESPONSE_DELAY_MS 250
+#define MAX_PING_NON_RESPONSE_DELAY_MS 500
 
 // IMPORTANT: ALL COMMANDS MUST BE BYTES_IN_COMMAND NUMBER OF CHARS
 // OTHERWISE WE COULD HAVE FUN BUFFER OVERFLOWS
@@ -25,7 +23,7 @@ constexpr char LOG_START_COMMAND[] = "LogStart";
 constexpr char INERT_GAS_FLUSH_COMMAND[] = "InrtFlsh";
 constexpr char PRESURIZE_FUEL_COMMAND[] = "PresFuel";
 constexpr char IGNITION_COMMAND[] = "Ignition";
-constexpr char SHUTDOWN_COMMAND[] = "ShutDown";
+constexpr char SHUTDOWN_COMMAND[] = "Shutdown";
 
 // Signals that define state of engine
 // These are never sent to the engine, they are only recieved
