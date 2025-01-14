@@ -168,8 +168,8 @@ void MainWindow::handleCommandFailed(const QString & command)
         );
 
     // Alert the user
-    userAlert->setAlertDescription("Communications Lost");
-    userAlert->setAlertTitle(
+    userAlert->setAlertTitle("Communications Lost");
+    userAlert->setAlertDescription(
         "The command: "
         + command
         + " has failed to be sent and acknowledged by the test stand."

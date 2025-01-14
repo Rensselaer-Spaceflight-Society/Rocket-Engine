@@ -4,7 +4,7 @@
 SerialWorker::SerialWorker(MainWindow * window, QObject *parent)
     : mainWindow(window),
     serialPort(new QSerialPort(this)),
-    dataBuffer(new QByteArray(sizeof(SensorData), 0)),
+    dataBuffer(new QByteArray()),
     commandTimer(new QTimer(this))
 {
     // TODO: Configure Serial Port to match the test stand config
@@ -91,6 +91,7 @@ void SerialWorker::issueCommand(const QString &command)
 
 void SerialWorker::handleReadReady()
 {
+    qDebug() << "Read Ready: " << serialPort->bytesAvailable();
     // If there is not already sensor data in the buffer and there is not a full command
     // wait until there is a full command
     if(dataBuffer->size() == 0 && serialPort->bytesAvailable() < BYTES_IN_COMMAND) return;
@@ -121,7 +122,7 @@ void SerialWorker::handleReadReady()
 
     // Check if its any of the signals and emit if it is
     for(const auto & signal: EngineSignals) {
-        if(!memcmp(dataBuffer->data(), signal.data(), BYTES_IN_COMMAND))
+        if(!memcmp(dataBuffer->data(), signal.toStdString().data(), BYTES_IN_COMMAND))
         {
             commandToSend = "";
             commandRetries = 0;
@@ -141,6 +142,8 @@ void SerialWorker::handleReadReady()
 
 void SerialWorker::handleSerialError(QSerialPort::SerialPortError error)
 {
+    if(error == QSerialPort::NoError) return;
+
     emit serialErrorOccurred(error, serialPort->errorString());
 }
 
@@ -156,6 +159,8 @@ void SerialWorker::handleTimeout()
         if(commandRetries >= MAX_COMMAND_RETRIES)
         {
             emit commandFailed(commandToSend);
+            commandToSend.clear();
+            commandRetries = 0;
         }
 
         serialPort->write(commandToSend.toUtf8());
