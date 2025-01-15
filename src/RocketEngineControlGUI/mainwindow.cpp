@@ -7,15 +7,16 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow), logger(DATA_OUTPUT_PATH), userAlert(new AlertDialog()), commsCenter(new SerialWorker(this))
+    , ui(new Ui::MainWindow),
+    logger(DATA_OUTPUT_PATH),
+    userAlert(new AlertDialog()),
+    commsCenter(new SerialWorker(this)),
+    countdown(new QTimer()),
+    pingCheck(new QTimer())
 {
     ui->setupUi(this);
 
-    this->configureCharts();
-    this->handleSerialPortRefresh();
-
-    countdown = new QTimer();
-    pingCheck = new QTimer();
+    handleSerialPortRefresh();
 
     if(!logger.initialize())
     {
@@ -53,6 +54,13 @@ void MainWindow::keyPressEvent(QKeyEvent* keyEvent)
 
 void MainWindow::handleSerialPortRefresh()
 {
+    ui->AbortButton->setDisabled(true);
+    ui->StartCountdown->setText("Start Countdown");
+    countdownMs = COUNTDOWN_LENGTH_MS;
+    pastAutoHold = false;
+    countdown->stop();
+    pingCheck->stop();
+    ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
     ui->SerialPortDropdown->clear();
     ui->SerialPortDropdown->addItem("Select a Serial Port");
     ui->SerialPortDropdown->addItems(this->getSerialPorts());
@@ -64,10 +72,12 @@ void MainWindow::handleStartCountdown()
     if(currentState == EngineStates::NO_CONNECTION)
     {
         emit setPings(false);
-        emit issueCommand(CONTROL_ACTIVE_COMMAND);
-        ui->StartCountdown->setDisabled(true);
         ui->AbortButton->setDisabled(true);
         ui->StartCountdown->setText("Start Countdown");
+        countdownMs = COUNTDOWN_LENGTH_MS;
+        pastAutoHold = false;
+        ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
+        emit issueCommand(CONTROL_ACTIVE_COMMAND);
         return;
     }
 
@@ -84,9 +94,12 @@ void MainWindow::handleStartCountdown()
     if(currentState == EngineStates::SHUTDOWN_COMPLETE)
     {
         currentState = EngineStates::CONNECTION_ESTABLISHED;
-        countdownMs = -COUNTDOWN_LENGTH_MS;
+        countdownMs = COUNTDOWN_LENGTH_MS;
         pastAutoHold = false;
-        // TODO: Reset Graphs, Create New Log Files
+        ui->AbortButton->setDisabled(true);
+        ui->StartCountdown->setEnabled(true);
+        ui->StartCountdown->setText("Start Countdown");
+        ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
         resetCharts();
         if(!logger.restartLogs())
         {
@@ -94,6 +107,7 @@ void MainWindow::handleStartCountdown()
             userAlert->setAlertDescription("The logger failed to reset the logs, please check file permissions.");
             userAlert->show();
         }
+        return;
     }
 
     // Set the burn duration from the text input
@@ -126,7 +140,7 @@ void MainWindow::handleShutdown()
 {
 
     // If we are pre-ignition then the shutdown button acts as a countdown hold
-    if(currentState < EngineStates::HOLDING)
+    if(currentState < EngineStates::HOLDING && currentState != EngineStates::NO_CONNECTION)
     {
         beforeHoldState = currentState; // Know which state we should return to after the hold is cleared
         currentState = EngineStates::HOLDING;
@@ -138,7 +152,9 @@ void MainWindow::handleShutdown()
 
     // If we are in a hold or ignition state and the shutdown button is clicked then we should
     // transition into a shutdown state
-    currentState = EngineStates::PENDING_SHUTDOWN;
+    if(currentState != EngineStates::NO_CONNECTION)
+        currentState = EngineStates::PENDING_SHUTDOWN;
+
     emit issueCommand(SHUTDOWN_COMMAND);
     ui->EngineStatus->setText("Pending Shutdown");
     ui->AbortButton->setText("Pending Shutdown");
@@ -184,6 +200,10 @@ void MainWindow::handleCommandFailed(const QString & command)
 
     // Try to shutdown assuming the connection from the rocket is the one that is severed
     handleShutdown();
+    pingCheck->stop();
+    countdown->stop();
+    emit setPings(false);
+    ui->AbortButton->setDisabled(true);
     ui->StartCountdown->setText("Attempt Reconnection");
 }
 
@@ -202,6 +222,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         return;
     }
 
+
     if(signal == CONNECTION_LOST)
     {
         logger.logEvent(countdownMs, EventType::Error, "The engine has indicated that it has lost connection. Automatic Shutdown Occurred.");
@@ -209,6 +230,9 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         userAlert->setAlertTitle("Connection Lost");
         userAlert->setAlertDescription("The engine has indicated it has lost connection. Automatic Shutdown has started. Please check comms hardware.");
         userAlert->show();
+        countdown->stop();
+        pingCheck->stop();
+        emit setPings(false);
         ui->EngineStatus->setText("No Connection");
         return;
     }
@@ -223,8 +247,19 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         ui->AbortButton->setText("Shutdown Started");
         ui->AbortButton->setDisabled(true);
         ui->StartCountdown->setDisabled(true);
+         countdown->stop();
         ui->EngineStatus->setText("Shutdown Started");
         return;
+    }
+
+    if(currentState == EngineStates::HOLDING)
+    {
+        if(signal == INERT_FLUSH_FINISHED)
+        {
+            beforeHoldState = EngineStates::NITROGEN_FLUSH_DONE;
+            ui->EngineStatus->setText("Inert Flush Finished");
+            return;
+        }
     }
 
     if(currentState == EngineStates::NO_CONNECTION)
@@ -232,10 +267,11 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         if(signal == CONTROL_ACTIVE_COMMAND)
         {
             currentState = EngineStates::CONNECTION_ESTABLISHED;
+            pingCheck->start(EVENT_POLL_DURATION_MS);
             ui->StartCountdown->setEnabled(true);
             ui->AbortButton->setEnabled(true);
             ui->StartCountdown->setText("Start Countdown");
-            ui->AbortButton->setText("Hold Countdown");
+            ui->AbortButton->setDisabled(true);
             ui->EngineStatus->setText("Connection Established");
             emit setPings(true);
             return;
@@ -249,6 +285,8 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
             currentState = EngineStates::COUNTDOWN_STARTED;
             countdown->start(EVENT_POLL_DURATION_MS);
             ui->StartCountdown->setDisabled(true);
+            ui->AbortButton->setEnabled(true);
+            ui->AbortButton->setText("Hold Countdown");
             ui->EngineStatus->setText("Logging Started");
             return;
         }
@@ -290,6 +328,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         {
             currentState = EngineStates::IGNITION;
             ui->EngineStatus->setText("Engine Ignition");
+            ui->AbortButton->setText("Shutdown Engine");
             return;
         }
     }
@@ -299,11 +338,11 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         if(signal == SHUTDOWN_CONFIRMED)
         {
             logger.logEvent(countdownMs, EventType::Info, "Engine Shutdown Completed");
-            countdown->stop();
             currentState = EngineStates::SHUTDOWN_COMPLETE;
             ui->AbortButton->setText("Shutdown Complete");
             ui->EngineStatus->setText("Shutdown Complete");
             ui->StartCountdown->setText("Reset Test");
+            countdown->stop();
             ui->StartCountdown->setEnabled(true);
             return;
         }
@@ -381,7 +420,14 @@ void MainWindow::handlePingCheck()
     userAlert->setAlertDescription("Engine has failed to respond to pings, please check hardware.");
     userAlert->show();
 
+    pingCheck->stop();
+    countdown->stop();
+    emit setPings(false);
+
     ui->StartCountdown->setText("Attempt Reconnection");
+    ui->AbortButton->setText("Hold Countdown");
+    ui->AbortButton->setDisabled(true);
+    ui->StartCountdown->setEnabled(true);
 }
 
 void MainWindow::handleDataAvailable(const SensorData & data)
