@@ -49,7 +49,7 @@
       <x>270</x>
       <y>70</y>
       <width>1401</width>
-      <height>821</height>
+      <height>791</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -66,161 +66,47 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_14">
-         <item>
-          <widget class="QLabel" name="label_13">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Thrust (N)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="DataChart" name="LoadCellChart" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="baseSize">
-            <size>
-             <width>0</width>
-             <height>206</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="DataChart" name="LoadCellChart" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>206</height>
+          </size>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="QLabel" name="label_3">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Engine Throat Temperature (c)</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="DataChart" name="EngineThroatChart" native="true">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>245</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="DataChart" name="EngineThroatChart" native="true"/>
          </item>
          <item>
-          <widget class="Line" name="line_49">
-           <property name="orientation">
-            <enum>Qt::Orientation::Vertical</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <item>
-            <widget class="QLabel" name="label_4">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Engine Nozzle Temperature (c)</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="DataChart" name="NozzleExitChart" native="true"/>
-           </item>
-          </layout>
+          <widget class="DataChart" name="NozzleExitChart" native="true"/>
          </item>
         </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
-           <item>
-            <widget class="QLabel" name="label_5">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Fuel Inlet Temperature (c)</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="DataChart" name="FuelInletChart" native="true"/>
-           </item>
-          </layout>
+          <widget class="DataChart" name="FuelInletChart" native="true"/>
          </item>
          <item>
-          <widget class="Line" name="line_50">
-           <property name="orientation">
-            <enum>Qt::Orientation::Vertical</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_7">
-           <item>
-            <widget class="QLabel" name="label_6">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Oxidizer Inlet Temperature (c)</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="DataChart" name="OxidizerInletChart" native="true"/>
-           </item>
-          </layout>
+          <widget class="DataChart" name="OxidizerInletChart" native="true"/>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line_47">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -237,134 +123,16 @@
         <number>0</number>
        </property>
        <item row="2" column="0">
-        <layout class="QVBoxLayout" name="verticalLayout_9">
-         <item>
-          <widget class="QLabel" name="label_9">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Fuel Tank Pressure (kPa)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="DataChart" name="FuelTankPressureChart" native="true"/>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="3">
-        <widget class="Line" name="line_61">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <layout class="QVBoxLayout" name="verticalLayout_10">
-         <item>
-          <widget class="QLabel" name="label_11">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Oxidizer Line Pressure (kPa)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="DataChart" name="OxidizerLinePressureChart" native="true"/>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="3">
-        <widget class="Line" name="line_57">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="3">
-        <widget class="Line" name="line_56">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="3">
-        <widget class="Line" name="line_62">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-        </widget>
+        <widget class="DataChart" name="FuelTankPressureChart" native="true"/>
        </item>
        <item row="0" column="2">
-        <layout class="QVBoxLayout" name="verticalLayout_11">
-         <item>
-          <widget class="QLabel" name="label_8">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Combustion Chamber Pressure (kPa)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="DataChart" name="CombustionChamberPressureChart" native="true"/>
-         </item>
-        </layout>
+        <widget class="DataChart" name="CombustionChamberPressureChart" native="true"/>
        </item>
-       <item row="0" column="0">
-        <layout class="QVBoxLayout" name="verticalLayout_8">
-         <item>
-          <widget class="QLabel" name="label_7">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Oxidizer Tank Pressure (kPa)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="DataChart" name="OxidizerTankPressureChart" native="true"/>
-         </item>
-        </layout>
+       <item row="4" column="2">
+        <widget class="DataChart" name="FuelLinePressureChart" native="true"/>
        </item>
-       <item row="3" column="0">
-        <widget class="Line" name="line_54">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="Line" name="line_60">
+       <item row="4" column="1">
+        <widget class="Line" name="line_56">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>
          </property>
@@ -377,51 +145,46 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
-        <layout class="QVBoxLayout" name="verticalLayout_12">
-         <item>
-          <widget class="QLabel" name="label_10">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Fuel Feed Pressure (kPa)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="DataChart" name="FuelFeedPressureChart" native="true"/>
-         </item>
-        </layout>
+       <item row="3" column="1">
+        <widget class="Line" name="line_62">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+        </widget>
        </item>
-       <item row="4" column="2">
-        <layout class="QVBoxLayout" name="verticalLayout_13">
-         <item>
-          <widget class="QLabel" name="label_12">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Fuel Line Pressure (kPa)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="DataChart" name="FuelLinePressureChart" native="true"/>
-         </item>
-        </layout>
+       <item row="0" column="0">
+        <widget class="DataChart" name="OxidizerTankPressureChart" native="true"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="Line" name="line_60">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="DataChart" name="OxidizerLinePressureChart" native="true"/>
+       </item>
+       <item row="1" column="2">
+        <widget class="Line" name="line_59">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="Line" name="line_57">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="Line" name="line_54">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+        </widget>
        </item>
        <item row="3" column="2">
         <widget class="Line" name="line_55">
@@ -430,12 +193,15 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
-        <widget class="Line" name="line_59">
+       <item row="1" column="1">
+        <widget class="Line" name="line_61">
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="DataChart" name="FuelFeedPressureChart" native="true"/>
        </item>
       </layout>
      </item>
@@ -447,7 +213,7 @@
       <x>20</x>
       <y>70</y>
       <width>241</width>
-      <height>821</height>
+      <height>791</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
@@ -1151,7 +917,7 @@ Pressure</string>
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>890</y>
+      <y>870</y>
       <width>1651</width>
       <height>16</height>
      </rect>
@@ -1164,9 +930,9 @@ Pressure</string>
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>910</y>
+      <y>890</y>
       <width>1651</width>
-      <height>51</height>
+      <height>71</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">

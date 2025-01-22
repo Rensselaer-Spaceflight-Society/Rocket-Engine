@@ -34,18 +34,16 @@ DataChart::DataChart(QWidget *parent)
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignLeft);
     chart->setBackgroundBrush(QColor(0,0,0,0));
-    chart->setTitleBrush(QBrush(Qt::white));
+    chart->setTitleBrush(QColor(0xffefefef));
     chart->legend()->setVisible(false);
 
     ui->ChartView->setChart(chart);
-    chart->setMargins(QMargins(0,0,0,0));
-    this->update();
+    chart->setMargins(QMargins(0,4,0,0));
 }
 
 void DataChart::setChartTitle(const QString& title)
 {
     chart->setTitle(title);
-    this->update();
 }
 
 void DataChart::setChartType(ChartType chartType)
@@ -68,8 +66,6 @@ void DataChart::setChartType(ChartType chartType)
         series->setBorderColor(QColor(137, 46, 19));
         axisY->setTitleText("Temp (C)");
     }
-
-    this->update();
 }
 
 void DataChart::append(float xValue, float yValue)
@@ -81,7 +77,6 @@ void DataChart::append(float xValue, float yValue)
     maxYValue = std::fmax(maxYValue, yValue);
     axisX->setRange(minXValue, (int) maxXValue + 1);
     axisY->setRange(0, (int) (maxYValue) + 1);
-    this->update();
 }
 
 void DataChart::reset()
