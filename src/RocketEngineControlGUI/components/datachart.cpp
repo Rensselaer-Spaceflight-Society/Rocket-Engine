@@ -75,8 +75,8 @@ void DataChart::append(float xValue, float yValue)
     maxXValue = std::fmax(maxXValue, xValue);
     minXValue = std::fmin(minXValue, xValue);
     maxYValue = std::fmax(maxYValue, yValue);
-    axisX->setRange(minXValue, (int) maxXValue + 1);
-    axisY->setRange(0, (int) (maxYValue) + 1);
+    axisX->setRange(minXValue, (int) maxXValue);
+    axisY->setRange(0, (int) (maxYValue));
 }
 
 void DataChart::reset()

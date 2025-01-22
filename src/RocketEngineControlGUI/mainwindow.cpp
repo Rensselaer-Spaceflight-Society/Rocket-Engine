@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->AbortButton->setDisabled(true);
     ui->StartCountdown->setDisabled(true);
     this->setupConnections();
-
+    this->configureCharts();
 }
 
 MainWindow::~MainWindow()
@@ -598,6 +598,30 @@ void MainWindow::configureCharts()
     ui->CombustionChamberPressureChart->setChartType(ChartType::Pressure);
     ui->FuelFeedPressureChart->setChartTitle("Kerosene Feed Line Pressure");
     ui->FuelFeedPressureChart->setChartType(ChartType::Pressure);
+
+    ui->LoadCellChart->append(0,0);
+    ui->FuelInletChart->append(0,0);
+    ui->OxidizerInletChart->append(0,0);
+    ui->EngineThroatChart->append(0,0);
+    ui->NozzleExitChart->append(0,0);
+    ui->CombustionChamberPressureChart->append(0,0);
+    ui->OxidizerLinePressureChart->append(0,0);
+    ui->OxidizerTankPressureChart->append(0,0);
+    ui->FuelLinePressureChart->append(0,0);
+    ui->FuelTankPressureChart->append(0,0);
+    ui->FuelFeedPressureChart->append(0,0);
+
+    ui->LoadCellChart->append(1,1);
+    ui->FuelInletChart->append(1,1);
+    ui->OxidizerInletChart->append(1,1);
+    ui->EngineThroatChart->append(1,1);
+    ui->NozzleExitChart->append(1,1);
+    ui->CombustionChamberPressureChart->append(1,1);
+    ui->OxidizerLinePressureChart->append(1,1);
+    ui->OxidizerTankPressureChart->append(1,1);
+    ui->FuelLinePressureChart->append(1,1);
+    ui->FuelTankPressureChart->append(1,1);
+    ui->FuelFeedPressureChart->append(1,1);
 }
 
 void MainWindow::resetCharts()
