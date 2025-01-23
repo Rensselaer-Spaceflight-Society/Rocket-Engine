@@ -88,6 +88,7 @@ void DataChart::reset()
     upperSeries->clear();
     axisX->setRange(minXValue, maxXValue);
     axisY->setRange(0, maxYValue);
+    this->append(0,0);
 }
 
 DataChart::~DataChart()
