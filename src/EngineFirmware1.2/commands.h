@@ -99,9 +99,19 @@ void handleCommand(char * command, EngineStates &currentState, unsigned int &las
 
   if (!strcmp(command, LOG_START)) {
     // This is a repeat command of a command we have seen before
-    if (currentState == EngineStates::LOG_START || currentState == EngineStates::SHUTDOWN_CONFIRMED) {
+    if (currentState == EngineStates::LOG_START ) {
       commandRepeats++;
       SerialPort.write(LOG_START, COMMAND_SIZE_BYTES);
+      resetPins();
+      return;
+    }
+
+    if(currentState == EngineStates::SHUTDOWN_CONFIRMED)
+    {
+      SerialPort.write(LOG_START, COMMAND_SIZE_BYTES);
+      resetPins();
+      currentState = EngineStates::LOG_START;
+      commandRepeats = 0;
       return;
     }
 
@@ -191,13 +201,31 @@ void handleCommand(char * command, EngineStates &currentState, unsigned int &las
     }
 
     if (currentState == EngineStates::SHUTDOWN_CONFIRMED) {
+      SerialPort.write(SHUTDOWN, COMMAND_SIZE_BYTES);
       SerialPort.write(SHUTDOWN_CONFIRMED, COMMAND_SIZE_BYTES);
+      return;
     }
-    // In any other state, we must shut down immediately
-    startShutdown();
-    currentState = EngineStates::SHUTDOWN_NITROGEN_FLUSH_STARTED;
-    lastEventTime = millis();
+    // If we are in the ignition state or later then we should flush
+    // Otherwise we should just go into the shutdown confirmed state.
+
+    if(currentState >= EngineStates::FUEL_OPEN)
+    {
+        startShutdown();
+        currentState = EngineStates::SHUTDOWN_NITROGEN_FLUSH_STARTED;
+        lastEventTime = millis();
+        SerialPort.write(SHUTDOWN, COMMAND_SIZE_BYTES);
+        commandRepeats = 0;
+        return;
+    }
+
+    // If we have not yet gotten to the state where fuel / oxidizer has flown into the
+    // lines then we can just directly transition into the shutdown confirmed state.
+
+    currentState = EngineStates::SHUTDOWN_CONFIRMED;
     SerialPort.write(SHUTDOWN, COMMAND_SIZE_BYTES);
+    SerialPort.write(SHUTDOWN_CONFIRMED, COMMAND_SIZE_BYTES);  // Indicate to the control computer the shutdown is done
+    digitalWrite(LED3, HIGH);
+    commandRepeats = 0;
     return;
   }
 

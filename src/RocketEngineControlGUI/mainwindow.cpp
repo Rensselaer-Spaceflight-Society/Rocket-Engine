@@ -158,7 +158,7 @@ void MainWindow::handleShutdown()
     emit issueCommand(SHUTDOWN_COMMAND);
     ui->EngineStatus->setText("Pending Shutdown");
     ui->AbortButton->setText("Pending Shutdown");
-    ui->AbortButton->setDisabled(true);
+
 }
 
 void MainWindow::handleSerialPortSelection(int index)
@@ -209,7 +209,7 @@ void MainWindow::handleCommandFailed(const QString & command)
 
 void MainWindow::hanldleSignalReceived(const QString & signal)
 {
-    qDebug() << "Signal Received: " << signal;
+
     timeSinceLastPing = 0; // All command responses indicate that two way comms are still active
     logger.logEvent(countdownMs, EventType::SignalReceived, signal + " was received. ");
 
@@ -233,6 +233,9 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         countdown->stop();
         pingCheck->stop();
         emit setPings(false);
+        ui->AbortButton->setEnabled(false);
+        ui->StartCountdown->setText("Attempt Reconnection");
+        ui->StartCountdown->setEnabled(true);
         ui->EngineStatus->setText("No Connection");
         return;
     }
@@ -245,7 +248,6 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         logger.logEvent(countdownMs, EventType::Info, "Engine Shutdown Started");
         currentState = EngineStates::SHUTDOWN_STARTED;
         ui->AbortButton->setText("Shutdown Started");
-        ui->AbortButton->setDisabled(true);
         ui->StartCountdown->setDisabled(true);
          countdown->stop();
         ui->EngineStatus->setText("Shutdown Started");
@@ -333,13 +335,16 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         }
     }
 
-    if(currentState == EngineStates::SHUTDOWN_STARTED)
+
+
+    if(currentState == EngineStates::SHUTDOWN_STARTED || currentState == EngineStates::PENDING_SHUTDOWN)
     {
         if(signal == SHUTDOWN_CONFIRMED)
         {
             logger.logEvent(countdownMs, EventType::Info, "Engine Shutdown Completed");
             currentState = EngineStates::SHUTDOWN_COMPLETE;
             ui->AbortButton->setText("Shutdown Complete");
+            ui->AbortButton->setDisabled(true);
             ui->EngineStatus->setText("Shutdown Complete");
             ui->StartCountdown->setText("Reset Test");
             countdown->stop();
