@@ -1,0 +1,274 @@
+(footprint "RS485_Transceiver"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0 -0.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "caf3a5dd-8b06-4a06-b082-0cec148ab3b1")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "RS485_Transceiver"
+		(at 0 1 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "24ea6774-0843-4a7a-9baf-f02e806d5ce7")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "f77db574-91b7-4f7d-8729-e4d05ae16df6")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "4daa8b30-b7dd-4976-b414-9199dfc71251")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0a412906-6c10-4b92-b605-2050133a2489")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_rect
+		(start -23.5 -8.5)
+		(end 20.5 6)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill none)
+		(layer "F.SilkS")
+		(uuid "1ceeba08-471d-4576-b082-2e24ab80b798")
+	)
+	(fp_text user "A"
+		(at 17 0.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "004ddf83-60ab-4264-a566-9e0c38c56f37")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "B"
+		(at 17 -2 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "2d1bc555-2226-48ea-94c3-780bfd17e607")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "DI"
+		(at -20.5 3 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "3204a896-54fb-4a79-972b-898879da37a6")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "RO"
+		(at -20.5 -4.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "4e8ec862-761a-4c7a-8b3d-a799f9b386fc")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "RS485 Transceiver"
+		(at -7.5 -3.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "acc7c9a0-f16d-4d1b-859d-0ba4d3a9214e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "RE"
+		(at -20.5 -2 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "bbbe1aaa-c660-452e-ba4e-129dd31ff958")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "GND"
+		(at 15 3 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "c57322f1-6521-482d-99ac-48b27104c4fb")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "DE"
+		(at -20.5 0.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "ca0adad1-b048-4b72-9254-58fa672b863a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "VCC"
+		(at 15 -4.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "d7585e8f-a95f-4487-ac46-5f49582ccc26")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 2.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "796cba8c-bd5e-40de-b51f-76a992fbd071")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "A" thru_hole circle
+		(at 19 0)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "a00925e8-9bf8-4b10-99f8-9679f90a1adc")
+	)
+	(pad "B" thru_hole circle
+		(at 19 -2.5)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "482bc84d-535c-40d1-aeec-7385a2a6f50a")
+	)
+	(pad "DE" thru_hole circle
+		(at -22 0)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "307d433f-fc1c-4d23-bbbc-f143151a7073")
+	)
+	(pad "DI" thru_hole circle
+		(at -22 2.5)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "acca9603-a44b-4b24-8020-9416636003a9")
+	)
+	(pad "GND" thru_hole circle
+		(at 19 2.5)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "1ec1c9fa-ef2e-49c7-b384-16748ed69118")
+	)
+	(pad "RE" thru_hole circle
+		(at -22 -2.5)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "6c56470d-a402-4c0b-9520-fe11986325dd")
+	)
+	(pad "RO" thru_hole circle
+		(at -22 -5)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "94936adb-b409-48bc-ac31-3a493105b880")
+	)
+	(pad "VCC" thru_hole circle
+		(at 19 -5)
+		(size 1.524 1.524)
+		(drill 0.762)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8d1cfad9-3a1a-4b1d-9f52-8bc753de0b87")
+	)
+)
