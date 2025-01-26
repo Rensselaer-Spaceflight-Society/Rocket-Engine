@@ -1,5 +1,6 @@
 #ifndef __PINS_H_
 #define __PINS_H_
+#include "HX711.h"
 
 // Pin Values (Digital)
 constexpr int NITROGENVALVE = 25;
@@ -19,6 +20,13 @@ constexpr int PRESSSEN6 = 5;
 // Digital Pin for Load Cell
 constexpr int LOADCELL = 24;
 
+//SCK Pin for Load Cell
+constexpr int LOADCELL_SCK = 22;
+
+//Creating scale object for Load Cell
+HX711 scale;
+
+
 // Thermocouple Analog Pins
 constexpr int THERMOCPL1 = 6;
 constexpr int THERMOCPL2 = 7;
@@ -31,7 +39,7 @@ constexpr int LED2 = 31;
 constexpr int LED3 = 32;
 
 void setupPins() {
-  pinMode(LOADCELL, INPUT);
+  scale.begin(LOADCELL, LOADCELL_SCK);
   pinMode(PRESSSEN1, INPUT);
   pinMode(PRESSSEN2, INPUT);
   pinMode(PRESSSEN3, INPUT);

@@ -1,7 +1,9 @@
+
 #ifndef __SENSORS_H_
 #define __SENSORS_H_
 
 #include "pins.h"
+#include "HX711.h"
 
 constexpr float voltageToTempScale = 0.005;
 constexpr float PSItoKPaFactor = 6.89476;
@@ -18,6 +20,15 @@ typedef struct sensors_struct {
 float processThermocoupleValue(int analogSignal) {
   float voltage = analogSignal * (5.0 / 1023.0);
   return voltage / voltageToTempScale;  // Convert to Celsius
+}
+
+float read_loadcell(HX711& scale){
+   if (scale.is_ready()){
+     return ((float) (scale.read() +2383.0)/904.0 - 10);
+  }
+   else{
+     return 0;
+   }
 }
 
 float processPressureValue(int analogSignal) {
@@ -43,7 +54,7 @@ void readSensorData(Sensors &sensorData) {
   memcpy(&sensorData.header, HEADER, 8);
 
   // TODO: Handle reading from the Load Cell
-  sensorData.loadCell = digitalRead(LOADCELL);
+  sensorData.loadCell = read_loadcell(scale);
 
   sensorData.pressure[0] = processPressureValue(analogRead(PRESSSEN1));
   sensorData.pressure[1] = processPressureValue(analogRead(PRESSSEN2));
