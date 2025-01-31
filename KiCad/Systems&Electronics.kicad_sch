@@ -4923,7 +4923,7 @@
 	)
 	(wire
 		(pts
-			(xy 276.86 153.67) (xy 276.86 158.75)
+			(xy 276.86 158.75) (xy 276.86 153.67)
 		)
 		(stroke
 			(width 0)
@@ -5050,16 +5050,6 @@
 			(type default)
 		)
 		(uuid "1ebc5bbc-30ac-4acb-9a62-1d1003d2c868")
-	)
-	(wire
-		(pts
-			(xy 204.47 67.31) (xy 204.47 90.17)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1ef66668-9e18-414b-ad2b-003faaed6039")
 	)
 	(wire
 		(pts
@@ -5253,7 +5243,7 @@
 	)
 	(wire
 		(pts
-			(xy 276.86 158.75) (xy 171.45 158.75)
+			(xy 276.86 158.75) (xy 166.37 158.75)
 		)
 		(stroke
 			(width 0)
@@ -5523,7 +5513,7 @@
 	)
 	(wire
 		(pts
-			(xy 166.37 82.55) (xy 160.02 82.55)
+			(xy 165.1 82.55) (xy 160.02 82.55)
 		)
 		(stroke
 			(width 0)
@@ -5753,6 +5743,16 @@
 	)
 	(wire
 		(pts
+			(xy 166.37 90.17) (xy 160.02 90.17)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "61a9d8ee-017c-4ed8-9b25-9df0abbb36e7")
+	)
+	(wire
+		(pts
 			(xy 240.03 41.91) (xy 278.13 41.91)
 		)
 		(stroke
@@ -5900,6 +5900,16 @@
 			(type default)
 		)
 		(uuid "6e8a6b05-fd3a-45a2-aa84-c7161ba71951")
+	)
+	(wire
+		(pts
+			(xy 204.47 67.31) (xy 204.47 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6f3d1ebc-6d54-4ba1-be2c-2da97d73f5b8")
 	)
 	(wire
 		(pts
@@ -6153,7 +6163,7 @@
 	)
 	(wire
 		(pts
-			(xy 199.39 154.94) (xy 166.37 154.94)
+			(xy 199.39 154.94) (xy 165.1 154.94)
 		)
 		(stroke
 			(width 0)
@@ -6350,6 +6360,16 @@
 			(type default)
 		)
 		(uuid "92d551ef-0bca-4bb5-800d-75b7c604f2ae")
+	)
+	(wire
+		(pts
+			(xy 204.47 92.71) (xy 160.02 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "938410ef-0610-4b0d-b2b9-d76a767efbe9")
 	)
 	(wire
 		(pts
@@ -6553,7 +6573,7 @@
 	)
 	(wire
 		(pts
-			(xy 166.37 154.94) (xy 166.37 82.55)
+			(xy 165.1 154.94) (xy 165.1 82.55)
 		)
 		(stroke
 			(width 0)
@@ -7003,16 +7023,6 @@
 	)
 	(wire
 		(pts
-			(xy 204.47 90.17) (xy 160.02 90.17)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c73378b0-9809-4dbe-897d-7068b8c7056f")
-	)
-	(wire
-		(pts
 			(xy 12.7 104.14) (xy 12.7 118.11)
 		)
 		(stroke
@@ -7070,16 +7080,6 @@
 			(type default)
 		)
 		(uuid "cb6ac180-cf25-4688-bb64-aae138da1cda")
-	)
-	(wire
-		(pts
-			(xy 171.45 92.71) (xy 160.02 92.71)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "cb9cfab2-b8ed-422c-ad3c-ba5b52b01337")
 	)
 	(wire
 		(pts
@@ -7503,7 +7503,7 @@
 	)
 	(wire
 		(pts
-			(xy 171.45 158.75) (xy 171.45 92.71)
+			(xy 166.37 90.17) (xy 166.37 158.75)
 		)
 		(stroke
 			(width 0)
@@ -12725,6 +12725,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Solenoids:Solenoid")
 		(lib_id "Solenoids:Solenoid")
 		(at 273.05 128.27 0)
 		(unit 1)
@@ -12734,7 +12735,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "5e30803e-d61a-4be5-98c8-23e9191b0d7e")
-		(property "Reference" "Solenoid4"
+		(property "Reference" "Oxidizer"
 			(at 273.05 120.65 0)
 			(effects
 				(font
@@ -12786,7 +12787,7 @@
 		(instances
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "Solenoid4")
+					(reference "Oxidizer")
 					(unit 1)
 				)
 			)
@@ -12879,6 +12880,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Solenoids:Solenoid")
 		(lib_id "Solenoids:Solenoid")
 		(at 251.46 128.27 0)
 		(unit 1)
@@ -12888,7 +12890,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "69840068-f0f0-42c9-9582-6fab6e2e060d")
-		(property "Reference" "Solenoid3"
+		(property "Reference" "Fuel"
 			(at 251.46 120.65 0)
 			(effects
 				(font
@@ -12940,7 +12942,7 @@
 		(instances
 			(project ""
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "Solenoid3")
+					(reference "Fuel")
 					(unit 1)
 				)
 			)
@@ -13181,6 +13183,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Solenoids:Solenoid")
 		(lib_id "Solenoids:Solenoid")
 		(at 195.58 128.27 0)
 		(unit 1)
@@ -13190,7 +13193,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "7fd7b3a6-e7b8-4319-82ba-4abcea9e82f0")
-		(property "Reference" "Solenoid1"
+		(property "Reference" "NitrogenFlush"
 			(at 195.58 120.65 0)
 			(effects
 				(font
@@ -13242,7 +13245,7 @@
 		(instances
 			(project ""
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "Solenoid1")
+					(reference "NitrogenFlush")
 					(unit 1)
 				)
 			)
@@ -14678,6 +14681,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Solenoids:Solenoid")
 		(lib_id "Solenoids:Solenoid")
 		(at 223.52 128.27 0)
 		(unit 1)
@@ -14687,7 +14691,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ea4be11f-bd1c-49b5-b1ad-f41aca5b9109")
-		(property "Reference" "Solenoid2"
+		(property "Reference" "FuelPressure"
 			(at 223.52 120.65 0)
 			(effects
 				(font
@@ -14739,7 +14743,7 @@
 		(instances
 			(project ""
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "Solenoid2")
+					(reference "FuelPressure")
 					(unit 1)
 				)
 			)

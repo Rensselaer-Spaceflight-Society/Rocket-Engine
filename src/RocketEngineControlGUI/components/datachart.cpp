@@ -68,13 +68,27 @@ void DataChart::setChartType(ChartType chartType)
     }
 }
 
-void DataChart::append(double xValue, double yValue)
+void DataChart::append(float xValue, float yValue)
 {
     lowerSeries->append(xValue, 0);
     upperSeries->append(xValue, yValue);
-    if(yValue > maxYValue) maxYValue = yValue;
-    axisX->setRange(0, (int) (xValue));
+    maxXValue = std::fmax(maxXValue, xValue);
+    minXValue = std::fmin(minXValue, xValue);
+    maxYValue = std::fmax(maxYValue, yValue);
+    axisX->setRange(minXValue, (int) maxXValue);
     axisY->setRange(0, (int) (maxYValue));
+}
+
+void DataChart::reset()
+{
+    minXValue = 0;
+    maxXValue = 1;
+    maxYValue = 1;
+    lowerSeries->clear();
+    upperSeries->clear();
+    axisX->setRange(minXValue, maxXValue);
+    axisY->setRange(0, maxYValue);
+    this->append(0,0);
 }
 
 DataChart::~DataChart()

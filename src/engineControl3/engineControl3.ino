@@ -18,10 +18,17 @@ constexpr char HEADER[] = {'D', 'a', 't', 'a', 'P', 'a', 'c', 'k'};
 
 // Pin Assignments
 constexpr int NITROGENVALVE = 25;
-constexpr int OXIDIZERVALVE = 26;
+constexpr int PRESFUELVALVE = 26;
 constexpr int FUELVALVE = 27;
+<<<<<<< HEAD
+constexpr int OXIDIZERVALVE = 28;
+constexpr int IGNITERVALVE = 29;
+
+// Analog Pins for Pressure Transducers
+=======
 constexpr int IGNITERVALVE = 28;
 constexpr int PRESFUELVALVE = 15;
+>>>>>>> 7c94f59b65b66a92612126d31881f3e22a1934c8
 constexpr int PRESSSEN1 = 0;
 constexpr int PRESSSEN2 = 1;
 constexpr int PRESSSEN3 = 2;
@@ -33,9 +40,17 @@ constexpr int THERMOCPL1 = 6;
 constexpr int THERMOCPL2 = 7;
 constexpr int THERMOCPL3 = 8;
 constexpr int THERMOCPL4 = 9;
+<<<<<<< HEAD
+
+// LED Ports (Digital)
+constexpr int LED1 = 30;
+constexpr int LED2 = 31;
+constexpr int LED3 = 32;
+=======
 constexpr int LED1 = 5;
 constexpr int LED2 = 6;
 constexpr int LED3 = 7;
+>>>>>>> 7c94f59b65b66a92612126d31881f3e22a1934c8
 
 // Constants for calculations
 constexpr float voltageToTempScale = 0.005;

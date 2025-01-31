@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 list(APPEND CMAKE_PREFIX_PATH "~/Qt/6.7.2/gcc_64/lib/cmake")
@@ -19,16 +19,21 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        communications/serialcommunicator.cpp
 )
 
 
 qt_add_executable(RocketEngineControlGUI
     MANUAL_FINALIZATION
     ${PROJECT_SOURCES}
-    communications/dataio.h
-    communications/serialcommunicator.h communications/serialcommunicator.cpp
+
     components/datachart.h components/datachart.cpp components/datachart.ui
+
+    communications/serialworker.h communications/serialworker.cpp
+    communications/sensordata.h
+    logging/loghandler.h logging/loghandler.cpp
+    components/alertdialog.h components/alertdialog.cpp components/alertdialog.ui
+
+
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
