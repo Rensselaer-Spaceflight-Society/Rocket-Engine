@@ -142,7 +142,7 @@
 			)
 		)
 	)
-	(pad "GND" thru_hole circle
+	(pad "GND" thru_hole rect
 		(at 8.5 -0.5)
 		(size 1.524 1.524)
 		(drill 0.762)
@@ -150,7 +150,7 @@
 		(remove_unused_layers no)
 		(uuid "fce98465-7aa2-448e-b166-130e512688b1")
 	)
-	(pad "GND" thru_hole circle
+	(pad "GND" thru_hole rect
 		(at 8.5 4.5)
 		(size 1.524 1.524)
 		(drill 0.762)

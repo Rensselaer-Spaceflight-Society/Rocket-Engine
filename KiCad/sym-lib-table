@@ -5,4 +5,5 @@
   (lib (name "12VRelay")(type "KiCad")(uri "${KIPRJMOD}/12VRelay.kicad_sym")(options "")(descr ""))
   (lib (name "5VRelay")(type "KiCad")(uri "${KIPRJMOD}/5VRelay.kicad_sym")(options "")(descr ""))
   (lib (name "USB_UART")(type "KiCad")(uri "${KIPRJMOD}/USB_UART.kicad_sym")(options "")(descr ""))
+  (lib (name "arduino-library")(type "KiCad")(uri "${KIPRJMOD}/arduino-library.kicad_sym")(options "")(descr ""))
 )

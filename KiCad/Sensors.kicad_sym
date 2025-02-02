@@ -2,6 +2,190 @@
 	(version 20231120)
 	(generator "kicad_symbol_editor")
 	(generator_version "8.0")
+	(symbol "AD8495_PCB"
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "U"
+			(at 0 1.016 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "AD8495_PCB_0_1"
+			(rectangle
+				(start -5.08 6.35)
+				(end 5.08 -3.81)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type background)
+				)
+			)
+			(rectangle
+				(start -2.54 5.08)
+				(end 2.54 2.54)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(circle
+				(center -1.27 3.81)
+				(radius 0.635)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(circle
+				(center 1.27 3.81)
+				(radius 0.635)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "AD8495_PCB_1_1"
+			(text "+"
+				(at -1.27 3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(text "-"
+				(at 1.27 3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(pin input line
+				(at -1.27 -8.89 90)
+				(length 5.08)
+				(name "GND"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "GND"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin input line
+				(at 3.81 -8.89 90)
+				(length 5.08)
+				(name "GND"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "GND"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin output line
+				(at 1.27 -8.89 90)
+				(length 5.08)
+				(name "OUT"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "OUT"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin input line
+				(at -3.81 -8.89 90)
+				(length 5.08)
+				(name "V+"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "V+"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+	)
 	(symbol "HX711_Board"
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -64,8 +248,8 @@
 		)
 		(symbol "HX711_Board_1_1"
 			(pin output line
-				(at 15.24 -11.43 180)
-				(length 2.54)
+				(at 17.78 -2.54 180)
+				(length 5.08)
 				(name "A+"
 					(effects
 						(font
@@ -73,7 +257,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "A+"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -82,8 +266,8 @@
 				)
 			)
 			(pin output line
-				(at 15.24 -7.62 180)
-				(length 2.54)
+				(at 17.78 1.27 180)
+				(length 5.08)
 				(name "A-"
 					(effects
 						(font
@@ -91,7 +275,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "A-"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -100,16 +284,16 @@
 				)
 			)
 			(pin output line
-				(at -15.24 -7.62 0)
-				(length 2.54)
-				(name "DO"
+				(at 17.78 -11.43 180)
+				(length 5.08)
+				(name "B+"
 					(effects
 						(font
 							(size 1.27 1.27)
 						)
 					)
 				)
-				(number ""
+				(number "B+"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -118,8 +302,44 @@
 				)
 			)
 			(pin output line
-				(at 15.24 11.43 180)
-				(length 2.54)
+				(at 17.78 -7.62 180)
+				(length 5.08)
+				(name "B-"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "B-"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin output line
+				(at -17.78 -7.62 0)
+				(length 5.08)
+				(name "DT"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "DT"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin output line
+				(at 17.78 11.43 180)
+				(length 5.08)
 				(name "E+"
 					(effects
 						(font
@@ -127,7 +347,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "E+"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -136,8 +356,8 @@
 				)
 			)
 			(pin output line
-				(at 15.24 7.62 180)
-				(length 2.54)
+				(at 17.78 7.62 180)
+				(length 5.08)
 				(name "E-"
 					(effects
 						(font
@@ -145,7 +365,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "E-"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -154,8 +374,8 @@
 				)
 			)
 			(pin input line
-				(at -15.24 -11.43 0)
-				(length 2.54)
+				(at -17.78 -11.43 0)
+				(length 5.08)
 				(name "GND"
 					(effects
 						(font
@@ -163,7 +383,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "GND"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -172,8 +392,8 @@
 				)
 			)
 			(pin input line
-				(at -15.24 7.62 0)
-				(length 2.54)
+				(at -17.78 7.62 0)
+				(length 5.08)
 				(name "SCK"
 					(effects
 						(font
@@ -181,7 +401,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "SCK"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -190,8 +410,8 @@
 				)
 			)
 			(pin input line
-				(at -15.24 11.43 0)
-				(length 2.54)
+				(at -17.78 11.43 0)
+				(length 5.08)
 				(name "VCC"
 					(effects
 						(font
@@ -199,7 +419,7 @@
 						)
 					)
 				)
-				(number ""
+				(number "VCC"
 					(effects
 						(font
 							(size 1.27 1.27)

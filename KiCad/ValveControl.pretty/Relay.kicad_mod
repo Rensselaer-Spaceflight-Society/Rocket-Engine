@@ -181,39 +181,6 @@
 			)
 		)
 	)
-	(dimension
-		(type aligned)
-		(layer "F.SilkS")
-		(uuid "e2a4cf25-b934-4cd7-9a94-0355e50bae68")
-		(pts
-			(xy -18.75 -4.5) (xy 19.75 -4.5)
-		)
-		(height -3.75)
-		(gr_text "38.5000 mm"
-			(at 0.5 -9.35 0)
-			(layer "F.SilkS")
-			(uuid "e2a4cf25-b934-4cd7-9a94-0355e50bae68")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.1)
-				)
-			)
-		)
-		(format
-			(prefix "")
-			(suffix "")
-			(units 3)
-			(units_format 1)
-			(precision 4)
-		)
-		(style
-			(thickness 0.1)
-			(arrow_length 1.27)
-			(text_position_mode 0)
-			(extension_height 0.58642)
-			(extension_offset 0.5) keep_text_aligned)
-	)
 	(pad "COM" thru_hole circle
 		(at 19.75 1)
 		(size 1.524 1.524)

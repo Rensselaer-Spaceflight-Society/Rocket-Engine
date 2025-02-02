@@ -3,4 +3,5 @@
   (lib (name "Arduino")(type "KiCad")(uri "${KIPRJMOD}/Arduino.pretty")(options "")(descr ""))
   (lib (name "Sensors")(type "KiCad")(uri "${KIPRJMOD}/Sensors.pretty")(options "")(descr ""))
   (lib (name "Communications")(type "KiCad")(uri "${KIPRJMOD}/Communications.pretty")(options "")(descr ""))
+  (lib (name "ValveControl")(type "KiCad")(uri "${KIPRJMOD}/ValveControl.pretty")(options "")(descr ""))
 )
