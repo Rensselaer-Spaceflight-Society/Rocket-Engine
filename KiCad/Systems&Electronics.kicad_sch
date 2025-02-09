@@ -603,6 +603,169 @@
 				)
 			)
 		)
+		(symbol "Device:D"
+			(pin_numbers hide)
+			(pin_names
+				(offset 1.016) hide)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "D"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Diode"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Sim.Device" "D"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Sim.Pins" "1=K 2=A"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "diode"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "D_0_1"
+				(polyline
+					(pts
+						(xy -1.27 1.27) (xy -1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "D_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "Device:LED"
 			(pin_numbers hide)
 			(pin_names
@@ -5114,7 +5277,7 @@
 	)
 	(wire
 		(pts
-			(xy 130.81 168.91) (xy 130.81 185.42)
+			(xy 130.81 168.91) (xy 130.81 173.99)
 		)
 		(stroke
 			(width 0)
@@ -7621,6 +7784,16 @@
 			(type default)
 		)
 		(uuid "cfa11cd5-aaf7-4093-b9e0-4e849e38b41e")
+	)
+	(wire
+		(pts
+			(xy 130.81 181.61) (xy 130.81 185.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d285a765-409a-4daf-8fd9-03c3580dbc45")
 	)
 	(wire
 		(pts
@@ -13156,7 +13329,6 @@
 		)
 	)
 	(symbol
-		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 57.15 168.91 180)
 		(unit 1)
@@ -13371,7 +13543,6 @@
 		)
 	)
 	(symbol
-		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 74.93 168.91 180)
 		(unit 1)
@@ -14582,7 +14753,6 @@
 		)
 	)
 	(symbol
-		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 38.1 168.91 180)
 		(unit 1)
@@ -15669,7 +15839,6 @@
 		)
 	)
 	(symbol
-		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 20.32 168.91 180)
 		(unit 1)
@@ -15806,6 +15975,94 @@
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
 					(reference "D7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D")
+		(at 130.81 177.8 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f60f6ee7-dd3f-49e6-809e-3f862d0111b2")
+		(property "Reference" "D4"
+			(at 133.35 176.5299 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "D"
+			(at 133.35 179.0699 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Diode_THT:D_A-405_P7.62mm_Horizontal"
+			(at 130.81 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 130.81 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Diode"
+			(at 130.81 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Device" "D"
+			(at 130.81 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Pins" "1=K 2=A"
+			(at 130.81 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "853703f1-9e11-421d-8c93-689c45ffa754")
+		)
+		(pin "1"
+			(uuid "6b8869ad-c71b-49be-ab4f-8e1edbe33ec6")
+		)
+		(instances
+			(project ""
+				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
+					(reference "D4")
 					(unit 1)
 				)
 			)
