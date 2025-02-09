@@ -88,6 +88,17 @@
 		(layer "F.SilkS")
 		(uuid "1ceeba08-471d-4576-b082-2e24ab80b798")
 	)
+	(fp_rect
+		(start -23.75 -8.75)
+		(end 20.75 6.25)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill none)
+		(layer "F.CrtYd")
+		(uuid "c6c3e0e8-56a5-4b48-b7bc-cd8391eeafb3")
+	)
 	(fp_text user "A"
 		(at 17 0.5 0)
 		(unlocked yes)
@@ -249,7 +260,7 @@
 		(remove_unused_layers no)
 		(uuid "acca9603-a44b-4b24-8020-9416636003a9")
 	)
-	(pad "5" thru_hole circle
+	(pad "5" thru_hole rect
 		(at 19 2.5)
 		(size 1.524 1.524)
 		(drill 0.762)

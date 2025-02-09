@@ -15727,7 +15727,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_Power_L48.0mm_W12.5mm_P55.88mm"
+		(property "Footprint" "Resistor_THT:R_Axial_Power_L50.0mm_W9.0mm_P55.88mm"
 			(at 217.17 50.038 90)
 			(effects
 				(font

@@ -68,8 +68,8 @@
 	)
 	(attr through_hole)
 	(fp_rect
-		(start -24.75 -12)
-		(end 25.25 13)
+		(start -25 -12.5)
+		(end 25.5 13.5)
 		(stroke
 			(width 0.1)
 			(type default)
@@ -77,6 +77,17 @@
 		(fill none)
 		(layer "F.SilkS")
 		(uuid "228e843a-df3b-45e1-a87e-279bce0051db")
+	)
+	(fp_rect
+		(start -25.25 -12.75)
+		(end 25.75 13.75)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill none)
+		(layer "F.CrtYd")
+		(uuid "00631273-91c6-45c2-a6f5-d8a667153768")
 	)
 	(fp_text user "5V Relay"
 		(at -3.25 11 0)
@@ -105,7 +116,7 @@
 		)
 	)
 	(fp_text user "NO"
-		(at 16.5 6.75 0)
+		(at 16.25 6.25 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "334d5834-5c70-41e1-9fe2-2da56887a721")
@@ -131,7 +142,7 @@
 		)
 	)
 	(fp_text user "COM"
-		(at 15.5 1.75 0)
+		(at 15.25 1.25 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "62de673a-332e-4993-95fd-a4836a87bb38")
@@ -157,7 +168,7 @@
 		)
 	)
 	(fp_text user "NC"
-		(at 16.5 -3.25 0)
+		(at 16.25 -3.75 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "f8ae5b4f-0206-47da-b9ec-6b29090a2bf1")
@@ -182,7 +193,7 @@
 		)
 	)
 	(pad "COM" thru_hole circle
-		(at 19.75 1)
+		(at 19.5 0.5)
 		(size 1.524 1.524)
 		(drill 0.762)
 		(layers "*.Cu" "*.Mask")
@@ -197,7 +208,7 @@
 		(remove_unused_layers no)
 		(uuid "6ee68703-5bc1-481e-afe2-9943d3a08619")
 	)
-	(pad "DC-" thru_hole circle
+	(pad "DC-" thru_hole rect
 		(at -18.75 0.5)
 		(size 1.524 1.524)
 		(drill 0.762)
@@ -213,8 +224,8 @@
 		(remove_unused_layers no)
 		(uuid "ccf2b897-6777-4a13-9859-36f57a0a3b3c")
 	)
-	(pad "NC" thru_hole circle
-		(at 19.75 -4)
+	(pad "NC" thru_hole rect
+		(at 19.5 -4.5)
 		(size 1.524 1.524)
 		(drill 0.762)
 		(layers "*.Cu" "*.Mask")
@@ -222,7 +233,7 @@
 		(uuid "ca381700-89ce-4893-8088-a2dc739e7883")
 	)
 	(pad "NO" thru_hole circle
-		(at 19.75 6)
+		(at 19.5 5.5)
 		(size 1.524 1.524)
 		(drill 0.762)
 		(layers "*.Cu" "*.Mask")
