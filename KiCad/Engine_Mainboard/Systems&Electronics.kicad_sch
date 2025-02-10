@@ -5047,6 +5047,16 @@
 	)
 	(wire
 		(pts
+			(xy 163.83 38.1) (xy 163.83 52.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "09e55301-99f7-4824-af74-1aa604586122")
+	)
+	(wire
+		(pts
 			(xy 36.83 152.4) (xy 36.83 160.02)
 		)
 		(stroke
@@ -5224,16 +5234,6 @@
 			(type default)
 		)
 		(uuid "14482725-185e-4a7a-bbd3-62fa8bdd3695")
-	)
-	(wire
-		(pts
-			(xy 161.29 39.37) (xy 161.29 49.53)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "14996049-6d75-4f1e-98f7-9ec1c6f3daf8")
 	)
 	(wire
 		(pts
@@ -5537,7 +5537,7 @@
 	)
 	(wire
 		(pts
-			(xy 160.02 52.07) (xy 162.56 52.07)
+			(xy 160.02 52.07) (xy 163.83 52.07)
 		)
 		(stroke
 			(width 0)
@@ -5637,7 +5637,7 @@
 	)
 	(wire
 		(pts
-			(xy 162.56 38.1) (xy 147.32 38.1)
+			(xy 147.32 38.1) (xy 163.83 38.1)
 		)
 		(stroke
 			(width 0)
@@ -6397,16 +6397,6 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 54.61) (xy 163.83 36.83)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "718a886f-f807-4d37-b1bd-cf9608308890")
-	)
-	(wire
-		(pts
 			(xy 208.28 49.53) (xy 208.28 73.66)
 		)
 		(stroke
@@ -6604,6 +6594,16 @@
 			(type default)
 		)
 		(uuid "808b3be9-87ea-47c8-9b8c-ffd5272934dd")
+	)
+	(wire
+		(pts
+			(xy 162.56 36.83) (xy 162.56 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "80af54fe-199e-4cd9-974c-7ae2e6c83473")
 	)
 	(wire
 		(pts
@@ -6817,7 +6817,7 @@
 	)
 	(wire
 		(pts
-			(xy 160.02 54.61) (xy 163.83 54.61)
+			(xy 160.02 54.61) (xy 165.1 54.61)
 		)
 		(stroke
 			(width 0)
@@ -6854,6 +6854,16 @@
 			(type default)
 		)
 		(uuid "91a39969-b185-41b9-a020-0a0339e1b948")
+	)
+	(wire
+		(pts
+			(xy 162.56 36.83) (xy 154.94 36.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "925555a9-e3b8-41ea-88f8-30f848108505")
 	)
 	(wire
 		(pts
@@ -7327,16 +7337,6 @@
 	)
 	(wire
 		(pts
-			(xy 162.56 52.07) (xy 162.56 38.1)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b2a6efbc-6672-4563-93e7-9894d9b0a6be")
-	)
-	(wire
-		(pts
 			(xy 250.19 118.11) (xy 250.19 123.19)
 		)
 		(stroke
@@ -7677,7 +7677,7 @@
 	)
 	(wire
 		(pts
-			(xy 160.02 49.53) (xy 161.29 49.53)
+			(xy 160.02 49.53) (xy 162.56 49.53)
 		)
 		(stroke
 			(width 0)
@@ -7874,16 +7874,6 @@
 			(type default)
 		)
 		(uuid "d6914619-1e31-466b-af37-63dbf1dddcb2")
-	)
-	(wire
-		(pts
-			(xy 163.83 36.83) (xy 154.94 36.83)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d7c4b0f1-3d3c-4fa5-99d9-d4e21328e9f4")
 	)
 	(wire
 		(pts
@@ -8097,7 +8087,7 @@
 	)
 	(wire
 		(pts
-			(xy 161.29 39.37) (xy 139.7 39.37)
+			(xy 139.7 39.37) (xy 165.1 39.37)
 		)
 		(stroke
 			(width 0)
@@ -8274,6 +8264,16 @@
 			(type default)
 		)
 		(uuid "f0751246-26ad-41e7-835b-c4bf82a5e5cc")
+	)
+	(wire
+		(pts
+			(xy 165.1 39.37) (xy 165.1 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f1d59894-9be6-4c45-9777-cf83fd8ab900")
 	)
 	(wire
 		(pts
@@ -12641,7 +12641,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 184.15 71.628 90)
 			(effects
 				(font
@@ -12793,7 +12793,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 253.492 152.4 90)
 			(effects
 				(font
@@ -13003,7 +13003,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "LED_THT:LED_D3.0mm"
+		(property "Footprint" "LED_THT:LED_D5.0mm"
 			(at 227.33 144.78 0)
 			(effects
 				(font
@@ -13071,7 +13071,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 184.15 107.188 90)
 			(effects
 				(font
@@ -13138,7 +13138,7 @@
 				)
 			)
 		)
-		(property "Footprint" "LED_THT:LED_D3.0mm"
+		(property "Footprint" "LED_THT:LED_D5.0mm"
 			(at 193.04 105.41 0)
 			(effects
 				(font
@@ -13205,7 +13205,7 @@
 				)
 			)
 		)
-		(property "Footprint" "LED_THT:LED_D3.0mm"
+		(property "Footprint" "LED_THT:LED_D5.0mm"
 			(at 139.7 22.86 0)
 			(effects
 				(font
@@ -13329,7 +13329,6 @@
 		)
 	)
 	(symbol
-		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 57.15 168.91 180)
 		(unit 1)
@@ -13432,7 +13431,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "LED_THT:LED_D3.0mm"
+		(property "Footprint" "LED_THT:LED_D5.0mm"
 			(at 199.39 144.78 0)
 			(effects
 				(font
@@ -13544,7 +13543,6 @@
 		)
 	)
 	(symbol
-		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 74.93 168.91 180)
 		(unit 1)
@@ -13644,7 +13642,7 @@
 				)
 			)
 		)
-		(property "Footprint" "LED_THT:LED_D3.0mm"
+		(property "Footprint" "LED_THT:LED_D5.0mm"
 			(at 147.32 22.86 0)
 			(effects
 				(font
@@ -13936,7 +13934,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 156.718 33.02 90)
 			(effects
 				(font
@@ -14073,7 +14071,7 @@
 				)
 			)
 		)
-		(property "Footprint" "LED_THT:LED_D3.0mm"
+		(property "Footprint" "LED_THT:LED_D5.0mm"
 			(at 154.94 22.86 0)
 			(effects
 				(font
@@ -14755,7 +14753,6 @@
 		)
 	)
 	(symbol
-		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 38.1 168.91 180)
 		(unit 1)
@@ -14856,7 +14853,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 208.28 157.988 90)
 			(effects
 				(font
@@ -14926,7 +14923,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 149.098 33.02 90)
 			(effects
 				(font
@@ -14995,7 +14992,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "LED_THT:LED_D3.0mm"
+		(property "Footprint" "LED_THT:LED_D5.0mm"
 			(at 276.86 144.78 0)
 			(effects
 				(font
@@ -15065,7 +15062,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "LED_THT:LED_D3.0mm"
+		(property "Footprint" "LED_THT:LED_D5.0mm"
 			(at 255.27 144.78 0)
 			(effects
 				(font
@@ -15455,7 +15452,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 141.478 33.02 90)
 			(effects
 				(font
@@ -15594,7 +15591,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 182.88 156.718 90)
 			(effects
 				(font
@@ -15842,7 +15839,6 @@
 		)
 	)
 	(symbol
-		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 20.32 168.91 180)
 		(unit 1)
@@ -15942,7 +15938,7 @@
 				)
 			)
 		)
-		(property "Footprint" "LED_THT:LED_D3.0mm"
+		(property "Footprint" "LED_THT:LED_D5.0mm"
 			(at 194.31 69.85 0)
 			(effects
 				(font
@@ -16100,7 +16096,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 275.082 153.67 90)
 			(effects
 				(font
