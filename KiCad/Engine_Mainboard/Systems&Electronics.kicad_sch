@@ -12402,7 +12402,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "05708e72-4651-40c8-bd21-62de1125f715")
-		(property "Reference" "J6"
+		(property "Reference" "P_Oxidizer_Line1"
 			(at 27.94 135.89 0)
 			(effects
 				(font
@@ -12457,7 +12457,7 @@
 		(instances
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "J6")
+					(reference "P_Oxidizer_Line1")
 					(unit 1)
 				)
 			)
@@ -12554,7 +12554,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0bc9de34-3b73-45e2-bed6-c8ea7f53679c")
-		(property "Reference" "J4"
+		(property "Reference" "P_Fuel_Line1"
 			(at 27.94 107.95 0)
 			(effects
 				(font
@@ -12609,7 +12609,7 @@
 		(instances
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "J4")
+					(reference "P_Fuel_Line1")
 					(unit 1)
 				)
 			)
@@ -12914,7 +12914,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "252126f8-5e60-4f4c-9893-c7383ddfeb49")
-		(property "Reference" "J3"
+		(property "Reference" "P_Fuel_Tank1"
 			(at 27.94 93.98 0)
 			(effects
 				(font
@@ -12969,7 +12969,7 @@
 		(instances
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "J3")
+					(reference "P_Fuel_Tank1")
 					(unit 1)
 				)
 			)
@@ -13122,7 +13122,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "34f2fbca-7b13-4fbb-b5ca-9d7e138d4a65")
-		(property "Reference" "D8"
+		(property "Reference" "D_SHUT1"
 			(at 199.39 104.14 0)
 			(effects
 				(font
@@ -13174,7 +13174,7 @@
 		(instances
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "D8")
+					(reference "D_SHUT1")
 					(unit 1)
 				)
 			)
@@ -13329,6 +13329,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 57.15 168.91 180)
 		(unit 1)
@@ -13543,6 +13544,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 74.93 168.91 180)
 		(unit 1)
@@ -13776,7 +13778,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "4d507360-5382-4855-b54c-a8831dc66106")
-		(property "Reference" "J2"
+		(property "Reference" "P_Fuel_Feed1"
 			(at 27.94 80.01 0)
 			(effects
 				(font
@@ -13831,7 +13833,7 @@
 		(instances
 			(project ""
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "J2")
+					(reference "P_Fuel_Feed1")
 					(unit 1)
 				)
 			)
@@ -13986,7 +13988,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "68d88ce8-7195-4e99-b587-fefb4b80b70a")
-		(property "Reference" "J12"
+		(property "Reference" "Load_Cell2"
 			(at 256.54 19.0499 0)
 			(effects
 				(font
@@ -14040,7 +14042,7 @@
 		(instances
 			(project ""
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "J12")
+					(reference "Load_Cell2")
 					(unit 1)
 				)
 			)
@@ -14691,7 +14693,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "82273241-e319-443e-9d6b-6372758eb752")
-		(property "Reference" "J1"
+		(property "Reference" "P_Unused1"
 			(at 27.94 66.04 0)
 			(effects
 				(font
@@ -14746,13 +14748,14 @@
 		(instances
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "J1")
+					(reference "P_Unused1")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
+		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 38.1 168.91 180)
 		(unit 1)
@@ -15361,7 +15364,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "a8f1a28d-fcb1-4d8e-90e8-06d897f0f47b")
-		(property "Reference" "J13"
+		(property "Reference" "Load_Cell1"
 			(at 256.54 30.4799 0)
 			(effects
 				(font
@@ -15418,7 +15421,7 @@
 		(instances
 			(project ""
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "J13")
+					(reference "Load_Cell1")
 					(unit 1)
 				)
 			)
@@ -15504,7 +15507,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b0fedbe5-e4bd-421f-bf5a-94f68dfe8ac0")
-		(property "Reference" "J5"
+		(property "Reference" "P_Oxidizer_Tank1"
 			(at 27.94 121.92 0)
 			(effects
 				(font
@@ -15559,7 +15562,7 @@
 		(instances
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "J5")
+					(reference "P_Oxidizer_Tank1")
 					(unit 1)
 				)
 			)
@@ -15839,6 +15842,7 @@
 		)
 	)
 	(symbol
+		(lib_name "Sensors:AD8495_PCB")
 		(lib_id "Sensors:AD8495_PCB")
 		(at 20.32 168.91 180)
 		(unit 1)
@@ -15922,7 +15926,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ef1ce01a-8f21-4e77-8e67-fdb63b0f4878")
-		(property "Reference" "D7"
+		(property "Reference" "D_IGN1"
 			(at 190.754 68.834 0)
 			(effects
 				(font
@@ -15974,7 +15978,7 @@
 		(instances
 			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff"
-					(reference "D7")
+					(reference "D_IGN1")
 					(unit 1)
 				)
 			)
