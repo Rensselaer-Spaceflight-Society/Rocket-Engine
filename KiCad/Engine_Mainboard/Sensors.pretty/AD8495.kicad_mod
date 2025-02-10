@@ -78,6 +78,50 @@
 		(layer "F.SilkS")
 		(uuid "a97457f4-5b52-4f5b-9b23-2bf577e3a107")
 	)
+	(fp_rect
+		(start -8.25 -3)
+		(end -4.75 4.5)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill none)
+		(layer "Dwgs.User")
+		(uuid "af9851d0-799d-4b7f-acec-7eb0ea289987")
+	)
+	(fp_circle
+		(center -6.5 -1.25)
+		(end -4.75 -1.25)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill none)
+		(layer "Dwgs.User")
+		(uuid "f16c387b-461f-4047-8558-3b0a7d5c8fc7")
+	)
+	(fp_circle
+		(center -6.5 2.5)
+		(end -4.75 2.5)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill none)
+		(layer "Dwgs.User")
+		(uuid "2a844da9-0574-4777-abe3-eed504915b77")
+	)
+	(fp_rect
+		(start -10.25 -7.5)
+		(end 10.75 9.5)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill none)
+		(layer "F.CrtYd")
+		(uuid "6f2813c8-8b1b-4ab5-a180-abc7e1292efd")
+	)
 	(fp_text user "GND"
 		(at 4 0 0)
 		(unlocked yes)
@@ -130,6 +174,32 @@
 			(justify left bottom)
 		)
 	)
+	(fp_text user "+"
+		(at -7.25 -0.75 0)
+		(unlocked yes)
+		(layer "Dwgs.User")
+		(uuid "62c5b9d0-b4fb-46c4-8545-cb6c2966e788")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "-"
+		(at -7.25 3 0)
+		(unlocked yes)
+		(layer "Dwgs.User")
+		(uuid "70b560ea-04d7-40a4-bf46-80647c459cb3")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
 	(fp_text user "${REFERENCE}"
 		(at 0 8 0)
 		(unlocked yes)
@@ -142,7 +212,7 @@
 			)
 		)
 	)
-	(pad "GND" thru_hole circle
+	(pad "GND" thru_hole rect
 		(at 8.5 -0.5)
 		(size 1.524 1.524)
 		(drill 0.762)
@@ -150,7 +220,7 @@
 		(remove_unused_layers no)
 		(uuid "fce98465-7aa2-448e-b166-130e512688b1")
 	)
-	(pad "GND" thru_hole circle
+	(pad "GND" thru_hole rect
 		(at 8.5 4.5)
 		(size 1.524 1.524)
 		(drill 0.762)

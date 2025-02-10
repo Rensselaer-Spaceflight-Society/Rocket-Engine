@@ -5,6 +5,193 @@
 	(uuid "5e4b0adc-dbbb-4c0d-8c17-55a3da555a5d")
 	(paper "A4")
 	(lib_symbols
+		(symbol "Connector:Screw_Terminal_01x02"
+			(pin_names
+				(offset 1.016) hide)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Screw_Terminal_01x02"
+				(at 0 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "screw terminal"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "TerminalBlock*:*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Screw_Terminal_01x02_1_1"
+				(rectangle
+					(start -1.27 1.27)
+					(end 1.27 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(circle
+					(center 0 -2.54)
+					(radius 0.635)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.5334 -2.2098) (xy 0.3302 -3.048)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.5334 0.3302) (xy 0.3302 -0.508)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.3556 -2.032) (xy 0.508 -2.8702)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -0.3556 0.508) (xy 0.508 -0.3302)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 0)
+					(radius 0.635)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "Interface_UART:MAX485E"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -430,185 +617,6 @@
 				)
 			)
 		)
-		(symbol "USB_UART:USB_UART"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "USB_UART"
-				(at 0.254 0.508 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "USB_UART_0_1"
-				(rectangle
-					(start -12.7 12.7)
-					(end 12.7 -12.7)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-			)
-			(symbol "USB_UART_1_0"
-				(pin input line
-					(at -2.54 15.24 270)
-					(length 2.54)
-					(name "RXD"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(symbol "USB_UART_1_1"
-				(pin output line
-					(at -10.16 15.24 270)
-					(length 2.54)
-					(name "CTS"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at 5.08 15.24 270)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at -6.35 15.24 270)
-					(length 2.54)
-					(name "RTS"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at 1.27 15.24 270)
-					(length 2.54)
-					(name "TXD"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at 8.89 15.24 270)
-					(length 2.54)
-					(name "VCC"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-		)
-	)
-	(junction
-		(at 133.35 41.91)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "0aada545-f4e6-45ea-8704-72ae46f4efab")
 	)
 	(junction
 		(at 116.84 57.15)
@@ -639,6 +647,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "5d051d52-276b-465d-a3a6-8a94b04938ca")
+	)
+	(junction
+		(at 133.35 41.91)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7b869713-c486-4913-bb6b-c7f39c2a7b26")
 	)
 	(junction
 		(at 114.3 57.15)
@@ -730,6 +744,16 @@
 	)
 	(wire
 		(pts
+			(xy 142.24 60.96) (xy 142.24 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1e209eef-ba58-4299-9470-10114292ab57")
+	)
+	(wire
+		(pts
 			(xy 101.6 57.15) (xy 114.3 57.15)
 		)
 		(stroke
@@ -747,26 +771,6 @@
 			(type default)
 		)
 		(uuid "37cccb23-8697-4eea-9e7a-15459ddd2dd3")
-	)
-	(wire
-		(pts
-			(xy 111.76 52.07) (xy 111.76 54.61)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "429eb3e6-a0aa-4db4-abf7-8560b63a598b")
-	)
-	(wire
-		(pts
-			(xy 132.08 41.91) (xy 133.35 41.91)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4b49bac2-b01e-41b9-b979-8f5c4dfb9b27")
 	)
 	(wire
 		(pts
@@ -940,7 +944,7 @@
 	)
 	(wire
 		(pts
-			(xy 137.16 53.34) (xy 137.16 60.96)
+			(xy 137.16 53.34) (xy 137.16 63.5)
 		)
 		(stroke
 			(width 0)
@@ -960,23 +964,33 @@
 	)
 	(wire
 		(pts
+			(xy 132.08 41.91) (xy 133.35 41.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "acbcac93-624d-40a8-bd75-bb3962fde4a5")
+	)
+	(wire
+		(pts
 			(xy 133.35 41.91) (xy 133.35 52.07)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b80f3887-f412-4f42-b5a6-ddfed323c56f")
+		(uuid "ad327ca7-fe9d-412f-89ed-4f8e2855420e")
 	)
 	(wire
 		(pts
-			(xy 144.78 60.96) (xy 144.78 57.15)
+			(xy 101.6 41.91) (xy 101.6 57.15)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b93a4cb8-2d04-46e7-b7c4-ffd6feea6c2d")
+		(uuid "ae8a5502-7d20-49df-a4e4-231405930e4b")
 	)
 	(wire
 		(pts
@@ -1010,6 +1024,36 @@
 	)
 	(wire
 		(pts
+			(xy 111.76 52.07) (xy 111.76 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cdb29008-623d-466a-845a-3bd0c0bc4a27")
+	)
+	(wire
+		(pts
+			(xy 144.78 57.15) (xy 144.78 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d3b4ecf2-6fbf-4bd5-b701-e53d8896600b")
+	)
+	(wire
+		(pts
+			(xy 133.35 60.96) (xy 134.62 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d65208f3-b0d2-4f7b-b4f4-27f41eb054d6")
+	)
+	(wire
+		(pts
 			(xy 149.86 54.61) (xy 133.35 54.61)
 		)
 		(stroke
@@ -1020,6 +1064,26 @@
 	)
 	(wire
 		(pts
+			(xy 140.97 60.96) (xy 142.24 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e8fcbfbc-0bac-4f08-827a-8c003c19a0b1")
+	)
+	(wire
+		(pts
+			(xy 134.62 60.96) (xy 134.62 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "eb6c2c73-0a5b-4ade-a829-e6709037721a")
+	)
+	(wire
+		(pts
 			(xy 114.3 29.21) (xy 114.3 31.75)
 		)
 		(stroke
@@ -1027,16 +1091,6 @@
 			(type default)
 		)
 		(uuid "eef0c121-d416-4164-9ca3-ceb546e6c049")
-	)
-	(wire
-		(pts
-			(xy 101.6 57.15) (xy 101.6 41.91)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "fc658cba-3e23-44e3-83d8-aca436222451")
 	)
 	(image
 		(at 186.69 173.99)
@@ -4977,7 +5031,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+		(property "Footprint" ""
 			(at 139.7 41.91 0)
 			(effects
 				(font
@@ -5038,6 +5092,75 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:Screw_Terminal_01x02")
+		(at 144.78 68.58 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9bb9a998-f8a5-4a43-8b56-e4c6c94a6424")
+		(property "Reference" "J_USB_POWER1"
+			(at 142.748 72.136 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Power"
+			(at 147.066 68.072 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 144.78 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 144.78 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 144.78 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "dd96849c-4dd0-4b3a-8bab-e4b1ba779e59")
+		)
+		(pin "1"
+			(uuid "775ca39a-c98e-4657-a887-a34dd5357bb4")
+		)
+		(instances
+			(project ""
+				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff/b15947ff-9075-4e47-b24b-e604669a88aa"
+					(reference "J_USB_POWER1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Interface_UART:MAX485E")
 		(at 154.94 41.91 90)
 		(unit 1)
@@ -5063,7 +5186,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+		(property "Footprint" ""
 			(at 177.8 41.91 0)
 			(effects
 				(font
@@ -5124,17 +5247,16 @@
 		)
 	)
 	(symbol
-		(lib_id "USB_UART:USB_UART")
-		(at 135.89 76.2 0)
+		(lib_id "Connector:Screw_Terminal_01x02")
+		(at 137.16 68.58 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "e3f07e22-b5b3-406c-ab34-0fa62bfecba4")
-		(property "Reference" "USB_UART1"
-			(at 149.86 75.5649 0)
+		(uuid "eb282afa-db5e-40e8-891e-9e448247f4c6")
+		(property "Reference" "J_USB_DATA1"
+			(at 121.158 68.58 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5142,8 +5264,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "~"
-			(at 149.86 77.47 0)
+		(property "Value" "TX_RX"
+			(at 132.842 71.628 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5152,7 +5274,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 135.89 76.2 0)
+			(at 137.16 68.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5160,8 +5282,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
-			(at 135.89 76.2 0)
+		(property "Datasheet" "~"
+			(at 137.16 68.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5169,8 +5291,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" ""
-			(at 135.89 76.2 0)
+		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 137.16 68.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5178,28 +5300,16 @@
 				(hide yes)
 			)
 		)
-		(pin ""
-			(uuid "548a90cd-9a16-4b12-9849-7ba2da6e46b7")
+		(pin "2"
+			(uuid "6e84fadb-993f-49f7-a34c-d3de40141a94")
 		)
-		(pin ""
-			(uuid "fa321b68-bb59-4490-a70d-1282e5e13bec")
-		)
-		(pin ""
-			(uuid "6cccbe0f-20a3-4bf3-8a40-2d5cef7e1bbb")
-		)
-		(pin ""
-			(uuid "2c36e2eb-57ed-468c-9936-7aa12e38e7bd")
-		)
-		(pin ""
-			(uuid "b672632e-26a6-4d89-a41a-4b53c69e77bd")
-		)
-		(pin ""
-			(uuid "28ef4b50-77be-4f60-8458-ac8cf4a6bd79")
+		(pin "1"
+			(uuid "22e5899b-f754-4ec8-a609-a62c088367c5")
 		)
 		(instances
-			(project ""
+			(project "Systems&Electronics"
 				(path "/4e05caf8-77e4-4a22-9a05-51fcca8e50ff/b15947ff-9075-4e47-b24b-e604669a88aa"
-					(reference "USB_UART1")
+					(reference "J_USB_DATA1")
 					(unit 1)
 				)
 			)
