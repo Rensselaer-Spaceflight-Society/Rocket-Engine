@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Communications")(type "KiCad")(uri "${KIPRJMOD}/Communications.pretty")(options "")(descr ""))
+)
