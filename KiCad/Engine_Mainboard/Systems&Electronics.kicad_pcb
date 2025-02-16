@@ -50,10 +50,10 @@
 			(layerselection 0x00010fc_ffffffff)
 			(plot_on_all_layers_selection 0x0000000_00000000)
 			(disableapertmacros no)
-			(usegerberextensions no)
-			(usegerberattributes yes)
-			(usegerberadvancedattributes yes)
-			(creategerberjobfile yes)
+			(usegerberextensions yes)
+			(usegerberattributes no)
+			(usegerberadvancedattributes no)
+			(creategerberjobfile no)
 			(dashed_line_dash_ratio 12.000000)
 			(dashed_line_gap_ratio 3.000000)
 			(svgprecision 4)
@@ -72,16 +72,16 @@
 			(psnegative no)
 			(psa4output no)
 			(plotreference yes)
-			(plotvalue yes)
+			(plotvalue no)
 			(plotfptext yes)
 			(plotinvisibletext no)
 			(sketchpadsonfab no)
-			(subtractmaskfromsilk no)
+			(subtractmaskfromsilk yes)
 			(outputformat 1)
 			(mirror no)
-			(drillshape 1)
+			(drillshape 0)
 			(scaleselection 1)
-			(outputdirectory "")
+			(outputdirectory "C:/Users/coope/Documents/Spaceflight Society/Engine-Mainboard-GBR/")
 		)
 	)
 	(net 0 "")
@@ -2188,17 +2188,6 @@
 			(layer "F.CrtYd")
 			(uuid "ecc9a914-380c-4ddf-806a-1502bfe6049d")
 		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(uuid "963591ce-8ee6-441b-aec7-29dd4ae00f66")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
 			(size 2.1 2.1)
@@ -2820,17 +2809,6 @@
 			(fill none)
 			(layer "F.CrtYd")
 			(uuid "82365b68-355b-467a-b037-36106ff87763")
-		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(uuid "8eea301f-485e-4639-b63d-ce6ac6d1bc15")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
 		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
@@ -5006,17 +4984,6 @@
 			(fill none)
 			(layer "F.CrtYd")
 			(uuid "68684f5e-55df-42de-8cfe-26cb8e23e354")
-		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(uuid "604204bb-06de-4f2e-ba3a-26a0e3c71d36")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
 		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
@@ -11665,17 +11632,6 @@
 			(layer "F.CrtYd")
 			(uuid "2733115e-8dea-426b-be38-6d8612699720")
 		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(uuid "325eb033-653a-40e8-bccc-448243204f47")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
 			(size 2.1 2.1)
@@ -15770,17 +15726,6 @@
 			(layer "F.CrtYd")
 			(uuid "580cb629-cba6-46ab-846e-3687b378cd30")
 		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(uuid "c09baa39-23dc-43af-8ac5-d62a9ac7dea8")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
 			(size 2.1 2.1)
@@ -16382,17 +16327,6 @@
 			(fill none)
 			(layer "F.CrtYd")
 			(uuid "49eba118-b68a-458d-8be7-389f553d6e68")
-		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(uuid "400e4937-3c9a-4906-9cbc-0b29febde508")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
 		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
@@ -22048,6 +21982,19 @@
 			"/B15UmU88jjyV9xHTXkYeRC535R7wN2m/Bm5E9+RJElqC/8A5HlOltl3lBgAAAAASUVORK5CYII="
 		)
 		(uuid "61bc007a-94eb-4a19-9ffa-c8734df59c8a")
+	)
+	(gr_text "RPU-1 {dblquote}Reliant{dblquote}"
+		(at 204 67 0)
+		(layer "B.SilkS")
+		(uuid "705115a1-e8b3-4665-8c96-dde33e6c754d")
+		(effects
+			(font
+				(size 10 10)
+				(thickness 1)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
 	)
 	(gr_text "220"
 		(at 89.54 89.13 0)
