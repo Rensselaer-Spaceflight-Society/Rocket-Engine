@@ -77,7 +77,7 @@ void MainWindow::handleStartCountdown()
         countdownMs = COUNTDOWN_LENGTH_MS;
         pastAutoHold = false;
         ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
-        emit issueCommand(CONTROL_ACTIVE_COMMAND);
+        commsCenter->issueCommand(CONTROL_ACTIVE_COMMAND);
         return;
     }
 
@@ -132,8 +132,8 @@ void MainWindow::handleStartCountdown()
     }
 
     // Issue the log start command to start logs
-    emit issueCommand(LOG_START_COMMAND);
-    emit setPings(true);
+    commsCenter->issueCommand(LOG_START_COMMAND);
+    commsCenter->setStartPings(true);
 }
 
 void MainWindow::handleShutdown()
@@ -155,7 +155,7 @@ void MainWindow::handleShutdown()
     if(currentState != EngineStates::NO_CONNECTION)
         currentState = EngineStates::PENDING_SHUTDOWN;
 
-    emit issueCommand(SHUTDOWN_COMMAND);
+    commsCenter->issueCommand(SHUTDOWN_COMMAND);
     ui->EngineStatus->setText("Pending Shutdown");
     ui->AbortButton->setText("Pending Shutdown");
 
@@ -170,6 +170,8 @@ void MainWindow::handleSerialPortSelection(int index)
 
 void MainWindow::handleCommandAttempt(const QString & command)
 {
+    // Ignore pings since they are sent so frequently
+    if (command == PING_COMMAND) return;
     // Log the attempt since the serial worker should handle repetition
     logger.logEvent(countdownMs, EventType::CommandSent, command + " Sent to Motor");
 }
@@ -211,10 +213,10 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
 {
 
     timeSinceLastPing = 0; // All command responses indicate that two way comms are still active
-    logger.logEvent(countdownMs, EventType::SignalReceived, signal + " was received. ");
+    if(signal == PING_COMMAND) return; // If the signal is a ping then we have already done all that we need to
 
-    // If the signal is a ping then we have already done all that we need to
-    if(signal == PING_COMMAND) return;
+    // We also shouldn't log pings since they happen so frequently.
+    logger.logEvent(countdownMs, EventType::SignalReceived, signal + " was received. ");
 
     if(signal == INVALID_COMMAND)
     {
@@ -361,7 +363,6 @@ void MainWindow::handleCountdownUpdate()
         return;
     }
 
-
     countdownMs += EVENT_POLL_DURATION_MS;
     QString countdownTimerText = LogHandler::formatCountdown(countdownMs);
     ui->CountdowLabel->setText(countdownTimerText);
@@ -380,14 +381,14 @@ void MainWindow::handleCountdownUpdate()
     // Handle the Inert Flush When we reach that point
     if(currentState == EngineStates::COUNTDOWN_STARTED && countdownMs > INERT_FLUSH_POINT_MS)
     {
-        emit issueCommand(INERT_GAS_FLUSH_COMMAND);
+        commsCenter->issueCommand(INERT_GAS_FLUSH_COMMAND);
         return;
     }
 
     // Handle Fuel Pressurization after the Nitrogen Flush
     if(currentState == EngineStates::NITROGEN_FLUSH_DONE && countdownMs > PRESURIZE_FUEL_POINT_MS)
     {
-        emit issueCommand(PRESURIZE_FUEL_COMMAND);
+        commsCenter->issueCommand(PRESURIZE_FUEL_COMMAND);
         return;
     }
 
@@ -395,18 +396,20 @@ void MainWindow::handleCountdownUpdate()
     // Handle Ignition after Fuel Pressurization
     if(currentState == EngineStates::PRESSUREIZED_FUEL && countdownMs > IGNITION_START_POINT_MS)
     {
-        emit issueCommand(IGNITION_COMMAND);
+        commsCenter->issueCommand(IGNITION_COMMAND);
         return;
     }
 
     // Handle Shutdown After We Have Burned for the Full Duration
     if(currentState == EngineStates::IGNITION && countdownMs > burnDurationMs)
     {
-        emit issueCommand(SHUTDOWN_COMMAND);
-        currentState = EngineStates::PENDING_SHUTDOWN;
-        ui->AbortButton->setText("Pending Shutdown");
-        ui->EngineStatus->setText("Pending Shutdown");
-        ui->AbortButton->setDisabled(true);
+        handleShutdown();
+        return;
+    }
+
+    if(currentState >= EngineStates::PENDING_SHUTDOWN && currentState < EngineStates::SHUTDOWN_COMPLETE){
+        handleShutdown();
+        return;
     }
 }
 

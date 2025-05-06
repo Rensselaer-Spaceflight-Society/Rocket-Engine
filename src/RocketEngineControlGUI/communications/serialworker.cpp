@@ -87,6 +87,7 @@ void SerialWorker::setStartPings(bool value)
 void SerialWorker::issueCommand(const QString &command)
 {
     commandToSend = command;
+    commandRetries = 0;
 }
 
 void SerialWorker::handleReadReady()
@@ -162,7 +163,6 @@ void SerialWorker::handleTimeout()
             commandRetries = 0;
             emit commandFailed(commandToSend);
             commandToSend.clear();
-            commandRetries = 0;
         }
 
         qDebug() << commandToSend.toUtf8();
@@ -177,6 +177,7 @@ void SerialWorker::handleTimeout()
     if(!startPings) return;
 
     serialPort->write(PING_COMMAND);
+    serialPort->flush();
     emit commandAttempt(PING_COMMAND);
 }
 

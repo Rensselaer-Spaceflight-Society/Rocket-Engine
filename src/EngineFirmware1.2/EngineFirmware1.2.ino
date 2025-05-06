@@ -1,5 +1,5 @@
 #define PRODUCTION false
-#define ENABLE_LOGGING true
+#define ENABLE_LOGGING false
 #define ENABLE_PINGS false
 
 #if PRODUCTION
