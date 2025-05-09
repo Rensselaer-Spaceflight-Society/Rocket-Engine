@@ -308,7 +308,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         }
     }
 
-    if(currentState == EngineStates::NITROGEN_FLUSH_PENDING)
+    if(currentState == EngineStates::COUNTDOWN_STARTED)
     {
         if(signal == INERT_GAS_FLUSH_COMMAND)
         {
@@ -328,7 +328,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         }
     }
 
-    if(currentState == EngineStates::PENDING_PRESSURIZED_FUEL)
+    if(currentState == EngineStates::NITROGEN_FLUSH_DONE)
     {
         if(signal == PRESURIZE_FUEL_COMMAND)
         {
@@ -338,7 +338,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         }
     }
 
-    if(currentState == EngineStates::PENDING_IGNITION)
+    if(currentState == EngineStates::PRESSUREIZED_FUEL)
     {
         if(signal == IGNITION_COMMAND)
         {
@@ -348,8 +348,6 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
             return;
         }
     }
-
-
 
     if(currentState == EngineStates::SHUTDOWN_STARTED || currentState == EngineStates::PENDING_SHUTDOWN)
     {
@@ -394,7 +392,6 @@ void MainWindow::handleCountdownUpdate()
     if(currentState == EngineStates::COUNTDOWN_STARTED && countdownMs > INERT_FLUSH_POINT_MS)
     {
         emit issueCommand(INERT_GAS_FLUSH_COMMAND);
-        currentState = EngineStates::NITROGEN_FLUSH_PENDING;
         return;
     }
 
@@ -402,7 +399,6 @@ void MainWindow::handleCountdownUpdate()
     if(currentState == EngineStates::NITROGEN_FLUSH_DONE && countdownMs > PRESURIZE_FUEL_POINT_MS)
     {
         emit issueCommand(PRESURIZE_FUEL_COMMAND);
-        currentState = EngineStates::PENDING_PRESSURIZED_FUEL;
         return;
     }
 
@@ -411,7 +407,6 @@ void MainWindow::handleCountdownUpdate()
     if(currentState == EngineStates::PRESSUREIZED_FUEL && countdownMs > IGNITION_START_POINT_MS)
     {
         emit issueCommand(IGNITION_COMMAND);
-        currentState = EngineStates::PENDING_IGNITION;
         return;
     }
 
@@ -590,7 +585,6 @@ void MainWindow::updateUIWithSensorData(const SensorData & data)
     // Oxidizer Line pressure
     this->ui->OxidizerLinePressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[5], 5, 'f', 2, QChar('0')));
     this->ui->OxidizerLinePressureChart->append(time, data.pressureTransducer[5]);
-
 }
 
 void MainWindow::configureCharts()
@@ -663,6 +657,4 @@ void MainWindow::setupConnections()
     connect(commsCenter, &SerialWorker::corruptedData, this, &MainWindow::handleCorruptedData, Qt::QueuedConnection);
     connect(commsCenter, &SerialWorker::signalReceived, this, &MainWindow::hanldleSignalReceived, Qt::QueuedConnection);
     connect(commsCenter, &SerialWorker::dataAvailable, this, &MainWindow::handleDataAvailable, Qt::QueuedConnection);
-
-
 }
