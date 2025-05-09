@@ -118,7 +118,7 @@ bool LogHandler::restartLogs()
 
 void LogHandler::logData(int countdownClockMS, const SensorData & data)
 {
-    qint64 unixTime = QDateTime::currentSecsSinceEpoch();
+    qint64 unixTime = QDateTime::currentMSecsSinceEpoch();
     QString localTime = QDateTime::currentDateTime().toString("HH:mm:ss.zzz");
     QString countdownTime = formatCountdown(countdownClockMS);
 
@@ -134,7 +134,7 @@ void LogHandler::logData(int countdownClockMS, const SensorData & data)
 
 void LogHandler::logEvent(int countdownClockMS, EventType eventType, const QString & message)
 {
-    qint64 unixTime = QDateTime::currentSecsSinceEpoch();
+    qint64 unixTime = QDateTime::currentMSecsSinceEpoch();
     QString localTime = QDateTime::currentDateTime().toString("HH:mm:ss.zzz");
     QString countdownTime = formatCountdown(countdownClockMS);
     QString messageType;
@@ -175,7 +175,7 @@ void LogHandler::logEvent(int countdownClockMS, EventType eventType, const QStri
 
 void LogHandler::logCorruptedData(int countdownClockMS, const QByteArray & corruptedData)
 {
-    qint64 unixTime = QDateTime::currentSecsSinceEpoch();
+    qint64 unixTime = QDateTime::currentMSecsSinceEpoch();
     QString localTime = QDateTime::currentDateTime().toString("HH:mm:ss.zzz");
     QString countdownTime = formatCountdown(countdownClockMS);
 

@@ -11,7 +11,7 @@ constexpr float voltageToTempScale = 0.005;
 constexpr float PSItoKPaFactor = 6.89476;
 constexpr char HEADER[] = "DataPack";
 
-#define MINIMUM_DATA_TRANSMIT_TIME_MS 100
+#define MINIMUM_DATA_TRANSMIT_TIME_MS 0
 
 typedef struct sensors_struct {
   char header[8];

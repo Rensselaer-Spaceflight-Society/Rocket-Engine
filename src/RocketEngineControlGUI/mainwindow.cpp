@@ -219,7 +219,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
     // We also shouldn't log pings since they happen so frequently.
     logger.logEvent(countdownMs, EventType::SignalReceived, signal + " was received. ");
 
-    qDebug() << "Current State: " << (int) currentState << ", Signal: " << signal;
+    // qDebug() << "Current State: " << (int) currentState << ", Signal: " << signal;
 
     if(signal == INVALID_COMMAND)
     {
@@ -450,6 +450,9 @@ void MainWindow::handleDataAvailable(const SensorData & data)
     // Log the data in the data log
     logger.logData(countdownMs, data);
 
+    numDataPacketsReceived++;
+
+    if (numDataPacketsReceived % 25 != 0) return;
     // Update the graphs and the data table
     this->updateUIWithSensorData(data);
 }

@@ -95,7 +95,7 @@ void SerialWorker::issueCommand(const QString &command)
 
 void SerialWorker::handleReadReady()
 {
-    // qDebug() << "Read Ready: " << serialPort->bytesAvailable();
+    qDebug() << "Read Ready: " << serialPort->bytesAvailable();
 
     dataBuffer->append(serialPort->readAll());
 

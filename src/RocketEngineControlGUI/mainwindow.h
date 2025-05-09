@@ -94,5 +94,6 @@ private:
     int countdownMs = COUNTDOWN_LENGTH_MS;
     int burnDurationMs = -1;
     int timeSinceLastPing = 0;
+    int numDataPacketsReceived = 0;
 };
 #endif // MAINWINDOW_H
