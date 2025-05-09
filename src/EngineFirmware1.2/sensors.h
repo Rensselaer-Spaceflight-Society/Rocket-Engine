@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include "Arduino.h"
 
 #ifndef __SENSORS_H_
 #define __SENSORS_H_
@@ -7,7 +9,9 @@
 
 constexpr float voltageToTempScale = 0.005;
 constexpr float PSItoKPaFactor = 6.89476;
-constexpr char HEADER[] = { 'D', 'a', 't', 'a', 'P', 'a', 'c', 'k' };
+constexpr char HEADER[] = "DataPack";
+
+#define MINIMUM_DATA_TRANSMIT_TIME_MS 100
 
 typedef struct sensors_struct {
   char header[8];
@@ -22,13 +26,12 @@ float processThermocoupleValue(int analogSignal) {
   return voltage / voltageToTempScale;  // Convert to Celsius
 }
 
-float read_loadcell(HX711& scale){
-   if (scale.is_ready()){
-     return ((float) (scale.read() +2383.0)/904.0 - 10);
+float read_loadcell(HX711 &scale) {
+  if (scale.is_ready()) {
+    return ((float)(scale.read() + 2383.0) / 904.0 - 10);
+  } else {
+    return 0;
   }
-   else{
-     return 0;
-   }
 }
 
 float processPressureValue(int analogSignal) {
@@ -40,8 +43,8 @@ float processPressureValue(int analogSignal) {
 }
 
 void checksum12(void *checksum, const void *data, int n) {
-  char *checksumPtr = (char *)checksum;
-  const char *dataPtr = (char *)data;
+  unsigned char *checksumPtr = (unsigned char *)checksum;
+  const unsigned char *dataPtr = (unsigned char *)data;
   memset(checksumPtr, 0, 12);
   for (int i = 0; i < n; ++i) {
     checksumPtr[i % 12] ^= dataPtr[i];
@@ -49,6 +52,8 @@ void checksum12(void *checksum, const void *data, int n) {
   }
 }
 
+
+#if READ_SENSORS
 void readSensorData(Sensors &sensorData) {
   // Copy the data header to the struct
   memcpy(&sensorData.header, HEADER, 8);
@@ -71,6 +76,31 @@ void readSensorData(Sensors &sensorData) {
   // Compute the checksum for the sensor data
   checksum12(&sensorData.checkSum, &sensorData, 52);
 }
+#else
+// If we are not reading from sensors, we should fudge a bunch of random data from 1-21
+void readSensorData(Sensors &sensorData) {
+  // Copy the data header to the struct
+  memcpy(&sensorData.header, HEADER, 8);
+
+  // TODO: Handle reading from the Load Cell
+  sensorData.loadCell =  ((float) rand()) / RAND_MAX * 20 + 1;
+
+  sensorData.pressure[0] =  ((float) rand()) / RAND_MAX * 20 + 1;
+  sensorData.pressure[1] =  ((float) rand()) / RAND_MAX * 20 + 1;
+  sensorData.pressure[2] =  ((float) rand()) / RAND_MAX * 20 + 1;
+  sensorData.pressure[3] =  ((float) rand()) / RAND_MAX * 20 + 1;
+  sensorData.pressure[4] =  ((float) rand()) / RAND_MAX * 20 + 1;
+  sensorData.pressure[5] =  ((float) rand()) / RAND_MAX * 20 + 1;
+
+  sensorData.thermocouple[0] =  ((float) rand()) / RAND_MAX * 20 + 1;
+  sensorData.thermocouple[1] =  ((float) rand()) / RAND_MAX * 20 + 1;
+  sensorData.thermocouple[2] =  ((float) rand()) / RAND_MAX * 20 + 1;
+  sensorData.thermocouple[3] =  ((float) rand()) / RAND_MAX * 20 + 1;
+
+  // Compute the checksum for the sensor data
+  checksum12(&sensorData.checkSum, &sensorData, 52);
+}
+#endif
 
 
 // TODO: Implement

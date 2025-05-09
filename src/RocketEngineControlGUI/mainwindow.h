@@ -26,10 +26,13 @@ enum class EngineStates : int8_t {
     NO_CONNECTION = -1,
     CONNECTION_ESTABLISHED,
     COUNTDOWN_STARTED,
+    NITROGEN_FLUSH_PENDING,
     NITROGEN_FLUSH_STARTED,
     NITROGEN_FLUSH_DONE,
+    PENDING_PRESSURIZED_FUEL,
     PRESSUREIZED_FUEL,
     HOLDING,
+    PENDING_IGNITION,
     IGNITION,
     PENDING_SHUTDOWN,
     SHUTDOWN_STARTED,
@@ -82,6 +85,7 @@ protected:
 private:
     Ui::MainWindow *ui;
     SerialWorker * commsCenter;
+    QThread * commsThread;
     AlertDialog * userAlert;
     QTimer * countdown;
     QTimer * pingCheck;

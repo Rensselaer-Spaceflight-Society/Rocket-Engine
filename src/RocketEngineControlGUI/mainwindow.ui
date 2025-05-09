@@ -287,6 +287,7 @@
       <widget class="QLabel" name="LoadCellValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -393,6 +394,7 @@
       <widget class="QLabel" name="FuelLinePressureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -432,6 +434,7 @@ Pressure</string>
       <widget class="QLabel" name="NozzleExitTempValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -477,6 +480,7 @@ Pressure</string>
       <widget class="QLabel" name="OxidizerInletTempValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -551,6 +555,7 @@ Pressure</string>
       <widget class="QLabel" name="FuelFeedPressureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -646,6 +651,7 @@ Temperature</string>
       <widget class="QLabel" name="EngineThroatTempValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -664,6 +670,7 @@ Temperature</string>
       <widget class="QLabel" name="OxidizerLinePressureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -724,6 +731,7 @@ Temperature</string>
       <widget class="QLabel" name="KeroseneTankPressureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -826,6 +834,7 @@ Pressure</string>
       <widget class="QLabel" name="FuelInletTempValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -879,6 +888,7 @@ Pressure</string>
       <widget class="QLabel" name="CompustionChamberPresureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -897,6 +907,7 @@ Pressure</string>
       <widget class="QLabel" name="OxidizerTankPressureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -990,6 +1001,7 @@ Pressure</string>
       <widget class="QLabel" name="CountdowLabel">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>24</pointsize>
         </font>
        </property>

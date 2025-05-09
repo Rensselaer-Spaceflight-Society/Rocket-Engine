@@ -16,21 +16,23 @@ LogHandler::~LogHandler()
 
 bool LogHandler::initialize()
 {
-    QString datetime = QDateTime::currentDateTime().toString("yyyy-mm-dd-HH:mm:ss");
-    QString dataFileName = QString("sensor-data-%1.csv").arg(datetime);
-    QString eventFileName = QString("event-log-%1.csv").arg(datetime);
-    QString corruptedDataFileName = QString("corrupted-data-%1.csv").arg(datetime);
+    QString datetime = QDateTime::currentDateTime().toString("yyyy-MM-dd-HH:mm:ss");
+    QString formattedOutputPath = outputPath+"/%1";
+    formattedOutputPath = formattedOutputPath.arg(datetime);
+    QString dataFileName = QString("sensor-data.csv");
+    QString eventFileName = QString("event-log.csv");
+    QString corruptedDataFileName = QString("corrupted-data.csv");
 
     // Make the folder if it doesn't already exist
 
-    QDir dir(outputPath);
+    QDir dir(formattedOutputPath);
     if (!dir.exists()) {
         dir.mkpath(".");  // Create the directory and any necessary parent directories
     }
 
-    QString dataFilePath = outputPath + "/" + dataFileName;
-    QString eventFilePath = outputPath + "/" + eventFileName;
-    QString corruptedDataFilePath = outputPath + "/" + corruptedDataFileName;
+    QString dataFilePath = formattedOutputPath + "/" + dataFileName;
+    QString eventFilePath = formattedOutputPath + "/" + eventFileName;
+    QString corruptedDataFilePath = formattedOutputPath + "/" + corruptedDataFileName;
 
     dataLog.setFileName(dataFilePath);
     eventLog.setFileName(eventFilePath);
@@ -178,7 +180,7 @@ void LogHandler::logCorruptedData(int countdownClockMS, const QByteArray & corru
     QString countdownTime = formatCountdown(countdownClockMS);
 
     corruptionStream << unixTime << ", " << localTime << ", " << countdownTime << ", "
-                     << (corruptedData).size() << ", " << (corruptedData).toHex();
+                     << (corruptedData).size() << ", " << (corruptedData).toHex() << "\n";
 
 }
 
