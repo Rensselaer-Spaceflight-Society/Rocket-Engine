@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QtCharts/QtCharts>
+#include "mainwindow.h"
+
 
 enum class ChartType {
     Force,
@@ -35,8 +37,8 @@ private:
     QValueAxis * axisX;
     QValueAxis * axisY;
     double maxYValue = 1;
-    double minXValue = 0;
-    double maxXValue = 1;
+    double minXValue = COUNTDOWN_LENGTH_MS;
+    double maxXValue = minXValue;
 };
 
 #endif // DATACHART_H

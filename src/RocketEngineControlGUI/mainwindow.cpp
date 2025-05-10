@@ -99,6 +99,7 @@ void MainWindow::handleStartCountdown()
         ui->StartCountdown->setText("Start Countdown");
         ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
         resetCharts();
+        timeSinceLogStart = 0;
         if(!logger.restartLogs())
         {
             userAlert->setAlertTitle("The logger failed to restart the logs");
@@ -284,6 +285,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
             ui->StartCountdown->setEnabled(true);
             ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
             resetCharts();
+            timeSinceLogStart = 0;
             if(!logger.restartLogs())
             {
                 userAlert->setAlertTitle("The logger failed to restart the logs");
@@ -368,12 +370,16 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
 
 void MainWindow::handleCountdownUpdate()
 {
+    timeSinceLogStart += (float) EVENT_POLL_DURATION_MS / 1000;
+
     // If we are holding then we shouldn't be updating the countdown;
     if(currentState == EngineStates::HOLDING) {
         return;
     }
 
     countdownMs += EVENT_POLL_DURATION_MS;
+
+
     QString countdownTimerText = LogHandler::formatCountdown(countdownMs);
     ui->CountdowLabel->setText(countdownTimerText);
 
@@ -421,6 +427,7 @@ void MainWindow::handleCountdownUpdate()
 void MainWindow::handlePingCheck()
 {
     timeSinceLastPing+=EVENT_POLL_DURATION_MS;
+
 
     if(timeSinceLastPing < MAX_PING_NON_RESPONSE_DELAY_MS || currentState < EngineStates::CONNECTION_ESTABLISHED) return;
 
@@ -543,51 +550,50 @@ void MainWindow::updateUIWithSensorData(const SensorData & data)
     */
 
     // TODO: Add Coloring to the Labels for Values out of spec
-    float time = (float) countdownMs / 1000;
 
     // Load Cell
     this->ui->LoadCellValue->setText(QString("%1 N").arg(data.loadCell, 5, 'f', 2, QChar('0')));
-    this->ui->LoadCellChart->append(time, data.loadCell);
+    this->ui->LoadCellChart->append(timeSinceLogStart, data.loadCell);
 
     // Kerosene Inlet
     this->ui->FuelInletTempValue->setText(QString("%1 C").arg(data.thermocouple[0], 5, 'f', 2, QChar('0')));
-    this->ui->FuelInletChart->append(time, data.thermocouple[0]);
+    this->ui->FuelInletChart->append(timeSinceLogStart, data.thermocouple[0]);
 
     // Oxidizer Inlet
     this->ui->OxidizerInletTempValue->setText(QString("%1 C").arg(data.thermocouple[1], 5, 'f', 2, QChar('0')));
-    this->ui->OxidizerInletChart->append(time, data.thermocouple[1]);
+    this->ui->OxidizerInletChart->append(timeSinceLogStart, data.thermocouple[1]);
 
     // Engine Throat
     this->ui->EngineThroatTempValue->setText(QString("%1 C").arg(data.thermocouple[2], 5, 'f', 2, QChar('0')));
-    this->ui->EngineThroatChart->append(time, data.thermocouple[2]);
+    this->ui->EngineThroatChart->append(timeSinceLogStart, data.thermocouple[2]);
 
     // Nozzle Near Exit
     this->ui->NozzleExitTempValue->setText(QString("%1 C").arg(data.thermocouple[3], 5, 'f', 2, QChar('0')));
-    this->ui->NozzleExitChart->append(time, data.thermocouple[3]);
+    this->ui->NozzleExitChart->append(timeSinceLogStart, data.thermocouple[3]);
 
     // Combustion Chamber
     this->ui->CompustionChamberPresureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[0], 5, 'f', 2, QChar('0')));
-    this->ui->CombustionChamberPressureChart->append(time, data.pressureTransducer[0]);
+    this->ui->CombustionChamberPressureChart->append(timeSinceLogStart, data.pressureTransducer[0]);
 
     // Fuel Feed Line Pressure
     this->ui->FuelFeedPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[1], 5, 'f', 2, QChar('0')));
-    this->ui->FuelFeedPressureChart->append(time, data.pressureTransducer[1]);
+    this->ui->FuelFeedPressureChart->append(timeSinceLogStart, data.pressureTransducer[1]);
 
     // Kerosene Tank Pressure
     this->ui->KeroseneTankPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[2], 5, 'f', 2, QChar('0')));
-    this->ui->FuelTankPressureChart->append(time, data.pressureTransducer[2]);
+    this->ui->FuelTankPressureChart->append(timeSinceLogStart, data.pressureTransducer[2]);
 
     // Kerosene Line Pressure
     this->ui->FuelLinePressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[3], 5, 'f', 2, QChar('0')));
-    this->ui->FuelLinePressureChart->append(time, data.pressureTransducer[3]);
+    this->ui->FuelLinePressureChart->append(timeSinceLogStart, data.pressureTransducer[3]);
 
     // Oxidizer Tank Pressure
     this->ui->OxidizerTankPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[4], 5, 'f', 2, QChar('0')));
-    this->ui->OxidizerTankPressureChart->append(time, data.pressureTransducer[4]);
+    this->ui->OxidizerTankPressureChart->append(timeSinceLogStart, data.pressureTransducer[4]);
 
     // Oxidizer Line pressure
     this->ui->OxidizerLinePressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[5], 5, 'f', 2, QChar('0')));
-    this->ui->OxidizerLinePressureChart->append(time, data.pressureTransducer[5]);
+    this->ui->OxidizerLinePressureChart->append(timeSinceLogStart, data.pressureTransducer[5]);
 }
 
 void MainWindow::configureCharts()
