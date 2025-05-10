@@ -13,7 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
     commsCenter(new SerialWorker(this)),
     commsThread(new QThread(this)),
     countdown(new QTimer()),
-    pingCheck(new QTimer())
+    pingCheck(new QTimer()),
+    telemetry(new QTimer())
 {
     ui->setupUi(this);
 
@@ -206,6 +207,7 @@ void MainWindow::handleCommandFailed(const QString & command)
     handleShutdown();
     pingCheck->stop();
     countdown->stop();
+    telemetry->stop();
     emit setPings(false);
     ui->AbortButton->setDisabled(true);
     ui->StartCountdown->setText("Attempt Reconnection");
@@ -213,9 +215,14 @@ void MainWindow::handleCommandFailed(const QString & command)
 
 void MainWindow::hanldleSignalReceived(const QString & signal)
 {
+    okBitsRecieved += BYTES_IN_COMMAND * 10;
+
 
     timeSinceLastPing = 0; // All command responses indicate that two way comms are still active
-    if(signal == PING_COMMAND) return; // If the signal is a ping then we have already done all that we need to
+    if(signal == PING_COMMAND) {
+        pingsReceived++;
+        return;
+    } // If the signal is a ping then we have already done all that we need to
 
     // We also shouldn't log pings since they happen so frequently.
     logger.logEvent(countdownMs, EventType::SignalReceived, signal + " was received. ");
@@ -225,6 +232,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
     if(signal == INVALID_COMMAND)
     {
         logger.logEvent(countdownMs, EventType::Warning, "The engine indicated that it received an invalid command.");
+        invalidCommandReceived++;
         return;
     }
 
@@ -238,6 +246,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         userAlert->show();
         countdown->stop();
         pingCheck->stop();
+        telemetry->stop();
         emit setPings(false);
         ui->AbortButton->setEnabled(false);
         ui->StartCountdown->setText("Attempt Reconnection");
@@ -285,6 +294,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
             ui->StartCountdown->setEnabled(true);
             ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
             resetCharts();
+            telemetry->start(1000);
             timeSinceLogStart = 0;
             if(!logger.restartLogs())
             {
@@ -457,9 +467,13 @@ void MainWindow::handleDataAvailable(const SensorData & data)
     // Log the data in the data log
     logger.logData(countdownMs, data);
 
-    numDataPacketsReceived++;
+    totalDataPacketsReceived++;
+    packetsReceived++;
 
-    if (numDataPacketsReceived % 25 != 0) return;
+    // 10 bits for the byte, start, and stop bit
+    okBitsRecieved += sizeof(SensorData) * 10;
+
+    if (totalDataPacketsReceived % 25 != 0) return;
     // Update the graphs and the data table
     this->updateUIWithSensorData(data);
 }
@@ -473,6 +487,15 @@ void MainWindow::handleCorruptedData(const QByteArray & data)
         EventType::CorruptedData,
         QString::number(data.size())+ " Bytes of Corrupted Data recieved and logged. "
         );
+
+    if (data.size() == 8){
+        // We send 8 bytes as corrupted as context, but only so far have we shown that
+        // 10 bits (1 byte + start bit + stop bit) are corrupted.
+        corruptedDataBitsRecieved += 10;
+    }else{
+        // Otherwise we have a data packet that failed the checksum
+        corruptedDataBitsRecieved += sizeof(SensorData) * 10;
+    }
 
     // Log the corrupted data
     logger.logCorruptedData(countdownMs, data);
@@ -516,6 +539,22 @@ void MainWindow::handlePortOpenSuccess()
 
     // Try to connect to the engine
     emit issueCommand(CONTROL_ACTIVE_COMMAND);
+}
+
+void MainWindow::handleTelemetryUpdate()
+{
+    float dataRateKbps = (float) (this->okBitsRecieved + this->corruptedDataBitsRecieved) / 1000.0;
+    ui->DataRateValue->setText(QString("In Data Rate (Kbps): %1").arg(dataRateKbps, 0, 'f', 1, '0'));
+    ui->InvalidCommandRateValue->setText(QString("Invalid Command Rate (Hz): %1").arg(invalidCommandReceived));
+    ui->CorruptedDataRateValue->setText(QString("Corrupted Data Rate (bps): %1").arg(corruptedDataBitsRecieved));
+    ui->PacketRateValue->setText(QString("Packet Rate (Hz): %1").arg(packetsReceived));
+    ui->PingRateValue->setText(QString("Ping Rate (Hz): %1").arg(pingsReceived));
+
+    okBitsRecieved = 0;
+    corruptedDataBitsRecieved = 0;
+    invalidCommandReceived = 0;
+    packetsReceived = 0;
+    pingsReceived = 0;
 }
 
 QStringList MainWindow::getSerialPorts()
@@ -571,10 +610,6 @@ void MainWindow::updateUIWithSensorData(const SensorData & data)
     this->ui->NozzleExitTempValue->setText(QString("%1 C").arg(data.thermocouple[3], 5, 'f', 2, QChar('0')));
     this->ui->NozzleExitChart->append(timeSinceLogStart, data.thermocouple[3]);
 
-    // Combustion Chamber
-    this->ui->CompustionChamberPresureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[0], 5, 'f', 2, QChar('0')));
-    this->ui->CombustionChamberPressureChart->append(timeSinceLogStart, data.pressureTransducer[0]);
-
     // Fuel Feed Line Pressure
     this->ui->FuelFeedPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[1], 5, 'f', 2, QChar('0')));
     this->ui->FuelFeedPressureChart->append(timeSinceLogStart, data.pressureTransducer[1]);
@@ -619,8 +654,6 @@ void MainWindow::configureCharts()
     ui->FuelTankPressureChart->setChartType(ChartType::Pressure);
     ui->FuelLinePressureChart->setChartTitle("Fuel Line Pressure");
     ui->FuelLinePressureChart->setChartType(ChartType::Pressure);
-    ui->CombustionChamberPressureChart->setChartTitle("Combustion Chamber Pressure");
-    ui->CombustionChamberPressureChart->setChartType(ChartType::Pressure);
     ui->FuelFeedPressureChart->setChartTitle("Kerosene Feed Line Pressure");
     ui->FuelFeedPressureChart->setChartType(ChartType::Pressure);
 }
@@ -636,7 +669,6 @@ void MainWindow::resetCharts()
     ui->OxidizerLinePressureChart->reset();
     ui->FuelTankPressureChart->reset();
     ui->FuelLinePressureChart->reset();
-    ui->CombustionChamberPressureChart->reset();
     ui->FuelFeedPressureChart->reset();
 }
 
@@ -650,6 +682,7 @@ void MainWindow::setupConnections()
     // Connecting Timers
     connect(countdown, &QTimer::timeout, this, &MainWindow::handleCountdownUpdate);
     connect(pingCheck, &QTimer::timeout, this, &MainWindow::handlePingCheck);
+    connect(telemetry, &QTimer::timeout, this, &MainWindow::handleTelemetryUpdate);
 
     // Connecting UI
     connect(ui->StartCountdown, &QPushButton::clicked, this, &MainWindow::handleStartCountdown);

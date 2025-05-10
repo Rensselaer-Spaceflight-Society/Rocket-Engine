@@ -61,7 +61,7 @@ void readSensorData(Sensors &sensorData) {
   // TODO: Handle reading from the Load Cell
   sensorData.loadCell = read_loadcell(scale);
 
-  sensorData.pressure[0] = processPressureValue(analogRead(PRESSSEN1));
+  sensorData.pressure[0] = 0; // This sensor is unused and so we always return 0.
   sensorData.pressure[1] = processPressureValue(analogRead(PRESSSEN2));
   sensorData.pressure[2] = processPressureValue(analogRead(PRESSSEN3));
   sensorData.pressure[3] = processPressureValue(analogRead(PRESSSEN4));
@@ -85,7 +85,7 @@ void readSensorData(Sensors &sensorData) {
   // TODO: Handle reading from the Load Cell
   sensorData.loadCell =  ((float) rand()) / RAND_MAX * 20 + 1;
 
-  sensorData.pressure[0] =  ((float) rand()) / RAND_MAX * 20 + 1;
+  sensorData.pressure[0] =  0;
   sensorData.pressure[1] =  ((float) rand()) / RAND_MAX * 20 + 1;
   sensorData.pressure[2] =  ((float) rand()) / RAND_MAX * 20 + 1;
   sensorData.pressure[3] =  ((float) rand()) / RAND_MAX * 20 + 1;

@@ -27,6 +27,8 @@ SerialWorker::~SerialWorker()
 {
     delete serialPort;
     delete dataBuffer;
+    commandTimer->stop();
+    delete commandTimer;
 }
 
 void SerialWorker::checksum12(void *checksum, const void *data, int n) {

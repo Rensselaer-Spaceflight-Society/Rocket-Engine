@@ -66,6 +66,8 @@ private slots:
 
     void handleSerialError(QSerialPort::SerialPortError error, const QString & errorString);
 
+    void handleTelemetryUpdate();
+
 signals:
     void issueCommand(const QString & command);
     void setPings(bool value);
@@ -86,6 +88,7 @@ private:
     AlertDialog * userAlert;
     QTimer * countdown;
     QTimer * pingCheck;
+    QTimer * telemetry;
     LogHandler logger;
     EngineStates currentState = EngineStates::NO_CONNECTION;
     EngineStates beforeHoldState = currentState;
@@ -94,7 +97,14 @@ private:
     int countdownMs = COUNTDOWN_LENGTH_MS;
     int burnDurationMs = -1;
     int timeSinceLastPing = 0;
-    int numDataPacketsReceived = 0;
+    int totalDataPacketsReceived = 0;
     float timeSinceLogStart = 0;
+
+    // Communications Telemetry Variables
+    int okBitsRecieved = 0;
+    int pingsReceived = 0;
+    int packetsReceived = 0;
+    int invalidCommandReceived = 0;
+    int corruptedDataBitsRecieved = 0;
 };
 #endif // MAINWINDOW_H
