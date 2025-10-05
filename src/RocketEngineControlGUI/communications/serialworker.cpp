@@ -8,7 +8,7 @@ SerialWorker::SerialWorker(MainWindow * window, QObject *parent)
     commandTimer(new QTimer(this))
 {
     // TODO: Configure Serial Port to match the test stand config
-    this->serialPort->setBaudRate(QSerialPort::BaudRate::Baud9600);
+    this->serialPort->setBaudRate(76800);
     this->serialPort->setParity(QSerialPort::Parity::NoParity);
     this->serialPort->setFlowControl(QSerialPort::FlowControl::NoFlowControl);
     this->serialPort->setDataBits(QSerialPort::DataBits::Data8);
@@ -27,6 +27,8 @@ SerialWorker::~SerialWorker()
 {
     delete serialPort;
     delete dataBuffer;
+    commandTimer->stop();
+    delete commandTimer;
 }
 
 void SerialWorker::checksum12(void *checksum, const void *data, int n) {
@@ -39,11 +41,11 @@ void SerialWorker::checksum12(void *checksum, const void *data, int n) {
     }
 }
 
-void SerialWorker::processSensorData()
+void SerialWorker::processSensorData(QByteArray && data)
 {
     // 1. Compute the checksum of the incomming data
     QByteArray incommingDataChecksum(CHECKSUM_SIZE, 0);
-    checksum12(incommingDataChecksum.data(), dataBuffer->data(), sizeof(SensorData)-CHECKSUM_SIZE);
+    checksum12(incommingDataChecksum.data(), data.data(), sizeof(SensorData)-CHECKSUM_SIZE);
 
     // 2. Compare the computed checksum and the existing one
     const char * receivedChecksumPointer = dataBuffer->data() + sizeof(SensorData)-CHECKSUM_SIZE;
@@ -86,58 +88,54 @@ void SerialWorker::setStartPings(bool value)
 
 void SerialWorker::issueCommand(const QString &command)
 {
+    if (command != commandToSend){
+        commandRetries = 0;
+    }
+
     commandToSend = command;
 }
 
 void SerialWorker::handleReadReady()
 {
-    // qDebug() << "Read Ready: " << serialPort->bytesAvailable();
-    // If there is not already sensor data in the buffer and there is not a full command
-    // wait until there is a full command
-    if(dataBuffer->size() == 0 && serialPort->bytesAvailable() < BYTES_IN_COMMAND) return;
+    qDebug() << "Read Ready: " << serialPort->bytesAvailable();
 
-    // If there is already sensor data then we should try to fill the buffer and process it
-    if(dataBuffer->size() > 0)
-    {
-        dataBuffer->append(serialPort->read(sizeof(SensorData)-dataBuffer->size()));
-        if(dataBuffer->size() == sizeof(SensorData))
-        {
-            processSensorData();
-            // After processing clear the buffer to indicate that we can move to the next packet
-            dataBuffer->clear();
+    dataBuffer->append(serialPort->readAll());
+
+    while(dataBuffer->size() >= BYTES_IN_COMMAND) {
+        // First we look for a data header to parse a data packet
+        if (memcmp(dataBuffer->data(), EXPECTED_DATA_HEADER, BYTES_IN_COMMAND) == 0) {
+            // Can we parse a full data packet?
+            if (dataBuffer->size() >= sizeof(SensorData)) {
+                processSensorData(dataBuffer->first(sizeof(SensorData)));
+                dataBuffer->remove(0, sizeof(SensorData));
+            } else {
+                // Wait for full SensorData to arrive
+                break;
+            }
         }
-        // If we cannot fill the buffer, then we return and wait until the read ready signal is sent
-        // to continue to fill the buffer
-        return;
-    }
+        else {
+            // Then we check for a command response from the engine
+            bool matchedSignal = false;
+            for (const auto & signal: EngineSignals) {
+                if (memcmp(dataBuffer->data(), signal.toStdString().data(), BYTES_IN_COMMAND) == 0) {
+                    // Emit that the signal was received, and then remove it from the buffer
+                    emit signalReceived(signal);
+                    dataBuffer->remove(0, BYTES_IN_COMMAND);
+                    matchedSignal = true;
+                    commandToSend.clear();
+                    commandRetries = 0;
+                    break;
+                }
+            }
 
-    // If there is not already sensor data then we read 8 bytes and check its value to see if its a
-    // data header, engine signal, or corrupted data
-    dataBuffer->append(serialPort->read(BYTES_IN_COMMAND));
-
-    // Then check if its a sensor data header and if it is then just leave it in the buffer and wait for more
-    // data
-
-    if(!memcmp(dataBuffer->data(), EXPECTED_DATA_HEADER, BYTES_IN_COMMAND)) return;
-
-    // Check if its any of the signals and emit if it is
-    for(const auto & signal: EngineSignals) {
-        if(!memcmp(dataBuffer->data(), signal.toStdString().data(), BYTES_IN_COMMAND))
-        {
-            commandToSend.clear();
-            commandRetries = 0;
-            emit signalReceived(signal);
-            dataBuffer->clear();
-            return;
+            if (!matchedSignal) {
+                // Unknown header, drop one byte and retry
+                QByteArray corrupted = dataBuffer->left(BYTES_IN_COMMAND);
+                emit corruptedData(corrupted);
+                dataBuffer->remove(0, 1); // shift by one byte to resync
+            }
         }
     }
-
-    // If the data is not an engine signal then we have an invalid signal and we can copy the buffer and emit as
-    // corrupted data and clear the data buffer
-
-    QByteArray bufferCopy = *dataBuffer;
-    emit corruptedData(bufferCopy);
-    dataBuffer->clear();
 
 }
 
@@ -162,7 +160,7 @@ void SerialWorker::handleTimeout()
             commandRetries = 0;
             emit commandFailed(commandToSend);
             commandToSend.clear();
-            commandRetries = 0;
+            return;
         }
 
         qDebug() << commandToSend.toUtf8();
@@ -177,6 +175,7 @@ void SerialWorker::handleTimeout()
     if(!startPings) return;
 
     serialPort->write(PING_COMMAND);
+    serialPort->flush();
     emit commandAttempt(PING_COMMAND);
 }
 

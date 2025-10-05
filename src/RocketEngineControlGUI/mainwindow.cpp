@@ -3,7 +3,7 @@
 
 #include "./ui_mainwindow.h"
 #include "mainwindow.h"
-#define DATA_OUTPUT_PATH "../../data"
+#define DATA_OUTPUT_PATH "../../../../data"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -11,30 +11,34 @@ MainWindow::MainWindow(QWidget *parent)
     logger(DATA_OUTPUT_PATH),
     userAlert(new AlertDialog()),
     commsCenter(new SerialWorker(this)),
+    commsThread(new QThread(this)),
     countdown(new QTimer()),
-    pingCheck(new QTimer())
+    pingCheck(new QTimer()),
+    telemetry(new QTimer())
 {
     ui->setupUi(this);
 
-    handleSerialPortRefresh();
 
-    if(!logger.initialize())
-    {
-        userAlert->setAlertTitle("Logging Failed to Start");
-        userAlert->setAlertDescription("One or more of the log files failed to open, please check permissions and try again. ");
-        userAlert->show();
-    }
+    commsCenter->moveToThread(commsThread);
+    this->setupConnections();
+    commsThread->start();
+    handleSerialPortRefresh();
 
     // Disable the Abort and Countdown Button until a connection is established
     ui->AbortButton->setDisabled(true);
     ui->StartCountdown->setDisabled(true);
-    this->setupConnections();
     this->configureCharts();
 }
 
 MainWindow::~MainWindow()
 {
-    delete commsCenter;
+    if (commsThread) {
+        commsThread->quit();
+        commsThread->wait();
+
+        delete commsCenter;   // only if you didn't set a parent
+        delete commsThread;
+    }
     delete userAlert;
     delete countdown;
     delete pingCheck;
@@ -72,11 +76,6 @@ void MainWindow::handleStartCountdown()
     if(currentState == EngineStates::NO_CONNECTION)
     {
         emit setPings(false);
-        ui->AbortButton->setDisabled(true);
-        ui->StartCountdown->setText("Start Countdown");
-        countdownMs = COUNTDOWN_LENGTH_MS;
-        pastAutoHold = false;
-        ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
         emit issueCommand(CONTROL_ACTIVE_COMMAND);
         return;
     }
@@ -101,6 +100,7 @@ void MainWindow::handleStartCountdown()
         ui->StartCountdown->setText("Start Countdown");
         ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
         resetCharts();
+        timeSinceLogStart = 0;
         if(!logger.restartLogs())
         {
             userAlert->setAlertTitle("The logger failed to restart the logs");
@@ -170,6 +170,8 @@ void MainWindow::handleSerialPortSelection(int index)
 
 void MainWindow::handleCommandAttempt(const QString & command)
 {
+    // Ignore pings since they are sent so frequently
+    if (command == PING_COMMAND) return;
     // Log the attempt since the serial worker should handle repetition
     logger.logEvent(countdownMs, EventType::CommandSent, command + " Sent to Motor");
 }
@@ -198,10 +200,14 @@ void MainWindow::handleCommandFailed(const QString & command)
 
     currentState = EngineStates::NO_CONNECTION;
 
+    // If the Shutdown command has failed then we must assume that the engine's firmware
+    // has kicked in and shut the engine down.
+    if (command == SHUTDOWN_COMMAND) return;
     // Try to shutdown assuming the connection from the rocket is the one that is severed
     handleShutdown();
     pingCheck->stop();
     countdown->stop();
+    telemetry->stop();
     emit setPings(false);
     ui->AbortButton->setDisabled(true);
     ui->StartCountdown->setText("Attempt Reconnection");
@@ -209,16 +215,24 @@ void MainWindow::handleCommandFailed(const QString & command)
 
 void MainWindow::hanldleSignalReceived(const QString & signal)
 {
+    okBitsRecieved += BYTES_IN_COMMAND * 10;
+
 
     timeSinceLastPing = 0; // All command responses indicate that two way comms are still active
+    if(signal == PING_COMMAND) {
+        pingsReceived++;
+        return;
+    } // If the signal is a ping then we have already done all that we need to
+
+    // We also shouldn't log pings since they happen so frequently.
     logger.logEvent(countdownMs, EventType::SignalReceived, signal + " was received. ");
 
-    // If the signal is a ping then we have already done all that we need to
-    if(signal == PING_COMMAND) return;
+    // qDebug() << "Current State: " << (int) currentState << ", Signal: " << signal;
 
     if(signal == INVALID_COMMAND)
     {
         logger.logEvent(countdownMs, EventType::Warning, "The engine indicated that it received an invalid command.");
+        invalidCommandReceived++;
         return;
     }
 
@@ -232,6 +246,7 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         userAlert->show();
         countdown->stop();
         pingCheck->stop();
+        telemetry->stop();
         emit setPings(false);
         ui->AbortButton->setEnabled(false);
         ui->StartCountdown->setText("Attempt Reconnection");
@@ -249,7 +264,6 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         currentState = EngineStates::SHUTDOWN_STARTED;
         ui->AbortButton->setText("Shutdown Started");
         ui->StartCountdown->setDisabled(true);
-         countdown->stop();
         ui->EngineStatus->setText("Shutdown Started");
         return;
     }
@@ -269,13 +283,25 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         if(signal == CONTROL_ACTIVE_COMMAND)
         {
             currentState = EngineStates::CONNECTION_ESTABLISHED;
+            emit setPings(true);
             pingCheck->start(EVENT_POLL_DURATION_MS);
             ui->StartCountdown->setEnabled(true);
-            ui->AbortButton->setEnabled(true);
             ui->StartCountdown->setText("Start Countdown");
             ui->AbortButton->setDisabled(true);
             ui->EngineStatus->setText("Connection Established");
-            emit setPings(true);
+            countdownMs = COUNTDOWN_LENGTH_MS;
+            pastAutoHold = false;
+            ui->StartCountdown->setEnabled(true);
+            ui->CountdowLabel->setText(LogHandler::formatCountdown(countdownMs));
+            resetCharts();
+            telemetry->start(1000);
+            timeSinceLogStart = 0;
+            if(!logger.restartLogs())
+            {
+                userAlert->setAlertTitle("The logger failed to restart the logs");
+                userAlert->setAlertDescription("The logger failed to reset the logs, please check file permissions.");
+                userAlert->show();
+            }
             return;
         }
     }
@@ -335,8 +361,6 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         }
     }
 
-
-
     if(currentState == EngineStates::SHUTDOWN_STARTED || currentState == EngineStates::PENDING_SHUTDOWN)
     {
         if(signal == SHUTDOWN_CONFIRMED)
@@ -356,13 +380,16 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
 
 void MainWindow::handleCountdownUpdate()
 {
+    timeSinceLogStart += (float) EVENT_POLL_DURATION_MS / 1000;
+
     // If we are holding then we shouldn't be updating the countdown;
     if(currentState == EngineStates::HOLDING) {
         return;
     }
 
-
     countdownMs += EVENT_POLL_DURATION_MS;
+
+
     QString countdownTimerText = LogHandler::formatCountdown(countdownMs);
     ui->CountdowLabel->setText(countdownTimerText);
 
@@ -400,19 +427,17 @@ void MainWindow::handleCountdownUpdate()
     }
 
     // Handle Shutdown After We Have Burned for the Full Duration
-    if(currentState == EngineStates::IGNITION && countdownMs > burnDurationMs)
+    if((currentState == EngineStates::IGNITION && countdownMs > burnDurationMs) || currentState == EngineStates::PENDING_SHUTDOWN)
     {
-        emit issueCommand(SHUTDOWN_COMMAND);
-        currentState = EngineStates::PENDING_SHUTDOWN;
-        ui->AbortButton->setText("Pending Shutdown");
-        ui->EngineStatus->setText("Pending Shutdown");
-        ui->AbortButton->setDisabled(true);
+        handleShutdown();
+        return;
     }
 }
 
 void MainWindow::handlePingCheck()
 {
     timeSinceLastPing+=EVENT_POLL_DURATION_MS;
+
 
     if(timeSinceLastPing < MAX_PING_NON_RESPONSE_DELAY_MS || currentState < EngineStates::CONNECTION_ESTABLISHED) return;
 
@@ -437,9 +462,18 @@ void MainWindow::handlePingCheck()
 
 void MainWindow::handleDataAvailable(const SensorData & data)
 {
+    // Data also can act as a ping, indicating an intact connection
+    timeSinceLastPing = 0;
     // Log the data in the data log
     logger.logData(countdownMs, data);
 
+    totalDataPacketsReceived++;
+    packetsReceived++;
+
+    // 10 bits for the byte, start, and stop bit
+    okBitsRecieved += sizeof(SensorData) * 10;
+
+    if (totalDataPacketsReceived % 25 != 0) return;
     // Update the graphs and the data table
     this->updateUIWithSensorData(data);
 }
@@ -453,6 +487,15 @@ void MainWindow::handleCorruptedData(const QByteArray & data)
         EventType::CorruptedData,
         QString::number(data.size())+ " Bytes of Corrupted Data recieved and logged. "
         );
+
+    if (data.size() == 8){
+        // We send 8 bytes as corrupted as context, but only so far have we shown that
+        // 10 bits (1 byte + start bit + stop bit) are corrupted.
+        corruptedDataBitsRecieved += 10;
+    }else{
+        // Otherwise we have a data packet that failed the checksum
+        corruptedDataBitsRecieved += sizeof(SensorData) * 10;
+    }
 
     // Log the corrupted data
     logger.logCorruptedData(countdownMs, data);
@@ -473,6 +516,8 @@ void MainWindow::handlePortOpenFailed()
 
 void MainWindow::handleSerialError(QSerialPort::SerialPortError error, const QString & errorStr)
 {
+    logger.logEvent(countdownMs, EventType::SerialError, QString::number(error) + ": " + errorStr);
+
     if(error == 0) return;
 
     userAlert->setAlertTitle("Serial Error Occurred Code: " + QString::number(error));
@@ -494,6 +539,22 @@ void MainWindow::handlePortOpenSuccess()
 
     // Try to connect to the engine
     emit issueCommand(CONTROL_ACTIVE_COMMAND);
+}
+
+void MainWindow::handleTelemetryUpdate()
+{
+    float dataRateKbps = (float) (this->okBitsRecieved + this->corruptedDataBitsRecieved) / 1000.0;
+    ui->DataRateValue->setText(QString("In Data Rate (Kbps): %1").arg(dataRateKbps, 0, 'f', 1, '0'));
+    ui->InvalidCommandRateValue->setText(QString("Invalid Command Rate (Hz): %1").arg(invalidCommandReceived));
+    ui->CorruptedDataRateValue->setText(QString("Corrupted Data Rate (bps): %1").arg(corruptedDataBitsRecieved));
+    ui->PacketRateValue->setText(QString("Packet Rate (Hz): %1").arg(packetsReceived));
+    ui->PingRateValue->setText(QString("Ping Rate (Hz): %1").arg(pingsReceived));
+
+    okBitsRecieved = 0;
+    corruptedDataBitsRecieved = 0;
+    invalidCommandReceived = 0;
+    packetsReceived = 0;
+    pingsReceived = 0;
 }
 
 QStringList MainWindow::getSerialPorts()
@@ -528,52 +589,46 @@ void MainWindow::updateUIWithSensorData(const SensorData & data)
     */
 
     // TODO: Add Coloring to the Labels for Values out of spec
-    float time = (float) countdownMs / 1000;
 
     // Load Cell
-    this->ui->LoadCellValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " N");
-    this->ui->LoadCellChart->append(time, data.loadCell);
+    this->ui->LoadCellValue->setText(QString("%1 N").arg(data.loadCell, 5, 'f', 2, QChar('0')));
+    this->ui->LoadCellChart->append(timeSinceLogStart, data.loadCell);
 
     // Kerosene Inlet
-    this->ui->FuelInletTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
-    this->ui->FuelInletChart->append(time, data.thermocouple[0]);
+    this->ui->FuelInletTempValue->setText(QString("%1 C").arg(data.thermocouple[0], 5, 'f', 2, QChar('0')));
+    this->ui->FuelInletChart->append(timeSinceLogStart, data.thermocouple[0]);
 
     // Oxidizer Inlet
-    this->ui->OxidizerInletTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
-    this->ui->OxidizerInletChart->append(time, data.thermocouple[1]);
+    this->ui->OxidizerInletTempValue->setText(QString("%1 C").arg(data.thermocouple[1], 5, 'f', 2, QChar('0')));
+    this->ui->OxidizerInletChart->append(timeSinceLogStart, data.thermocouple[1]);
 
     // Engine Throat
-    this->ui->EngineThroatTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
-    this->ui->EngineThroatChart->append(time, data.thermocouple[2]);
+    this->ui->EngineThroatTempValue->setText(QString("%1 C").arg(data.thermocouple[2], 5, 'f', 2, QChar('0')));
+    this->ui->EngineThroatChart->append(timeSinceLogStart, data.thermocouple[2]);
 
     // Nozzle Near Exit
-    this->ui->NozzleExitTempValue->setText(QString::number(data.thermocouple[1], 'g', 2 ) + " C");
-    this->ui->NozzleExitChart->append(time, data.thermocouple[3]);
-
-    // Combustion Chamber
-    this->ui->CompustionChamberPresureValue->setText(QString::number(data.pressureTransducer[0], 'g', 2));
-    this->ui->CombustionChamberPressureChart->append(time, data.pressureTransducer[0]);
+    this->ui->NozzleExitTempValue->setText(QString("%1 C").arg(data.thermocouple[3], 5, 'f', 2, QChar('0')));
+    this->ui->NozzleExitChart->append(timeSinceLogStart, data.thermocouple[3]);
 
     // Fuel Feed Line Pressure
-    this->ui->FuelFeedPressureValue->setText(QString::number(data.pressureTransducer[1], 'g', 2));
-    this->ui->FuelFeedPressureChart->append(time, data.pressureTransducer[1]);
+    this->ui->FuelFeedPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[1], 5, 'f', 2, QChar('0')));
+    this->ui->FuelFeedPressureChart->append(timeSinceLogStart, data.pressureTransducer[1]);
 
     // Kerosene Tank Pressure
-    this->ui->KeroseneTankPressureValue->setText(QString::number(data.pressureTransducer[2], 'g', 2));
-    this->ui->FuelTankPressureChart->append(time, data.pressureTransducer[2]);
+    this->ui->KeroseneTankPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[2], 5, 'f', 2, QChar('0')));
+    this->ui->FuelTankPressureChart->append(timeSinceLogStart, data.pressureTransducer[2]);
 
     // Kerosene Line Pressure
-    this->ui->FuelLinePressureValue->setText(QString::number(data.pressureTransducer[3], 'g', 2));
-    this->ui->FuelLinePressureChart->append(time, data.pressureTransducer[3]);
+    this->ui->FuelLinePressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[3], 5, 'f', 2, QChar('0')));
+    this->ui->FuelLinePressureChart->append(timeSinceLogStart, data.pressureTransducer[3]);
 
     // Oxidizer Tank Pressure
-    this->ui->OxidizerTankPressureValue->setText(QString::number(data.pressureTransducer[4], 'g', 2));
-    this->ui->OxidizerTankPressureChart->append(time, data.pressureTransducer[4]);
+    this->ui->OxidizerTankPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[4], 5, 'f', 2, QChar('0')));
+    this->ui->OxidizerTankPressureChart->append(timeSinceLogStart, data.pressureTransducer[4]);
 
     // Oxidizer Line pressure
-    this->ui->OxidizerLinePressureValue->setText(QString::number(data.pressureTransducer[5], 'g', 2));
-    this->ui->OxidizerLinePressureChart->append(time, data.pressureTransducer[5]);
-
+    this->ui->OxidizerLinePressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[5], 5, 'f', 2, QChar('0')));
+    this->ui->OxidizerLinePressureChart->append(timeSinceLogStart, data.pressureTransducer[5]);
 }
 
 void MainWindow::configureCharts()
@@ -599,34 +654,8 @@ void MainWindow::configureCharts()
     ui->FuelTankPressureChart->setChartType(ChartType::Pressure);
     ui->FuelLinePressureChart->setChartTitle("Fuel Line Pressure");
     ui->FuelLinePressureChart->setChartType(ChartType::Pressure);
-    ui->CombustionChamberPressureChart->setChartTitle("Combustion Chamber Pressure");
-    ui->CombustionChamberPressureChart->setChartType(ChartType::Pressure);
     ui->FuelFeedPressureChart->setChartTitle("Kerosene Feed Line Pressure");
     ui->FuelFeedPressureChart->setChartType(ChartType::Pressure);
-
-    ui->LoadCellChart->append(0,0);
-    ui->FuelInletChart->append(0,0);
-    ui->OxidizerInletChart->append(0,0);
-    ui->EngineThroatChart->append(0,0);
-    ui->NozzleExitChart->append(0,0);
-    ui->CombustionChamberPressureChart->append(0,0);
-    ui->OxidizerLinePressureChart->append(0,0);
-    ui->OxidizerTankPressureChart->append(0,0);
-    ui->FuelLinePressureChart->append(0,0);
-    ui->FuelTankPressureChart->append(0,0);
-    ui->FuelFeedPressureChart->append(0,0);
-
-    ui->LoadCellChart->append(1,1);
-    ui->FuelInletChart->append(1,1);
-    ui->OxidizerInletChart->append(1,1);
-    ui->EngineThroatChart->append(1,1);
-    ui->NozzleExitChart->append(1,1);
-    ui->CombustionChamberPressureChart->append(1,1);
-    ui->OxidizerLinePressureChart->append(1,1);
-    ui->OxidizerTankPressureChart->append(1,1);
-    ui->FuelLinePressureChart->append(1,1);
-    ui->FuelTankPressureChart->append(1,1);
-    ui->FuelFeedPressureChart->append(1,1);
 }
 
 void MainWindow::resetCharts()
@@ -640,20 +669,20 @@ void MainWindow::resetCharts()
     ui->OxidizerLinePressureChart->reset();
     ui->FuelTankPressureChart->reset();
     ui->FuelLinePressureChart->reset();
-    ui->CombustionChamberPressureChart->reset();
     ui->FuelFeedPressureChart->reset();
 }
 
 void MainWindow::setupConnections()
 {
     // Connections from MainWindow to SerialWorker
-    connect(this, &MainWindow::issueCommand, commsCenter, &SerialWorker::issueCommand);
-    connect(this, &MainWindow::serialPortChanged, commsCenter, &SerialWorker::onPortNameChange);
-    connect(this, &MainWindow::setPings, commsCenter, &SerialWorker::setStartPings);
+    connect(this, &MainWindow::issueCommand, commsCenter, &SerialWorker::issueCommand, Qt::QueuedConnection);
+    connect(this, &MainWindow::serialPortChanged, commsCenter, &SerialWorker::onPortNameChange, Qt::QueuedConnection);
+    connect(this, &MainWindow::setPings, commsCenter, &SerialWorker::setStartPings, Qt::QueuedConnection);
 
     // Connecting Timers
     connect(countdown, &QTimer::timeout, this, &MainWindow::handleCountdownUpdate);
     connect(pingCheck, &QTimer::timeout, this, &MainWindow::handlePingCheck);
+    connect(telemetry, &QTimer::timeout, this, &MainWindow::handleTelemetryUpdate);
 
     // Connecting UI
     connect(ui->StartCountdown, &QPushButton::clicked, this, &MainWindow::handleStartCountdown);
@@ -662,14 +691,12 @@ void MainWindow::setupConnections()
     connect(ui->SerialPortDropdown, &QComboBox::currentIndexChanged, this, &MainWindow::handleSerialPortSelection);
 
     // Connecting SerialWorker to MainWindow
-    connect(commsCenter, &SerialWorker::serialErrorOccurred, this, &MainWindow::handleSerialError);
-    connect(commsCenter, &SerialWorker::commandAttempt, this, &MainWindow::handleCommandAttempt);
-    connect(commsCenter, &SerialWorker::commandFailed, this, &MainWindow::handleCommandFailed);
-    connect(commsCenter, &SerialWorker::portOpenFailed, this, &MainWindow::handlePortOpenFailed);
-    connect(commsCenter, &SerialWorker::portOpenSuccess, this, &MainWindow::handlePortOpenSuccess);
-    connect(commsCenter, &SerialWorker::corruptedData, this, &MainWindow::handleCorruptedData);
-    connect(commsCenter, &SerialWorker::signalReceived, this, &MainWindow::hanldleSignalReceived);
-    connect(commsCenter, &SerialWorker::dataAvailable, this, &MainWindow::handleDataAvailable);
-
-
+    connect(commsCenter, &SerialWorker::serialErrorOccurred, this, &MainWindow::handleSerialError, Qt::QueuedConnection);
+    connect(commsCenter, &SerialWorker::commandAttempt, this, &MainWindow::handleCommandAttempt, Qt::QueuedConnection);
+    connect(commsCenter, &SerialWorker::commandFailed, this, &MainWindow::handleCommandFailed, Qt::QueuedConnection);
+    connect(commsCenter, &SerialWorker::portOpenFailed, this, &MainWindow::handlePortOpenFailed, Qt::QueuedConnection);
+    connect(commsCenter, &SerialWorker::portOpenSuccess, this, &MainWindow::handlePortOpenSuccess, Qt::QueuedConnection);
+    connect(commsCenter, &SerialWorker::corruptedData, this, &MainWindow::handleCorruptedData, Qt::QueuedConnection);
+    connect(commsCenter, &SerialWorker::signalReceived, this, &MainWindow::hanldleSignalReceived, Qt::QueuedConnection);
+    connect(commsCenter, &SerialWorker::dataAvailable, this, &MainWindow::handleDataAvailable, Qt::QueuedConnection);
 }

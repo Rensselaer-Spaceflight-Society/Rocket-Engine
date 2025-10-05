@@ -125,9 +125,6 @@
        <item row="2" column="0">
         <widget class="DataChart" name="FuelTankPressureChart" native="true"/>
        </item>
-       <item row="0" column="2">
-        <widget class="DataChart" name="CombustionChamberPressureChart" native="true"/>
-       </item>
        <item row="4" column="2">
         <widget class="DataChart" name="FuelLinePressureChart" native="true"/>
        </item>
@@ -203,6 +200,106 @@
        <item row="2" column="2">
         <widget class="DataChart" name="FuelFeedPressureChart" native="true"/>
        </item>
+       <item row="0" column="2">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QLabel" name="TelemetryLabel">
+           <property name="font">
+            <font>
+             <family>Fira Mono Medium</family>
+             <pointsize>16</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Communications Telemetry</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="DataRateValue">
+           <property name="font">
+            <font>
+             <family>Fira Mono</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Data Rate (Kbps):</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="PingRateValue">
+           <property name="font">
+            <font>
+             <family>Fira Mono</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Ping Rate (Hz):</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="PacketRateValue">
+           <property name="font">
+            <font>
+             <family>Fira Mono Medium</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Packet Rate (Hz): </string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="InvalidCommandRateValue">
+           <property name="font">
+            <font>
+             <family>Fira Mono</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Invalid Command Rate (Hz):</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="CorruptedDataRateValue">
+           <property name="font">
+            <font>
+             <family>Fira Mono</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Corrupted Data Rate (bps):</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </item>
     </layout>
@@ -220,78 +317,30 @@
      <property name="sizeConstraint">
       <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
      </property>
-     <item row="0" column="1">
-      <widget class="Line" name="line_45">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="Line" name="line_2">
+     <item row="5" column="0">
+      <widget class="Line" name="line_3">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="17" column="0">
-      <widget class="Line" name="line_9">
+     <item row="19" column="2">
+      <widget class="Line" name="line_16">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="11" column="0">
-      <widget class="Line" name="line_6">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="13" column="0">
-      <widget class="Line" name="line_7">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="19" column="1">
-      <widget class="Line" name="line_40">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="17" column="1">
-      <widget class="Line" name="line_39">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="Line" name="line_43">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="Line" name="line_31">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QLabel" name="LoadCellValue">
+     <item row="8" column="2">
+      <widget class="QLabel" name="EngineThroatTempValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>0.00 N</string>
+        <string>0.00 C</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -301,113 +350,7 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="2">
-      <widget class="Line" name="line_24">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="Line" name="line_34">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="22" column="1">
-      <widget class="Line" name="line_15">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="SensorValue">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Value</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="13" column="1">
-      <widget class="Line" name="line_38">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="Line" name="line_44">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="18" column="1">
-      <widget class="Line" name="line_20">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="21" column="1">
-      <widget class="Line" name="line_41">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="24" column="1">
-      <widget class="Line" name="line_19">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="19" column="0">
-      <widget class="Line" name="line_11">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="24" column="2">
-      <widget class="QLabel" name="FuelLinePressureValue">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>0.00 kPa</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="24" column="0">
+     <item row="22" column="0">
       <widget class="QLabel" name="FuelLinePressureLabel">
        <property name="text">
         <string>Fuel Line 
@@ -421,28 +364,10 @@ Pressure</string>
        </property>
       </widget>
      </item>
-     <item row="17" column="2">
-      <widget class="Line" name="line_21">
+     <item row="0" column="1">
+      <widget class="Line" name="line_45">
        <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="2">
-      <widget class="QLabel" name="NozzleExitTempValue">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>0.00 C</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
+        <enum>Qt::Orientation::Vertical</enum>
        </property>
       </widget>
      </item>
@@ -459,125 +384,16 @@ Pressure</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
-      <widget class="Line" name="line_30">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="Line" name="line_3">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="2">
-      <widget class="QLabel" name="OxidizerInletTempValue">
+     <item row="10" column="2">
+      <widget class="QLabel" name="NozzleExitTempValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
        <property name="text">
         <string>0.00 C</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="20" column="0">
-      <widget class="QLabel" name="FuelFeedPressureLabel">
-       <property name="text">
-        <string> Kerosene Nitrogen 
- Feed Pressure</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="21" column="0">
-      <widget class="Line" name="line_10">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="13" column="2">
-      <widget class="Line" name="line_28">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="22" column="0">
-      <widget class="QLabel" name="OxidizerLinePressureLabel">
-       <property name="text">
-        <string>Oxidizer Line 
-Pressure</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="23" column="0">
-      <widget class="Line" name="line_12">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="20" column="1">
-      <widget class="Line" name="line_18">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="20" column="2">
-      <widget class="QLabel" name="FuelFeedPressureValue">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>0.00 kPa</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="Line" name="line_32">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="12" column="0">
-      <widget class="QLabel" name="CombustionChamberPressure">
-       <property name="text">
-        <string>Combustion 
-Chamber
-Pressure</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -594,20 +410,14 @@ Pressure</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="SensorCategory">
-       <property name="text">
-        <string>Sensor</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
+     <item row="17" column="1">
+      <widget class="Line" name="line_40">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="16" column="0">
+     <item row="14" column="0">
       <widget class="QLabel" name="OxidizerTankPressureLabel">
        <property name="text">
         <string>Oxidizer Tank 
@@ -621,31 +431,25 @@ Pressure</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="FuelThermocouple1Label">
-       <property name="text">
-        <string>Fuel Inlet 
-Temperature</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="12" column="1">
-      <widget class="Line" name="line_8">
+     <item row="9" column="2">
+      <widget class="Line" name="line_26">
        <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="8" column="2">
-      <widget class="QLabel" name="EngineThroatTempValue">
+     <item row="21" column="2">
+      <widget class="Line" name="line_14">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QLabel" name="OxidizerInletTempValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -660,10 +464,11 @@ Temperature</string>
        </property>
       </widget>
      </item>
-     <item row="22" column="2">
-      <widget class="QLabel" name="OxidizerLinePressureValue">
+     <item row="14" column="2">
+      <widget class="QLabel" name="OxidizerTankPressureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -678,52 +483,44 @@ Temperature</string>
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
-      <widget class="Line" name="line_29">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="1">
-      <widget class="Line" name="line_36">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="2">
-      <widget class="Line" name="line_26">
+     <item row="11" column="0">
+      <widget class="Line" name="line_6">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="EngineThroatThermocoupleLabel">
+     <item row="18" column="1">
+      <widget class="Line" name="line_18">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QLabel" name="FuelInletTempValue">
+       <property name="font">
+        <font>
+         <family>Fira Mono</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>Engine Throat 
- Temperature</string>
+        <string>0.00 C</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="0">
-      <widget class="Line" name="line_5">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
      <item row="18" column="2">
-      <widget class="QLabel" name="KeroseneTankPressureValue">
+      <widget class="QLabel" name="FuelFeedPressureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -738,18 +535,77 @@ Temperature</string>
        </property>
       </widget>
      </item>
-     <item row="11" column="1">
-      <widget class="Line" name="line_37">
+     <item row="2" column="2">
+      <widget class="QLabel" name="LoadCellValue">
+       <property name="font">
+        <font>
+         <family>Fira Mono</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>0.00 N</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="0">
+      <widget class="Line" name="line_12">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="1">
+      <widget class="Line" name="line_13">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="15" column="1">
+      <widget class="Line" name="line_39">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="0">
+      <widget class="QLabel" name="FuelFeedPressureLabel">
+       <property name="text">
+        <string> Kerosene Nitrogen 
+ Feed Pressure</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="Line" name="line_30">
        <property name="orientation">
         <enum>Qt::Orientation::Vertical</enum>
        </property>
       </widget>
      </item>
-     <item row="18" column="0">
-      <widget class="QLabel" name="KeroseneTankPressureLabel">
+     <item row="16" column="2">
+      <widget class="QLabel" name="KeroseneTankPressureValue">
+       <property name="font">
+        <font>
+         <family>Fira Mono</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>Kerosene Tank 
-Pressure</string>
+        <string>0.00 kPa</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -773,6 +629,41 @@ Pressure</string>
        </property>
       </widget>
      </item>
+     <item row="10" column="1">
+      <widget class="Line" name="line_29">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="Line" name="line_31">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="Line" name="line_5">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="Line" name="line_24">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="Line" name="line_35">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
      <item row="6" column="0">
       <widget class="QLabel" name="OxidizerThermocoupleLabel">
        <property name="text">
@@ -787,63 +678,24 @@ Pressure</string>
        </property>
       </widget>
      </item>
-     <item row="16" column="1">
-      <widget class="Line" name="line_22">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="21" column="2">
-      <widget class="Line" name="line_16">
+     <item row="19" column="1">
+      <widget class="Line" name="line_41">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
-      <widget class="Line" name="line_35">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="23" column="2">
-      <widget class="Line" name="line_14">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="Line" name="line_23">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
-      <widget class="QLabel" name="FuelInletTempValue">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
+     <item row="8" column="0">
+      <widget class="QLabel" name="EngineThroatThermocoupleLabel">
        <property name="text">
-        <string>0.00 C</string>
+        <string>Engine Throat 
+ Temperature</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="Line" name="line_4">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
@@ -854,17 +706,58 @@ Pressure</string>
        </property>
       </widget>
      </item>
-     <item row="19" column="2">
-      <widget class="Line" name="line_17">
+     <item row="0" column="0">
+      <widget class="QLabel" name="SensorCategory">
+       <property name="text">
+        <string>Sensor</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="1">
+      <widget class="Line" name="line_15">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="0">
+      <widget class="Line" name="line_10">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="23" column="1">
-      <widget class="Line" name="line_13">
+     <item row="4" column="1">
+      <widget class="Line" name="line_32">
        <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="16" column="1">
+      <widget class="Line" name="line_20">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="16" column="0">
+      <widget class="QLabel" name="KeroseneTankPressureLabel">
+       <property name="text">
+        <string>Kerosene Tank 
+Pressure</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -875,10 +768,18 @@ Pressure</string>
        </property>
       </widget>
      </item>
-     <item row="12" column="2">
-      <widget class="QLabel" name="CompustionChamberPresureValue">
+     <item row="22" column="1">
+      <widget class="Line" name="line_19">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="22" column="2">
+      <widget class="QLabel" name="FuelLinePressureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -893,10 +794,102 @@ Pressure</string>
        </property>
       </widget>
      </item>
-     <item row="16" column="2">
-      <widget class="QLabel" name="OxidizerTankPressureValue">
+     <item row="15" column="2">
+      <widget class="Line" name="line_21">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="17" column="0">
+      <widget class="Line" name="line_11">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="0">
+      <widget class="QLabel" name="OxidizerLinePressureLabel">
+       <property name="text">
+        <string>Oxidizer Line 
+Pressure</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="1">
+      <widget class="Line" name="line_37">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="FuelThermocouple1Label">
+       <property name="text">
+        <string>Fuel Inlet 
+Temperature</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="Line" name="line_43">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="14" column="1">
+      <widget class="Line" name="line_22">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="17" column="2">
+      <widget class="Line" name="line_17">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="Line" name="line_44">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="Line" name="line_36">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="2">
+      <widget class="QLabel" name="OxidizerLinePressureValue">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>14</pointsize>
         </font>
        </property>
@@ -908,6 +901,59 @@ Pressure</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="15" column="0">
+      <widget class="Line" name="line_9">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="Line" name="line_34">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="SensorValue">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Value</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="Line" name="line_23">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="Line" name="line_4">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
@@ -990,6 +1036,7 @@ Pressure</string>
       <widget class="QLabel" name="CountdowLabel">
        <property name="font">
         <font>
+         <family>Fira Mono</family>
          <pointsize>24</pointsize>
         </font>
        </property>

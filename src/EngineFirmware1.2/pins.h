@@ -1,12 +1,13 @@
 #ifndef __PINS_H_
 #define __PINS_H_
 #include "HX711.h"
+#include <Servo.h>
 
 // Pin Values (Digital)
 constexpr int NITROGENVALVE = 25;
 constexpr int PRESFUELVALVE = 26;
 constexpr int FUELVALVE = 27;
-constexpr int OXIDIZERVALVE = 28;
+constexpr int OXIDIZERVALVE = A0;
 constexpr int IGNITERVALVE = 29;
 
 // Analog Pins for Pressure Transducers
@@ -25,6 +26,7 @@ constexpr int LOADCELL_SCK = 22;
 
 //Creating scale object for Load Cell
 HX711 scale;
+Servo oxidizerValve;
 
 
 // Thermocouple Analog Pins
@@ -39,6 +41,7 @@ constexpr int LED2 = 31;
 constexpr int LED3 = 32;
 
 void setupPins() {
+  oxidizerValve.attach(OXIDIZERVALVE);
   scale.begin(LOADCELL, LOADCELL_SCK);
   pinMode(PRESSSEN1, INPUT);
   pinMode(PRESSSEN2, INPUT);
@@ -50,9 +53,8 @@ void setupPins() {
   pinMode(THERMOCPL2, INPUT);
   pinMode(THERMOCPL3, INPUT);
   pinMode(THERMOCPL4, INPUT);
-  
+
   pinMode(NITROGENVALVE, OUTPUT);
-  pinMode(OXIDIZERVALVE, OUTPUT);
   pinMode(FUELVALVE, OUTPUT);
   pinMode(IGNITERVALVE, OUTPUT);
   pinMode(PRESFUELVALVE, OUTPUT);
@@ -62,8 +64,8 @@ void setupPins() {
 }
 
 void resetPins() {
+  oxidizerValve.write(LOW);
   digitalWrite(NITROGENVALVE, LOW);
-  digitalWrite(OXIDIZERVALVE, LOW);
   digitalWrite(FUELVALVE, LOW);
   digitalWrite(IGNITERVALVE, LOW);
   digitalWrite(PRESFUELVALVE, LOW);
