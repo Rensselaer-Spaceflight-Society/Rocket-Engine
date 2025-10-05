@@ -53,10 +53,9 @@ void readSensorData(Sensors &sensorData) {
   // Copy the data header to the struct
   memcpy(&sensorData.header, HEADER, 8);
 
-  // TODO: Handle reading from the Load Cell
   sensorData.loadCell = read_loadcell(scale);
 
-  sensorData.pressure[0] = processPressureValue(analogRead(PRESSSEN1));
+  sensorData.pressure[0] = 0;
   sensorData.pressure[1] = processPressureValue(analogRead(PRESSSEN2));
   sensorData.pressure[2] = processPressureValue(analogRead(PRESSSEN3));
   sensorData.pressure[3] = processPressureValue(analogRead(PRESSSEN4));

@@ -16,7 +16,7 @@
 #include "pins.h"
 #include "sensors.h"
 
-char dataIn[COMMAND_SIZE_BYTES];
+char dataIn[COMMAND_SIZE_BYTES + 1];
 EngineStates currentState = EngineStates::NO_CONNECTION;
 unsigned int lastPingTime = 0;
 unsigned int lastEventTime = 0;
@@ -38,7 +38,7 @@ void loop() {
     // SerialPort.print(SerialPort.available());
     SerialPort.readBytes(dataIn, COMMAND_SIZE_BYTES);
     // SerialPort.println(SerialPort.available());
-    dataIn[8] = 0; // Null Terminator
+    dataIn[COMMAND_SIZE_BYTES] = 0; // Null Terminator
     handleCommand(dataIn, currentState, lastPingTime, lastEventTime, commandRepeats);
   }
 
@@ -92,21 +92,13 @@ void loop() {
   }
 
   // Handling lighting the igniter after fuel flow
-  if (currentState == EngineStates::FUEL_OPEN) {
+  if (currentState == EngineStates::OXIDIZER_OPEN) {
     int currentTime = millis();
     if ((currentTime - lastEventTime) > FUEL_VALVE_OPEN_DELAY_MS) {
       openValve(IGNITERVALVE);
-      currentState = EngineStates::SPARK;
-      lastEventTime = millis();
-    }
-  }
-
-  // Handling Opening Oxidizer After Spark
-  if (currentState == EngineStates::SPARK) {
-    int currentTime = millis();
-    if ((currentTime - lastEventTime) > SPARK_DELAY_MS) {
-      openValve(OXIDIZERVALVE);
+      openValve(FUELVALVE);
       currentState = EngineStates::IGNITION;
+      lastEventTime = millis();
     }
   }
 

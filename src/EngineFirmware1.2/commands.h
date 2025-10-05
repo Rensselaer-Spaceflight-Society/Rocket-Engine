@@ -8,8 +8,7 @@
 #define MAX_PING_DELAY_MS 50
 #define MAX_COMMAND_REPEATS 3
 #define NITROGEN_FLUSH_DELAY_MS 5000
-#define FUEL_VALVE_OPEN_DELAY_MS 1000
-#define SPARK_DELAY_MS 500
+#define FUEL_VALVE_OPEN_DELAY_MS 250
 
 
 constexpr char COMMS_ESTABLISHED[] = "CtrlActi";
@@ -33,8 +32,7 @@ enum class EngineStates {
   PRE_BURN_NITROGEN_FLUSH_STARTED,
   PRE_BURN_NITROGEN_FLUSH_FINISHED,
   FUEL_PRESSURIZATION,
-  FUEL_OPEN,
-  SPARK,
+  OXIDIZER_OPEN,
   IGNITION,
   SHUTDOWN_NITROGEN_FLUSH_STARTED,
   SHUTDOWN_CONFIRMED
@@ -136,7 +134,8 @@ void handleCommand(char * command, EngineStates &currentState, unsigned int &las
       return;
     }
 
-    if (currentState == EngineStates::LOG_START || currentState == EngineStates::SHUTDOWN_CONFIRMED) {
+    // if (currentState == EngineStates::LOG_START || currentState == EngineStates::SHUTDOWN_CONFIRMED) {
+    if (currentState == EngineStates::LOG_START){
       commandRepeats = 0;
       resetPins();
       SerialPort.write(INERT_FLUSH, COMMAND_SIZE_BYTES);
@@ -172,8 +171,7 @@ void handleCommand(char * command, EngineStates &currentState, unsigned int &las
   }
 
   if (!strcmp(command, IGNITION)) {
-    if (currentState == EngineStates::FUEL_OPEN
-        || currentState == EngineStates::SPARK
+    if (currentState == EngineStates::OXIDIZER_OPEN
         || currentState == EngineStates::IGNITION) {
       commandRepeats++;
       SerialPort.write(IGNITION, COMMAND_SIZE_BYTES);
@@ -183,9 +181,9 @@ void handleCommand(char * command, EngineStates &currentState, unsigned int &las
     if (currentState == EngineStates::FUEL_PRESSURIZATION) {
       commandRepeats = 0;
       SerialPort.write(IGNITION, COMMAND_SIZE_BYTES);
-      openValve(FUELVALVE);
+      openValve(OXIDIZERVALVE);
       lastEventTime = millis();
-      currentState = EngineStates::FUEL_OPEN;
+      currentState = EngineStates::OXIDIZER_OPEN;
       return;
     }
 
@@ -208,7 +206,7 @@ void handleCommand(char * command, EngineStates &currentState, unsigned int &las
     // If we are in the ignition state or later then we should flush
     // Otherwise we should just go into the shutdown confirmed state.
 
-    if(currentState >= EngineStates::FUEL_OPEN)
+    if(currentState >= EngineStates::OXIDIZER_OPEN)
     {
         startShutdown();
         currentState = EngineStates::SHUTDOWN_NITROGEN_FLUSH_STARTED;

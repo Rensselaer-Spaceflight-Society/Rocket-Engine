@@ -17,10 +17,10 @@ QT_END_NAMESPACE
 
 #define EVENT_POLL_DURATION_MS 10
 #define COUNTDOWN_LENGTH_MS -60000 // Negative for Countdown
-#define AUTO_HOLD_POINT_MS -30000 // Holds at T-30s
+#define PRESURIZE_FUEL_POINT_MS -30000 // Fuel Pressurization at T-30s
+#define AUTO_HOLD_POINT_MS -20000 // Holds at T-30s
 #define INERT_FLUSH_POINT_MS -10000 // Inert Flush at T-10s
-#define PRESURIZE_FUEL_POINT_MS -5000 // Fuel Pressurization at T-5s
-#define IGNITION_START_POINT_MS -1500 // Ignition Starts at T-1.5s
+#define IGNITION_START_POINT_MS -250 // Ignition Starts at T-1.5s
 
 enum class EngineStates : int8_t {
     NO_CONNECTION = -1,
