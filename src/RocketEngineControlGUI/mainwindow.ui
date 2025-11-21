@@ -473,7 +473,7 @@ Pressure</string>
         </font>
        </property>
        <property name="text">
-        <string>0.00 kPa</string>
+        <string>0.00 PSI</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -525,7 +525,7 @@ Pressure</string>
         </font>
        </property>
        <property name="text">
-        <string>0.00 kPa</string>
+        <string>0.00 PSI</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -605,7 +605,7 @@ Pressure</string>
         </font>
        </property>
        <property name="text">
-        <string>0.00 kPa</string>
+        <string>0.00 PSI</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -784,7 +784,7 @@ Pressure</string>
         </font>
        </property>
        <property name="text">
-        <string>0.00 kPa</string>
+        <string>0.00 PSI</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -894,7 +894,7 @@ Temperature</string>
         </font>
        </property>
        <property name="text">
-        <string>0.00 kPa</string>
+        <string>0.00 PSI</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>

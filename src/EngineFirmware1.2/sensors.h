@@ -27,11 +27,13 @@ float processThermocoupleValue(int analogSignal) {
 }
 
 float read_loadcell(HX711 &scale) {
+  static float load_cell = 0;
+  
   if (scale.is_ready()) {
-    return ((float)(scale.read() + 2383.0) / 904.0 - 10);
-  } else {
-    return 0;
+    load_cell = ((float)(scale.read() + 2383.0) / 904.0 - 10);
   }
+
+  return load_cell;
 }
 
 float processPressureValue(int analogSignal) {
@@ -39,7 +41,7 @@ float processPressureValue(int analogSignal) {
   // 4.5v -> 500 PSI
   float voltage = analogSignal * (5.0 / 1023.0);
   float psi = (voltage - 0.5) * (500 / 4.0);  // Convert to PSI
-  return psi * PSItoKPaFactor;                // Convert to KPa
+  return psi;
 }
 
 void checksum12(void *checksum, const void *data, int n) {

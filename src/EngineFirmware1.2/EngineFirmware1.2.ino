@@ -1,13 +1,13 @@
 #define PRODUCTION false
 #define ENABLE_LOGGING true
-#define READ_SENSORS false
+#define READ_SENSORS true
 #define ENABLE_PINGS false
 
 #if PRODUCTION
 #define BAUD_RATE 38400
 #define ENABLE_LOGGING true  // Production should always have logging enabled
 #define ENABLE_PINGS true    // Production should always have pings
-#define READ_SENSORS true    // Production should alwats read from sensors
+#define READ_SENSORS true    // Production should always read from sensors
 #define SerialPort Serial1   // Use the production serial pins
 #else
 #define BAUD_RATE 76800
@@ -29,11 +29,13 @@ uint64_t lastDataTransmissionTime = 0;
 
 
 void setup() {
+  Serial.begin(9600);
   SerialPort.begin(BAUD_RATE);
   while (!SerialPort) {
     ;
   }
   setupPins();
+  Serial.println("Setup Resetting Pins");
   resetPins();
   lastPingTime = millis();
   srand(analogRead(15));
@@ -71,7 +73,7 @@ void loop() {
 
   // Handle Lost Connection
   if (commandRepeats > MAX_COMMAND_REPEATS) {
-    if (currentState >= EngineStates::FUEL_OPEN) {
+    if (currentState >= EngineStates::OXIDIZER_OPEN) {
       startShutdown();
       lastEventTime = millis();
       commandRepeats = 0;
@@ -79,7 +81,9 @@ void loop() {
       SerialPort.write(CONNECTION_LOST, COMMAND_SIZE_BYTES);
       SerialPort.flush();
     } else {
+      Serial.println("Max Repeat Resetting Pins");
       resetPins();
+
       SerialPort.write(CONNECTION_LOST, COMMAND_SIZE_BYTES);
       SerialPort.flush();
       digitalWrite(LED3, HIGH);
@@ -92,7 +96,7 @@ void loop() {
     int currentTime = millis();
     // If there has been too much time between pings, then attempt shutting down.
     if ((currentTime - lastPingTime) > MAX_PING_DELAY_MS) {
-      if (currentState >= EngineStates::FUEL_OPEN) {
+      if (currentState >= EngineStates::OXIDIZER_OPEN) {
         startShutdown();
         lastEventTime = millis();
         commandRepeats = 0;
@@ -100,6 +104,7 @@ void loop() {
         SerialPort.write(CONNECTION_LOST, COMMAND_SIZE_BYTES);
         SerialPort.flush();
       } else {
+        Serial.println("Pings Lost Resetting Pins");
         resetPins();
         SerialPort.write(CONNECTION_LOST, COMMAND_SIZE_BYTES);
         SerialPort.flush();
@@ -133,16 +138,6 @@ void loop() {
     }
   }
 
-  // Handling Opening Oxidizer After Spark
-  if (currentState == EngineStates::SPARK) {
-    int currentTime = millis();
-    if ((currentTime - lastEventTime) > SPARK_DELAY_MS) {
-      openServoValve(oxidizerValve);
-      openValve(LED2);
-      currentState = EngineStates::IGNITION;
-    }
-  }
-
   // Handle the Shutdown Inert Flush
   if (currentState == EngineStates::SHUTDOWN_NITROGEN_FLUSH_STARTED) {
     int currentTime = millis();
@@ -151,7 +146,7 @@ void loop() {
       currentState = EngineStates::SHUTDOWN_CONFIRMED;
       SerialPort.write(SHUTDOWN_CONFIRMED, COMMAND_SIZE_BYTES);  // Indicate to the control computer the shutdown is done
       SerialPort.flush();
-      digitalWrite(LED3, HIGH);
+      digitalWrite(LED1, HIGH);
     }
   }
 

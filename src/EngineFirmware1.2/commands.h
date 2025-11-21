@@ -57,7 +57,8 @@ void openValve(int pin) {
 }
 
 void openServoValve(Servo &valve) {
-  valve.write(SERVO_VALVE_OPEN_POSITION);
+  // valve.write(SERVO_VALVE_OPEN_POSITION);
+  digitalWrite(OXIDIZERVALVE, HIGH);
 }
 
 void closeValve(int pin) {
@@ -65,12 +66,15 @@ void closeValve(int pin) {
 }
 
 void closeServoValve(Servo &valve) {
-  valve.write(SERVO_VALVE_CLOSED_POSITION);
+  // valve.write(SERVO_VALVE_CLOSED_POSITION);
+  digitalWrite(OXIDIZERVALVE, LOW);
 }
 
 void startShutdown() {
+  Serial.println("Shutdown Reset Pins");
   resetPins();
   openValve(NITROGENVALVE);
+  closeValve(SHUTDOWN_VALVE);  // Closing the SHUTDOWN_VALVE actually opens it since it is normally open
 }
 
 void handleCommand(char *command, EngineStates &currentState, unsigned int &lastPingTime, unsigned int &lastEventTime, int &commandRepeats) {
@@ -85,8 +89,6 @@ void handleCommand(char *command, EngineStates &currentState, unsigned int &last
   }
 
   if (!strcmp(command, COMMS_ESTABLISHED)) {
-    // SerialPort.println("Comms Pathway");
-    // If we are already in the Comms_Est state, then just reply
     if (currentState == EngineStates::CONNECTION_ESTABLISHED) {
       SerialPort.write(COMMS_ESTABLISHED, COMMAND_SIZE_BYTES);
       commandRepeats++;
@@ -105,7 +107,7 @@ void handleCommand(char *command, EngineStates &currentState, unsigned int &last
     }
 
     // Otherwise, this indicates that comms may have been lost and we should re-start
-    if (currentState >= EngineStates::FUEL_OPEN) {
+    if (currentState >= EngineStates::OXIDIZER_OPEN) {
       startShutdown();
     } else {
       resetPins();
@@ -151,23 +153,20 @@ void handleCommand(char *command, EngineStates &currentState, unsigned int &last
     return;
   }
 
-  if (!strcmp(command, INERT_FLUSH)) {
-    if (currentState == EngineStates::PRE_BURN_NITROGEN_FLUSH_STARTED
-        || currentState == EngineStates::PRE_BURN_NITROGEN_FLUSH_FINISHED) {
+  if (!strcmp(command, PRES_FUEL)) {
+    if (currentState == EngineStates::FUEL_PRESSURIZATION) {
       commandRepeats++;
-      SerialPort.write(INERT_FLUSH, COMMAND_SIZE_BYTES);
+      SerialPort.write(PRES_FUEL, COMMAND_SIZE_BYTES);
       SerialPort.flush();
       return;
     }
 
-    // if (currentState == EngineStates::LOG_START || currentState == EngineStates::SHUTDOWN_CONFIRMED) {
-    if (currentState == EngineStates::LOG_START){
+    if (currentState == EngineStates::LOG_START) {
       commandRepeats = 0;
-      resetPins();
-      SerialPort.write(INERT_FLUSH, COMMAND_SIZE_BYTES);
-      openValve(NITROGENVALVE);
-      lastEventTime = millis();
-      currentState = EngineStates::PRE_BURN_NITROGEN_FLUSH_STARTED;
+      SerialPort.write(PRES_FUEL, COMMAND_SIZE_BYTES);
+      openValve(PRESFUELVALVE);
+      openValve(SHUTDOWN_VALVE);
+      currentState = EngineStates::FUEL_PRESSURIZATION;
       SerialPort.flush();
       return;
     }
@@ -178,19 +177,22 @@ void handleCommand(char *command, EngineStates &currentState, unsigned int &last
     return;
   }
 
-  if (!strcmp(command, PRES_FUEL)) {
-    if (currentState == EngineStates::FUEL_PRESSURIZATION) {
+  if (!strcmp(command, INERT_FLUSH)) {
+    if (currentState == EngineStates::PRE_BURN_NITROGEN_FLUSH_STARTED
+        || currentState == EngineStates::PRE_BURN_NITROGEN_FLUSH_FINISHED) {
       commandRepeats++;
-      SerialPort.write(PRES_FUEL, COMMAND_SIZE_BYTES);
+      SerialPort.write(INERT_FLUSH, COMMAND_SIZE_BYTES);
       SerialPort.flush();
       return;
     }
 
-    if (currentState == EngineStates::PRE_BURN_NITROGEN_FLUSH_FINISHED) {
+    // if (currentState == EngineStates::LOG_START || currentState == EngineStates::SHUTDOWN_CONFIRMED) {
+    if (currentState == EngineStates::FUEL_PRESSURIZATION) {
       commandRepeats = 0;
-      SerialPort.write(PRES_FUEL, COMMAND_SIZE_BYTES);
-      openValve(PRESFUELVALVE);
-      currentState = EngineStates::FUEL_PRESSURIZATION;
+      SerialPort.write(INERT_FLUSH, COMMAND_SIZE_BYTES);
+      openValve(NITROGENVALVE);
+      lastEventTime = millis();
+      currentState = EngineStates::PRE_BURN_NITROGEN_FLUSH_STARTED;
       SerialPort.flush();
       return;
     }
@@ -210,10 +212,12 @@ void handleCommand(char *command, EngineStates &currentState, unsigned int &last
       return;
     }
 
-    if (currentState == EngineStates::FUEL_PRESSURIZATION) {
+    if (currentState == EngineStates::PRE_BURN_NITROGEN_FLUSH_FINISHED) {
       commandRepeats = 0;
       SerialPort.write(IGNITION, COMMAND_SIZE_BYTES);
-      openValve(OXIDIZERVALVE);
+      openServoValve(oxidizerValve);
+      Serial.println("Opening");
+      digitalWrite(LED2, HIGH);
       lastEventTime = millis();
       currentState = EngineStates::OXIDIZER_OPEN;
       return;
@@ -241,14 +245,13 @@ void handleCommand(char *command, EngineStates &currentState, unsigned int &last
     // If we are in the ignition state or later then we should flush
     // Otherwise we should just go into the shutdown confirmed state.
 
-    if(currentState >= EngineStates::OXIDIZER_OPEN)
-    {
-        startShutdown();
-        currentState = EngineStates::SHUTDOWN_NITROGEN_FLUSH_STARTED;
-        lastEventTime = millis();
-        SerialPort.write(SHUTDOWN, COMMAND_SIZE_BYTES);
-        commandRepeats = 0;
-        return;
+    if (currentState >= EngineStates::OXIDIZER_OPEN) {
+      startShutdown();
+      currentState = EngineStates::SHUTDOWN_NITROGEN_FLUSH_STARTED;
+      lastEventTime = millis();
+      SerialPort.write(SHUTDOWN, COMMAND_SIZE_BYTES);
+      commandRepeats = 0;
+      return;
     }
 
     // If we have not yet gotten to the state where fuel / oxidizer has flown into the
@@ -257,7 +260,7 @@ void handleCommand(char *command, EngineStates &currentState, unsigned int &last
     currentState = EngineStates::SHUTDOWN_CONFIRMED;
     SerialPort.write(SHUTDOWN, COMMAND_SIZE_BYTES);
     SerialPort.write(SHUTDOWN_CONFIRMED, COMMAND_SIZE_BYTES);  // Indicate to the control computer the shutdown is done
-    digitalWrite(LED3, HIGH);
+    digitalWrite(LED1, HIGH);
     commandRepeats = 0;
     SerialPort.flush();
     return;

@@ -322,6 +322,16 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
 
     if(currentState == EngineStates::COUNTDOWN_STARTED)
     {
+        if(signal == PRESURIZE_FUEL_COMMAND)
+        {
+            currentState = EngineStates::PRESSUREIZED_FUEL;
+            ui->EngineStatus->setText("Fuel Pressurized");
+            return;
+        }
+    }
+
+    if(currentState == EngineStates::PRESSUREIZED_FUEL)
+    {
         if(signal == INERT_GAS_FLUSH_COMMAND)
         {
             currentState = EngineStates::NITROGEN_FLUSH_STARTED;
@@ -340,17 +350,9 @@ void MainWindow::hanldleSignalReceived(const QString & signal)
         }
     }
 
-    if(currentState == EngineStates::NITROGEN_FLUSH_DONE)
-    {
-        if(signal == PRESURIZE_FUEL_COMMAND)
-        {
-            currentState = EngineStates::PRESSUREIZED_FUEL;
-            ui->EngineStatus->setText("Fuel Pressurized");
-            return;
-        }
-    }
 
-    if(currentState == EngineStates::PRESSUREIZED_FUEL)
+
+    if(currentState == EngineStates::NITROGEN_FLUSH_DONE)
     {
         if(signal == IGNITION_COMMAND)
         {
@@ -393,7 +395,14 @@ void MainWindow::handleCountdownUpdate()
     QString countdownTimerText = LogHandler::formatCountdown(countdownMs);
     ui->CountdowLabel->setText(countdownTimerText);
 
-    if(currentState == EngineStates::COUNTDOWN_STARTED && countdownMs > AUTO_HOLD_POINT_MS && !pastAutoHold)
+    // Handle Fuel Pressurization
+    if(currentState == EngineStates::COUNTDOWN_STARTED && countdownMs > PRESURIZE_FUEL_POINT_MS)
+    {
+        emit issueCommand(PRESURIZE_FUEL_COMMAND);
+        return;
+    }
+
+    if(currentState == EngineStates::PRESSUREIZED_FUEL && countdownMs > AUTO_HOLD_POINT_MS && !pastAutoHold)
     {
         beforeHoldState = currentState;
         currentState = EngineStates::HOLDING;
@@ -404,23 +413,16 @@ void MainWindow::handleCountdownUpdate()
         return;
     }
 
+
     // Handle the Inert Flush When we reach that point
-    if(currentState == EngineStates::COUNTDOWN_STARTED && countdownMs > INERT_FLUSH_POINT_MS)
+    if(currentState == EngineStates::PRESSUREIZED_FUEL && countdownMs > INERT_FLUSH_POINT_MS)
     {
         emit issueCommand(INERT_GAS_FLUSH_COMMAND);
         return;
     }
 
-    // Handle Fuel Pressurization after the Nitrogen Flush
-    if(currentState == EngineStates::NITROGEN_FLUSH_DONE && countdownMs > PRESURIZE_FUEL_POINT_MS)
-    {
-        emit issueCommand(PRESURIZE_FUEL_COMMAND);
-        return;
-    }
-
-
-    // Handle Ignition after Fuel Pressurization
-    if(currentState == EngineStates::PRESSUREIZED_FUEL && countdownMs > IGNITION_START_POINT_MS)
+    // Handle Ignition after Inert Flush
+    if(currentState == EngineStates::NITROGEN_FLUSH_DONE && countdownMs > IGNITION_START_POINT_MS)
     {
         emit issueCommand(IGNITION_COMMAND);
         return;
@@ -611,23 +613,23 @@ void MainWindow::updateUIWithSensorData(const SensorData & data)
     this->ui->NozzleExitChart->append(timeSinceLogStart, data.thermocouple[3]);
 
     // Fuel Feed Line Pressure
-    this->ui->FuelFeedPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[1], 5, 'f', 2, QChar('0')));
+    this->ui->FuelFeedPressureValue->setText(QString("%1 PSI").arg(data.pressureTransducer[1], 5, 'f', 2, QChar('0')));
     this->ui->FuelFeedPressureChart->append(timeSinceLogStart, data.pressureTransducer[1]);
 
     // Kerosene Tank Pressure
-    this->ui->KeroseneTankPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[2], 5, 'f', 2, QChar('0')));
+    this->ui->KeroseneTankPressureValue->setText(QString("%1 PSI").arg(data.pressureTransducer[2], 5, 'f', 2, QChar('0')));
     this->ui->FuelTankPressureChart->append(timeSinceLogStart, data.pressureTransducer[2]);
 
     // Kerosene Line Pressure
-    this->ui->FuelLinePressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[3], 5, 'f', 2, QChar('0')));
+    this->ui->FuelLinePressureValue->setText(QString("%1 PSI").arg(data.pressureTransducer[3], 5, 'f', 2, QChar('0')));
     this->ui->FuelLinePressureChart->append(timeSinceLogStart, data.pressureTransducer[3]);
 
     // Oxidizer Tank Pressure
-    this->ui->OxidizerTankPressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[4], 5, 'f', 2, QChar('0')));
+    this->ui->OxidizerTankPressureValue->setText(QString("%1 PSI").arg(data.pressureTransducer[4], 5, 'f', 2, QChar('0')));
     this->ui->OxidizerTankPressureChart->append(timeSinceLogStart, data.pressureTransducer[4]);
 
     // Oxidizer Line pressure
-    this->ui->OxidizerLinePressureValue->setText(QString("%1 kPa").arg(data.pressureTransducer[5], 5, 'f', 2, QChar('0')));
+    this->ui->OxidizerLinePressureValue->setText(QString("%1 PSI").arg(data.pressureTransducer[5], 5, 'f', 2, QChar('0')));
     this->ui->OxidizerLinePressureChart->append(timeSinceLogStart, data.pressureTransducer[5]);
 }
 
